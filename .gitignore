@@ -1,0 +1,5 @@
+*.out
+*.sbatch
+
+fast_output/
+output/
