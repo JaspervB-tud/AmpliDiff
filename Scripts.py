@@ -707,7 +707,7 @@ def determine_differences_exp(amplicons, sequences, lineages, ids, amplicon_thre
                 for next_amplicon in amplicons:
                     diffs = move_window_exp(sequences[seq1], sequences[seq2], diffs, prev_amplicon, next_amplicon, comparison_matrix)
                     if len(diffs) > amplicon_threshold:
-                        diffs_per_amp[next_amplicon].add((ids[seq1], ids[seq2]))
+                        diffs_per_amp[next_amplicon].add((ids[seq2], ids[seq1]))
                     prev_amplicon = next_amplicon
     return diffs_per_amp
 
