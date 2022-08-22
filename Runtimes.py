@@ -1,5 +1,5 @@
-import Classes
-import Scripts
+from Classes import *
+from Scripts import *
 import argparse
 import time
 import random
@@ -39,13 +39,13 @@ if __name__ == '__main__':
     
     #Read sequences
     st = time.time()
-    sequences = Scripts.generate_sequences(args.metadata, args.sequences)
+    sequences = generate_sequences(args.metadata, args.sequences)
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent generating sequences: ' + str(time.time() - st) + '\n')
     #runtimes.append('Time spent generating sequences: ' + str(time.time() - st))
     
     #Generate comparison matrix
-    comparison = Scripts.generate_opportunistic_matrix()
+    comparison = generate_opportunistic_matrix()
     
     #Preprocess sequences
     st = time.time()
@@ -72,7 +72,7 @@ if __name__ == '__main__':
                 variants.append('Mu')
             elif variant == 'o' and 'Omicron' not in variants:
                 variants.append('Omicron')
-        sequences, lb, ub, feasible_amplicons = Scripts.preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+        sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
         #Randomize sequences
         random.seed(args.seed)
         random.shuffle(sequences)
@@ -87,7 +87,7 @@ if __name__ == '__main__':
                 f.write(variant + '\n')
             f.write('Total sequences = ' + str(len(sequences)) + '\n')
     else:
-        sequences, lb, ub, feasible_amplicons = Scripts.preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+        sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
         #Randomize sequences
         random.seed(args.seed)
         random.shuffle(sequences)
@@ -108,7 +108,7 @@ if __name__ == '__main__':
     
     #Generate primer index
     st = time.time()
-    PI = Classes.PrimerIndex.generate_index_mp(sequences, args.primer_width, comparison, processors=args.cores)
+    PI = PrimerIndex.generate_index_mp(sequences, args.primer_width, comparison, processors=args.cores)
     PI.remove_redundant()
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent generating primer index and filtering for feasible primers: ' + str(time.time() - st) + '\n')
@@ -116,7 +116,7 @@ if __name__ == '__main__':
     
     #Generate amplicons
     st = time.time()
-    amplicons = Scripts.generate_amplicons_mp_exp(sequences, args.amplicon_width, comparison, feasible_amplicons=feasible_amplicons, processors=args.cores, amplicon_threshold=args.amplicon_threshold)
+    amplicons = generate_amplicons_mp_exp(sequences, args.amplicon_width, comparison, feasible_amplicons=feasible_amplicons, processors=args.cores, amplicon_threshold=args.amplicon_threshold)
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent generating amplicon differentiation ' + str(time.time() - st) + '\n')
         f.write('Total feasible amplicons: ' + str(len(amplicons)) + '\n')
@@ -124,7 +124,7 @@ if __name__ == '__main__':
     
     #Run greedy
     st = time.time()
-    logs, amplicons, result_amplicons = Scripts.greedy(sequences, amplicons, args.primer_width, args.search_width, PI, comparison, args.amplicons, args.coverage, 5, logging=True, multiplex=args.multiplex)
+    logs, amplicons, result_amplicons = greedy(sequences, amplicons, args.primer_width, args.search_width, PI, comparison, args.amplicons, args.coverage, 5, logging=True, multiplex=args.multiplex)
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent running greedy algorithm: ' + str(time.time() - st) + '\n')
     #runtimes.append('Time spent running greedy algorithm: ' + str(time.time() - st))
@@ -132,13 +132,13 @@ if __name__ == '__main__':
     #Run final optimization
     if args.multiplex:
         st = time.time()
-        Scripts.check_primer_feasibility(sequences, result_amplicons, PI, optimize=1, coverage=args.coverage)
+        check_primer_feasibility(sequences, result_amplicons, PI, optimize=1, coverage=args.coverage)
         with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
             f.write('Time spent doing final primer optimization: ' + str(time.time() - st))
     else:
         st = time.time()
         for amplicon in result_amplicons:
-            cur_primers = Scripts.check_primer_feasibility(sequences, [amplicon], PI, optimize=1, coverage=args.coverage)
+            cur_primers = check_primer_feasibility(sequences, [amplicon], PI, optimize=1, coverage=args.coverage)
             with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
                 f.write('Amplicon: ' + str(amplicon.id) + '\n')
                 f.write('Forward primers\n')
