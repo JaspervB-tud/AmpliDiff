@@ -817,7 +817,7 @@ def greedy(sequences, amplicons, primer_width, search_width, primer_index, compa
     total_to_cover = len(to_cover)
     
     if logging:
-        log_results = ['Total to cover: ' + str(total_to_cover) + ' with ' + str(len(sequences)) + ' sequences and ' + str(len(amplicons)) + ' amplicons.']
+        log_results = ['Total to cover based on amplicon feasibility: ' + str(total_to_cover) + ' with ' + str(len(sequences)) + ' sequences and ' + str(len(amplicons)) + ' amplicons.']
         
     result_amplicons = [] #this will store the result amplicons
     removed_amplicons = [] #this will store the removed amplicons
