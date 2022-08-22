@@ -359,7 +359,7 @@ def check_variant(sequence, lineages_per_variant, variants):
             continue
     return None
 
-def preprocess_sequences(sequences, min_non_align, variants_location=None, variants=[], amplicon_width=0, misalign_threshold=-1):
+def preprocess_sequences(sequences, min_non_align, variants_location=None, variants=[], amplicon_width=0, misalign_threshold=-1, lineages_location=None, min_sequences_threshold=0):
     '''
     Function that preprocesses the sequences by excluding sequences not part of any of the variants in $variants and
     calculating the lower- and upperbound such that that every sequence contains at least &min_non_align nucleotides before and after
@@ -372,13 +372,17 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
     min_non_align : int
         Number of nucleotides to include before (after) $lb ($ub).
     variants_location : str, optional
-        Location of the Variants.txt file that explains which lineages are part of which variant. The default is None in which case every variant is considered
+        Location of the Variants.txt file that explains which lineages are part of which variant. The default is None in which case every variant is considered.
     variants : list[ str ], optional
         List of the variants of interest (not VOI). The default is [] in which case every variant is considered.
     amplicon_width : int, optional
         Size of the amplicons, if we want to determine their feasibility a priori. The default is 0 in which case feasibility of amplicons is not checked.
     misalign_threshold : int, optional
         Number of allowed misalign characters in an amplicon. The default is -1 in which case feasibility of amplicons is not checked.
+    lineages_location : str, optional
+        Location of the lineages.txt file which contains the number of sequences per lineage. The default is None in which case every lineage is considered.
+    min_sequences_threshold : int, optional
+        Relative number of sequences that have to belong to a lineage in order to consider it. The default is 0 in which case every lineage is considered.
 
     Returns
     -------
@@ -441,8 +445,31 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
     
     filtered_sequences = [] #stores which sequences should be retained
     feasible_amplicons = set() #stores which amplicons are feasible
+    
     lb = 0
     ub = 10**9
+    
+    #If we want to filter on the number of sequences
+    if min_sequences_threshold > 0 and lineages_location:
+        sequences_per_lineage = {}
+        total_sequences = 0
+        for line in csv.reader(open(lineages_location + '/lineages.txt'), delimiter='\t'):
+            cur_line = line[0].split()
+            #Tally the number of sequences of each lineage
+            sequences_per_lineage[cur_line[0]] = int(cur_line[1])
+            total_sequences += int(cur_line[1])
+        print(total_sequences)
+        #Check which sequences belong to a lineage that exceeds the minimum threshold
+        index = 0
+        for sequence in sequences:
+            try:
+                if sequences_per_lineage[sequence.lineage]/total_sequences >= min_sequences_threshold:
+                    filtered_sequences.append(index)
+            except:
+                print(sequence.id + ' : ' + sequence.lineage + ' does not occur in lineages.txt')
+            index += 1
+        sequences = [sequences[i] for i in filtered_sequences]
+        filtered_sequences = []
     
     if len(variants) > 0 and variants_location:
         lineages_per_variant = {} #Store the (base-)lineages per variant to infer variants later
@@ -901,10 +928,12 @@ def check_primer_feasibility(sequences, amplicons, primer_index, optimize=0, tem
 
 
 if __name__ == '__main__':
-    #sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0','/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0')
-    sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022', '/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022')
-    sequences, lb, ub, feasible5 = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=5)
+    sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0','/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0')
+    #sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022', '/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022')
+    sequences1, lb1, ub1, feasible1 = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=5)
+    sequences2, lb2, ub2, feasible2 = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=5, lineages_location='/Users/jaspervanbemmelen/Documents/Wastewater/source_code', min_sequences_threshold=0.001)
     
+    '''
     test = []
     lins = []
     for sequence in sequences:
@@ -928,7 +957,7 @@ if __name__ == '__main__':
     st = time.time()
     amplicons = generate_amplicons_mp2(test[:n_seqs], amplicon_width, comparison_matrix, feasible_amplicons=feasible5, processors=n_cores, sort_type=0)
     print(time.time() - st)
-
+    '''
 """
 ################################# This code generates the comparison matrices ######################################################
 def generateConservativeMatrix():
