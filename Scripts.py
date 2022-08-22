@@ -1,4 +1,3 @@
-from Classes import *
 from Bio import AlignIO
 import RNA
 from Bio.SeqUtils import MeltingTemp as mt
@@ -13,6 +12,7 @@ from gurobipy import GRB
 import copy
 import time
 import multiprocessing as mp
+from Classes import *
 #from pympler.asizeof import asizeof
 
 #Updated scripts
