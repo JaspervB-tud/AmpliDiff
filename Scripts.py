@@ -359,7 +359,7 @@ def check_variant(sequence, lineages_per_variant, variants):
             continue
     return None
 
-def preprocess_sequences(sequences, min_non_align, variants_location=None, variants=[], make_primer_index=None, amplicon_width=0, misalign_threshold=-1):
+def preprocess_sequences(sequences, min_non_align, variants_location=None, variants=[], amplicon_width=0, misalign_threshold=-1):
     '''
     Function that preprocesses the sequences by excluding sequences not part of any of the variants in $variants and
     calculating the lower- and upperbound such that that every sequence contains at least &min_non_align nucleotides before and after
@@ -375,8 +375,6 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
         Location of the Variants.txt file that explains which lineages are part of which variant. The default is None in which case every variant is considered
     variants : list[ str ], optional
         List of the variants of interest (not VOI). The default is [] in which case every variant is considered.
-    make_primer_index : int, optional
-        Size of the primers, if set to None (default) does not generate primers in preprocessing. The default is None in which primers are not generated in preprocessing.
     amplicon_width : int, optional
         Size of the amplicons, if we want to determine their feasibility a priori. The default is 0 in which case feasibility of amplicons is not checked.
     misalign_threshold : int, optional
@@ -392,8 +390,6 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
         Upperbound such that every sequence has at least $min_non_align nucleotides after it.
     feasible_amplicons : set{ (int,int) }, optional
         Set of feasible amplicons in case amplicon feasibility should be checked.
-    primer_index : PrimerIndex
-        Primer index filled with all the possible primers of length $make_primer_index, if it is supplied.
 
     '''
     def determine_feasible_amplicons(sequence, lb, ub, amplicon_width, misalign_threshold):
@@ -445,7 +441,6 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
     
     filtered_sequences = [] #stores which sequences should be retained
     feasible_amplicons = set() #stores which amplicons are feasible
-    primer_index = PrimerIndex()
     lb = 0
     ub = 10**9
     
@@ -479,12 +474,10 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
                         feasible_amplicons = feasible_amplicons.intersection(determine_feasible_amplicons(sequence, lb, ub, amplicon_width, misalign_threshold))
             index += 1
         #If amplicons should be checked, return feasible amplicons
-        if make_primer_index:
-            primer_index = PrimerIndex.generate_index([sequences[i] for i in filtered_sequences], make_primer_index, generate_opportunistic_matrix())
         if amplicon_width > 0 and misalign_threshold >= 0:
-            return [sequences[i] for i in filtered_sequences], lb, ub, feasible_amplicons, primer_index
+            return [sequences[i] for i in filtered_sequences], lb, ub, feasible_amplicons
         else:
-            return [sequences[i] for i in filtered_sequences], lb, ub, primer_index
+            return [sequences[i] for i in filtered_sequences], lb, ub
     else:
         index = 0
         for sequence in sequences:
@@ -500,12 +493,10 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
                     feasible_amplicons = feasible_amplicons.intersection(determine_feasible_amplicons(sequence, lb, ub, amplicon_width, misalign_threshold))
             index += 1
         #If amplicons should be checked, return feasible amplicons
-        if make_primer_index:
-            primer_index = PrimerIndex.generate_index(sequences, make_primer_index, generate_opportunistic_matrix())
         if amplicon_width > 0 and misalign_threshold >= 0:
-            return sequences, lb, ub, feasible_amplicons, primer_index
+            return sequences, lb, ub, feasible_amplicons
         else:
-            return sequences, lb, ub, primer_index
+            return sequences, lb, ub
         
 def generate_amplicons(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=0, feasible_amplicons=set()):
     '''
@@ -893,28 +884,6 @@ def check_primer_feasibility(sequences, amplicons, primer_index, optimize=0, tem
             model.addConstr( forward_primers[fwd][0] + reverse_primers[rev][0] <= primer_index.check_conflict( [primer_index.index2primer['forward'][fwd], primer_index.index2primer['reverse'][rev]] ) )
     
     model.optimize()
-    '''
-    for amplicon in amplicons:
-        amplicon.chosen_primers = {'forward' : set(), 'reverse' : set()}
-        amplicon.uncovered_sequences = []
-        tot = 0
-        print('Uncovered sequences for amplicon : ' + str(amplicon.id))
-        for sequence in sequences:
-            if covered_binary[(sequence.id, amplicon.id)].x <= 0.9:
-                amplicon.uncovered_sequences.append(sequence.id)
-                print(sequence.id)
-                tot += 1
-            for orientation in amplicon.chosen_primers:
-                for primer in amplicon.full_primerset[orientation]:
-                    if orientation == 'forward':
-                        if forward_primers[primer][0].x >= 0.9:
-                            amplicon.chosen_primers[orientation].add(primer)
-                    else:
-                        if reverse_primers[primer][0].x >= 0.9:
-                            amplicon.chosen_primers[orientation].add(primer)
-                            
-        print('Total uncovered sequences for amplicon : ' + str(amplicon.id) + ', ' + str(tot))
-    '''
     if optimize == 1 and model.Status == 2:
         res = {'forward' : [], 'reverse' : []}
         print('Forward primers: ')
@@ -932,9 +901,9 @@ def check_primer_feasibility(sequences, amplicons, primer_index, optimize=0, tem
 
 
 if __name__ == '__main__':
-    sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0','/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0')
-    #sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022', '/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022')
-    sequences, lb, ub, feasible5, _ = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=5)
+    #sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0','/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0')
+    sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022', '/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022')
+    sequences, lb, ub, feasible5 = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=5)
     
     test = []
     lins = []
@@ -948,7 +917,7 @@ if __name__ == '__main__':
     feasible_amplicons = feasible5
     amplicon_threshold = 1
     n_cores = 8
-    n_seqs = 500
+    n_seqs = 650
     
     #PI = PrimerIndex.generate_index_mp(sequences, 25, comparison_matrix, processors=3)
     
