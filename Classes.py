@@ -903,7 +903,7 @@ def run_comparison(args):
     if args.multiplex:
         st = time.time()
         cur_primers = check_primer_feasibility(sequences, result_amplicons, PI, optimize=1, coverage=args.coverage)
-        with open(args.output + '/runtimes.txt', 'a') as f:
+        with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
             f.write('Time spent doing final primer optimization: ' + str(time.time() - st) + '\n')
             f.write('Forward primers\n')
             for fwd in cur_primers['forward']:
