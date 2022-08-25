@@ -1071,7 +1071,7 @@ if __name__ == '__main__':
     parser.add_argument('-vl', '--variants_location', default=None, type=str, help='File location containing the lineages per variant')
     parser.add_argument('-v', '--variants', default=None, type=str, help='Letters representing the variants to consider')
     parser.add_argument('-n', '--n_sequences', default=10**9, type=int, help='Number of sequences to include')
-    parser.add_argument('-s', '--seed', default=0, type=int, help='Seed to use when randomizing sequences')
+    parser.add_argument('-sd', '--seed', default=0, type=int, help='Seed to use when randomizing sequences')
     parser.add_argument('-spl' '--sequences_per_lineage', default=0, type=int, help='Minimum number of sequences a lineage should include')
     parser.add_argument('-ll', '--lineages_location', default=None, type=str, help='File location containing the number of sequences per lineage')
     #Runtype parameter
