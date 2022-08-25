@@ -965,14 +965,28 @@ def run_greedy(args):
                     variants.append('Mu')
                 elif variant == 'o' and 'Omicron' not in variants:
                     variants.append('Omicron')
-            sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+            sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, 
+                                                                         amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold, 
+                                                                         lineages_location=args.lineages_location, min_sequences_threshold=args.sequences_per_lineage)
+            
+            with open(args.output + '/sequences_included.txt', 'w+') as f:
+                for sequence in sequences:
+                    f.write(sequence.id + ' : ' + sequence.lineage + '\n')
+            
             with open(args.output + '/runtimes.txt', 'a') as f:
                 f.write('Variants considered:\n')
                 for variant in variants:
                     f.write(variant + '\n')
                 f.write('Total sequences = ' + str(len(sequences)) + '\n')
         else:
-            sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+            sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, 
+                                                                         misalign_threshold=args.misalign_threshold, lineages_location=args.lineages_location,
+                                                                         min_sequences_threshold=args.sequences_per_lineage)
+            
+            with open(args.output + '/sequences_included.txt', 'w+') as f:
+                for sequence in sequences:
+                    f.write(sequence.id + ' : ' + sequence.lineage + '\n')
+            
             with open(args.output + '/runtimes.txt', 'a') as f:
                 f.write('Variants considered:\n')
                 for variant in ['Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Eta','Kappa','Mu','Omicron']:
@@ -1058,6 +1072,8 @@ if __name__ == '__main__':
     parser.add_argument('-v', '--variants', default=None, type=str, help='Letters representing the variants to consider')
     parser.add_argument('-n', '--n_sequences', default=10**9, type=int, help='Number of sequences to include')
     parser.add_argument('-s', '--seed', default=0, type=int, help='Seed to use when randomizing sequences')
+    parser.add_argument('-spl' '--sequences_per_lineage', default=0, type=int, help='Minimum number of sequences a lineage should include')
+    parser.add_argument('-ll', '--lineages_location', default=None, type=str, help='File location containing the number of sequences per lineage')
     #Runtype parameter
     parser.add_argument('-run', '--run_type', default='greedy', type=str, help='Type of program to run')
     args = parser.parse_args()
