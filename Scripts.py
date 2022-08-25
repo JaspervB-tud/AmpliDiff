@@ -442,12 +442,126 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
                 continue
         return feasible_amplicons
                 
+    def filter_on_occurrences(sequences, lineages_location, min_sequences_threshold):
+        '''
+        Function that filters the given sequences based on how often their lineage occurs in the full database.
+
+        Parameters
+        ----------
+        sequences : list[ Sequence ] 
+            List of sequences.
+        lineages_location : str
+            File location of the lineages.txt file containing occurrences per lineage in the full database.
+        min_sequences_threshold : float
+            Minimum occurrence of a lineage to be considered.
+
+        Returns
+        -------
+        list[ Sequence ]
+            List of sequences that belong to a lineage that meets the minimum occurrence threshold.
+
+        '''
+        filtered_sequences = []
+        sequences_per_lineage = {}
+        total_sequences = 0
+        
+        for line in csv.reader(open(lineages_location + '/lineages.txt'), delimiter='\t'):
+            try:
+                cur_line = line[0].split()
+                #Count the number of sequences of each lineage in database
+                sequences_per_lineage[cur_line[0]] = int(cur_line[0])
+                total_sequences += int(cur_line[1])
+            except:
+                print('Line: "' + str(line) + '" cannot be parsed and hence is not considered!')
+                continue
+        print('Total sequences: %d\n' % total_sequences)
+        #Check which sequences belong to a lineage that exceeds the minimum threshold
+        index = 0 #<- sequence index
+        for sequence in sequences:
+            #Try-Except in case something weird happens to lineages.txt
+            try:
+                if sequences_per_lineage[sequence.lineage]/total_sequences >= min_sequences_threshold:
+                    filtered_sequences.append(index)
+            except:
+                print(sequence.id + ' : ' + sequence.lineage + ' does not occur in lineages.txt and is not considered!')
+            index += 1
+        return [sequences[i] for i in filtered_sequences]
+
+    def filter_on_variants(sequences, variants_location, variants):
+        '''
+        Function that filters the given sequences based on whether they are part of a lineage that belongs to a variant in $variants.
+
+        Parameters
+        ----------
+        sequences : list[ Sequence ]
+            List of sequences.
+        variants_location : str
+            File location of the variants.txt file containing the (super-)lineages per variant.
+        variants : list[ str ]
+            List of variants to include.
+
+        Returns
+        -------
+        list[ Sequence ]
+            List of sequences that belong to a lineage that is part of the variants of interest (not VOI).
+
+        '''
+        filtered_sequences = []
+        lineages_per_variant = {}
+        
+        for variant in csv.reader(open(variants_location + '/variants.txt'), delimiter='\t'):
+            try:
+                lineages_per_variant[variant[0]] = []
+                for lineage in variant[1:]:
+                    if lineage != '':
+                        lineages_per_variant[variant[0]].append(lineage)
+            except:
+                print('Line "' + str(variant) + '" cannot be parsed and hence is not considered!')
+                continue
+        #Check which sequences belong to a lineage part of the variants to be considered
+        index = 0 #<- sequence index
+        for sequence in sequences:
+            cur_variant = check_variant(sequence, lineages_per_variant, variants) #check if lineage is part of relevant variants
+            if cur_variant:
+                print( 'Sequence %s with lineage %s is part of the %s variant.' % (sequence.id, sequence.lineage, cur_variant) )
+                filtered_sequences.append(index)        
+            index += 1
+        return [sequences[i] for i in filtered_sequences]
+                
     
-    filtered_sequences = [] #stores which sequences should be retained
+    filtered_sequences = [] #stores the sequences that should be retained
     feasible_amplicons = set() #stores which amplicons are feasible
     
     lb = 0
     ub = 10**9
+    
+    #Filter based on the number of sequences of a lineage
+    if min_sequences_threshold > 0 and lineages_location:
+        sequences = filter_on_occurrences(sequences, lineages_location, min_sequences_threshold)
+        
+    #Filter based on variants
+    if len(variants) > 0 and variants_location:
+        sequences = filter_on_variants(sequences, variants_location, variants)
+       
+    index = 0 #<- sequence index
+    for sequence in sequences:
+        sequence.align_to_trim()
+        (cur_lb, cur_ub) = sequence.find_bounds(min_non_align)
+        lb = max(lb, cur_lb)
+        ub = min(ub, cur_ub)
+        
+        if amplicon_width > 0 and misalign_threshold >= 0:
+            if index == 0:
+                feasible_amplicons = determine_feasible_amplicons(sequence, lb, ub, amplicon_width, misalign_threshold)
+            else:
+                feasible_amplicons = feasible_amplicons.intersection(determine_feasible_amplicons(sequence, lb, ub, amplicon_width, misalign_threshold))
+        index += 1
+    
+    return sequences, lb, ub, feasible_amplicons
+    
+        
+    """
+    Old version
     
     #If we want to filter on the number of sequences
     if min_sequences_threshold > 0 and lineages_location:
@@ -525,6 +639,7 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
         else:
             return sequences, lb, ub
         
+    """
 def generate_amplicons(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=0, feasible_amplicons=set()):
     '''
     Function that generates amplicons, along with their differentiability. If a non-empty $feasible_amplicons set is provided, it will only
