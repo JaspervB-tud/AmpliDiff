@@ -861,10 +861,7 @@ def run_comparison(args):
             f.write('Total sequences = ' + str(len(sequences)) + '\n')
     else:
         sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
-        #Randomize sequences
-        random.seed(args.seed)
-        random.shuffle(sequences)
-        sequences = sequences[:args.n_sequences]
+        
         with open(args.output + '/sequences_included_' + str(args.seed) + '.txt', 'w+') as f:
             for sequence in sequences:
                 f.write(sequence.id + '\n')
@@ -1047,6 +1044,14 @@ def run_greedy(args):
         with open(args.output + '/logfile.txt', 'w') as f:
             for line in logs:
                 f.write(line + '\n')
+#Unfinished
+def run_plot_differences(args):
+    sequences = generate_sequences(args.metadata, args.sequences)
+    sequences_raw = [s.sequence for s in sequences]
+    lineages_raw = [s.lineage for s in sequences]
+    
+    amplicons = [(i,i+args.amplicon_width) for i in range(sequences[0].length-args.amplicon_width+1)]
+    
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Run the greedy amplicon and primer selection algorithm.')
