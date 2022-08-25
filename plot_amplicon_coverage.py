@@ -63,6 +63,7 @@ if __name__ == '__main__':
     sequences = generate_sequences('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000', 
                                    '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000')
     amplicons = parse_amplicons(filenames)
+    print(amplicons)
     counts = np.zeros((sequences[0].length))
     
     for i in range(sequences[0].length):
