@@ -382,7 +382,7 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
     lineages_location : str, optional
         Location of the lineages.txt file which contains the number of sequences per lineage. The default is None in which case every lineage is considered.
     min_sequences_threshold : int, optional
-        Relative number of sequences that have to belong to a lineage in order to consider it. The default is 0 in which case every lineage is considered.
+        Absolute number of sequences that have to belong to a lineage in order to consider it. The default is 0 in which case every lineage is considered.
 
     Returns
     -------
@@ -480,7 +480,7 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
         for sequence in sequences:
             #Try-Except in case something weird happens to lineages.txt
             try:
-                if sequences_per_lineage[sequence.lineage]/total_sequences >= min_sequences_threshold:
+                if sequences_per_lineage[sequence.lineage] >= min_sequences_threshold:
                     filtered_sequences.append(index)
             except:
                 print(sequence.id + ' : ' + sequence.lineage + ' does not occur in lineages.txt and is not considered!')
