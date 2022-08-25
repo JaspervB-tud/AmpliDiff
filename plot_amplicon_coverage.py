@@ -99,5 +99,6 @@ if __name__ == '__main__':
     plt.axvspan(N[0], N[1], color='red', alpha=0.2)
     plt.annotate('N', ((N[0] + N[1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
     
-    plt.ylim([0 (max(counts) + 20)])
+    y_max = max(counts) + 20
+    plt.ylim([0, y_max])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread.pdf', figsize=[20,10], dpi=200, format='pdf')
