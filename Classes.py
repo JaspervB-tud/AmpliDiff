@@ -815,6 +815,11 @@ def run_comparison(args):
         f.write('Time spent generating sequences: ' + str(time.time() - st) + '\n')
     #runtimes.append('Time spent generating sequences: ' + str(time.time() - st))
     
+    #Randomize sequences
+    random.seed(args.seed)
+    random.shuffle(sequences)
+    sequences = sequences[:args.n_sequences]
+
     #Generate comparison matrix
     comparison = generate_opportunistic_matrix()
     
@@ -844,10 +849,7 @@ def run_comparison(args):
             elif variant == 'o' and 'Omicron' not in variants:
                 variants.append('Omicron')
         sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
-        #Randomize sequences
-        random.seed(args.seed)
-        random.shuffle(sequences)
-        sequences = sequences[:args.n_sequences]
+        
         with open(args.output + '/sequences_included_' + str(args.seed) + '.txt', 'w+') as f:
             for sequence in sequences:
                 f.write(sequence.id + '\n')
@@ -963,14 +965,14 @@ def run_greedy(args):
                     variants.append('Mu')
                 elif variant == 'o' and 'Omicron' not in variants:
                     variants.append('Omicron')
-            sequences, lb, ub, feasible_amplicons, _ = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+            sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
             with open(args.output + '/runtimes.txt', 'a') as f:
                 f.write('Variants considered:\n')
                 for variant in variants:
                     f.write(variant + '\n')
                 f.write('Total sequences = ' + str(len(sequences)) + '\n')
         else:
-            sequences, lb, ub, feasible_amplicons, _ = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+            sequences, lb, ub, feasible_amplicons = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
             with open(args.output + '/runtimes.txt', 'a') as f:
                 f.write('Variants considered:\n')
                 for variant in ['Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Eta','Kappa','Mu','Omicron']:
