@@ -469,7 +469,7 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
             try:
                 cur_line = line[0].split()
                 #Count the number of sequences of each lineage in database
-                sequences_per_lineage[cur_line[0]] = int(cur_line[0])
+                sequences_per_lineage[cur_line[0]] = int(cur_line[1])
                 total_sequences += int(cur_line[1])
             except:
                 print('Line: "' + str(line) + '" cannot be parsed and hence is not considered!')
