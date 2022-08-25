@@ -73,7 +73,7 @@ if __name__ == '__main__':
        
     fig = plt.figure(figsize=[20,10], dpi=200)
     ax = plt.gca()
-    plt.title('Number of times a nucleotide is covered by an amplicon (' + str(len(filenames)) + ' runs)')
+    plt.title('Number of times a nucleotide is covered by an amplicon (' + str(len(filenames)) + ' runs)', size=25)
     plt.xlabel('Nucleotide index', size=18)
     plt.ylabel('Occurrence', size=18)
     plt.plot(counts, color='black', linewidth=2)
