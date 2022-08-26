@@ -112,6 +112,7 @@ if __name__ == '__main__':
     regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'N']
     colors = ['red','blue']
     color_index = 0
+    
     #Aggregated counts 
     fig = plt.figure(figsize=[20,10], dpi=200)
     ax = plt.gca()
@@ -121,10 +122,12 @@ if __name__ == '__main__':
     plt.plot(counts, color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20, ha='center')
         color_index += 1
     plt.ylim([0, max(counts) + 20])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_all.pdf', figsize=[20,10], dpi=200, format='pdf')
+    del fig, ax
+    
     
     #200-width counts
     fig = plt.figure(figsize=[20,10], dpi=200)
@@ -135,10 +138,11 @@ if __name__ == '__main__':
     plt.plot(counts_200, color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20, ha='center')
         color_index += 1
     plt.ylim([0, max(counts_200) + 20])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_200.pdf', figsize=[20,10], dpi=200, format='pdf')
+    del fig, ax
     
     #400-width counts
     fig = plt.figure(figsize=[20,10], dpi=200)
@@ -149,7 +153,7 @@ if __name__ == '__main__':
     plt.plot(counts_400, color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20, ha='center')
         color_index += 1
     plt.ylim([0, max(counts_400) + 20])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_400.pdf', figsize=[20,10], dpi=200, format='pdf')
