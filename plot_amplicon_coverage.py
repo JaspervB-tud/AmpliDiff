@@ -93,7 +93,7 @@ if __name__ == '__main__':
     filenames = generate_filenames(base_folder, settings, modes, parameters, parameter_names)
     sequences = generate_sequences('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000', 
                                    '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000')
-    ref_genome = Bio.SeqIO.read(open('NC_045512.2.fasta'), format='fasta')
+    ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
     amplicons, n_files = parse_amplicons(filenames)
     print(amplicons)
     
