@@ -6,8 +6,10 @@ from Bio import pairwise2
 from Bio.pairwise2 import format_alignment
 import Bio
 
-def parse_amplicons(filenames):
-    amplicons = []
+def parse_amplicons(filenames, sequence_length):
+    counts_200 = np.zeros((sequence_length))
+    counts_400 = np.zeros((sequence_length))
+    counts = np.zeros((sequence_length))
     n_files = [0,0]
     for file in filenames:
         try:
@@ -15,14 +17,22 @@ def parse_amplicons(filenames):
                 lines = f.readlines()
                 for line in lines:
                     if 'Amplicon' in line:
-                        amplicons.append(eval(line.split(':')[-1]))
+                        cur_amplicon = eval(line.split(':')[-1])
+                        if 'ampwidth200' in file:
+                            for i in range(cur_amplicon[0], cur_amplicon[1]):
+                                counts_200[i] += 1
+                                counts[i] += 1
+                        elif 'ampwidth400' in file:
+                            for i in range(cur_amplicon[0], cur_amplicon[1]):
+                                counts_400[i] += 1
+                                counts[i] += 1
             if 'ampwidth200' in file:
                 n_files[0] += 1
             if 'ampwidth400' in file:
                 n_files[1] += 1
         except:
             print(file + ' does not exist')
-    return amplicons, n_files
+    return counts_200, counts_400, counts, n_files
 
 def generate_filenames(base_folder, settings, modes, parameters, parameter_names):
     res = []
@@ -71,6 +81,7 @@ def determine_annotations(sequences, ref_genome):
     annotations['E'] = [np.where(ref_sequence.aligned_to_trim == E[0])[0][0], np.where(ref_sequence.aligned_to_trim == E[1])[0][0]]
     annotations['M'] = [np.where(ref_sequence.aligned_to_trim == M[0])[0][0], np.where(ref_sequence.aligned_to_trim == M[1])[0][0]]
     annotations['N'] = [np.where(ref_sequence.aligned_to_trim == N[0])[0][0], np.where(ref_sequence.aligned_to_trim == N[1])[0][0]]
+    print(annotations)
     return annotations
             
 
@@ -94,23 +105,8 @@ if __name__ == '__main__':
     sequences = generate_sequences('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000', 
                                    '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000')
     ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
-    amplicons, n_files = parse_amplicons(filenames)
-    print(amplicons)
-    
-    counts_200 = np.zeros((sequences[0].length))
-    counts_400 = np.zeros((sequences[0].length))
-    
-    counts = np.zeros((sequences[0].length))
-    
-    for i in range(sequences[0].length):
-        for a in amplicons:
-            if a[0] <= i and a[1] >= i:
-                counts[i] += 1
-                if a[1] - a[0] == 200:
-                    counts_200[i] += 1
-                elif a[1] - a[0] == 400:
-                    counts_400[i] += 1
-    
+    counts_200, counts_400, counts, n_files = parse_amplicons(filenames)
+                    
     annotations = determine_annotations(sequences, ref_genome)
     regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'N']
     colors = ['red','blue']
