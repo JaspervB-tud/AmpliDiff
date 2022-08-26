@@ -1,5 +1,6 @@
 from Bio import AlignIO
 import RNA
+import AmpliconGeneration
 from Bio.SeqUtils import MeltingTemp as mt
 import os
 import sys
@@ -871,8 +872,34 @@ def generate_amplicons_mp_exp(sequences, amplicon_width, comparison_matrix, lb=N
             result_amplicons.append(Amplicon(amp[0], amp[1]))
             result_amplicons[-1].differences = partition[amp]
     return result_amplicons
-'''
-'''
+
+def generate_amplicons_mp_exp_cy(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), processors=1):
+    if len(feasible_amplicons) > 0:
+        amplicons = list(feasible_amplicons)
+        amplicons.sort(key = lambda x : x[0])
+    else:
+        if not lb:
+            lb = 0
+        else:
+            lb = max(lb, 0)
+        if not ub:
+            ub = sequences[0].length
+        else:
+            ub = min(ub, sequences[0].length)
+    lineages = [seq.lineage for seq in sequences]
+    seqs = [seq.sequence for seq in sequences]
+    ids = [seq.id for seq in sequences]
+    amplicons_part = [ amplicons[i:i+(ceil(len(amplicons)/processors))] for i in range(0, len(amplicons), ceil(len(amplicons)/processors))]
+    
+    with mp.Pool(processors) as pool:
+        res = pool.starmap(AmpliconGeneration.determine_differences_exp_cy, zip(amplicons_part, itertools.repeat(seqs), itertools.repeat(lineages), itertools.repeat(ids), itertools.repeat(amplicon_threshold), itertools.repeat(comparison_matrix)))
+    
+    result_amplicons = []
+    for partition in res:
+        for amp in partition:
+            result_amplicons.append(Amplicon(amp[0], amp[1]))
+            result_amplicons[-1].differences = partition[amp]
+    return result_amplicons
 
 def process_sequence_pairs(pairs, amplicons, amplicon_threshold, comparison_matrix):
     res = ((pair[0].id, pair[1].id), [])
@@ -1045,34 +1072,27 @@ def check_primer_feasibility(sequences, amplicons, primer_index, optimize=0, tem
 if __name__ == '__main__':
     sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0','/Users/jaspervanbemmelen/Documents/Wastewater/Data/Global/global_all_time_N0')
     #sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022', '/Users/jaspervanbemmelen/Documents/Wastewater/Data/Africa/South_Africa/South_Africa_jan_2022')
-    sequences1, lb1, ub1, feasible1 = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=5)
-    sequences2, lb2, ub2, feasible2 = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=5, lineages_location='/Users/jaspervanbemmelen/Documents/Wastewater/source_code', min_sequences_threshold=0.001)
+    sequences1, lb1, ub1, feasible1 = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=50)
+    #sequences2, lb2, ub2, feasible2 = preprocess_sequences(sequences, 50, variants_location='/Users/jaspervanbemmelen/Documents/Wastewater/Data', amplicon_width=200, misalign_threshold=5, lineages_location='/Users/jaspervanbemmelen/Documents/Wastewater/source_code', min_sequences_threshold=0.001)
     
-    '''
-    test = []
-    lins = []
-    for sequence in sequences:
-        if sequence.lineage not in lins:
-            test.append(sequence)
-            lins.append(sequence.lineage)
+    print('Number of amplicons: ' + str(len(feasible1)))
     
     amplicon_width = 200
     comparison_matrix = generate_opportunistic_matrix()
-    feasible_amplicons = feasible5
     amplicon_threshold = 1
-    n_cores = 8
-    n_seqs = 650
+    n_cores = 4
+    n_seqs = 200
     
     #PI = PrimerIndex.generate_index_mp(sequences, 25, comparison_matrix, processors=3)
     
     st = time.time()
-    amplicons2 = generate_amplicons_mp_exp(test[:n_seqs], amplicon_width, comparison_matrix, feasible_amplicons=feasible5, processors=n_cores)
+    amplicons = generate_amplicons_mp_exp(sequences1[:n_seqs], amplicon_width, comparison_matrix, feasible_amplicons=feasible1, processors=n_cores)
     print(time.time() - st)
     
     st = time.time()
-    amplicons = generate_amplicons_mp2(test[:n_seqs], amplicon_width, comparison_matrix, feasible_amplicons=feasible5, processors=n_cores, sort_type=0)
+    amplicons2 = generate_amplicons_mp_exp_cy(sequences1[:n_seqs], amplicon_width, comparison_matrix, feasible_amplicons=feasible1, processors=n_cores)
     print(time.time() - st)
-    '''
+    
 """
 ################################# This code generates the comparison matrices ######################################################
 def generateConservativeMatrix():

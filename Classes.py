@@ -1,4 +1,5 @@
 import RNA
+import AmpliconGeneration
 from Bio.SeqUtils import MeltingTemp as mt
 import itertools
 import os

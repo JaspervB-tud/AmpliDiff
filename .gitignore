@@ -1,5 +1,10 @@
+AmpliconGeneration.c*
+AmpliconGeneration.html
+
 *.out
 *.sbatch
 
 fast_output/
 output/
+
+build/
