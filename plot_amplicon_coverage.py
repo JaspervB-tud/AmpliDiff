@@ -1,10 +1,13 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from Scripts import generate_sequences
+from Classes import Sequence
+from Bio import pairwise2
+from Bio.pairwise2 import format_alignment
 
 def parse_amplicons(filenames):
     amplicons = []
-    n_files = 0
+    n_files = [0,0]
     for file in filenames:
         try:
             with open(file, 'r') as f:
@@ -12,7 +15,10 @@ def parse_amplicons(filenames):
                 for line in lines:
                     if 'Amplicon' in line:
                         amplicons.append(eval(line.split(':')[-1]))
-            n_files += 1
+            if 'ampwidth200' in file:
+                n_files[0] += 1
+            if 'ampwidth400' in file:
+                n_files[1] += 1
         except:
             print(file + ' does not exist')
     return amplicons, n_files
@@ -43,6 +49,28 @@ def generate_filenames(base_folder, settings, modes, parameters, parameter_names
         progress += 1
     
     return res
+
+def determine_annotations(sequences, ref_genome):
+    alignments = pairwise2.align.globalxx(sequences[0].sequence_raw.upper(), str(ref_genome.seq))
+    ref_sequence = Sequence(alignments[0].seqB.lower(), 'NC_045512.2')
+    ref_sequence.align_to_trim()
+    
+    annotations = {}
+    ORF1a = [266, 13483]
+    ORF1b = [13483, 21555]
+    spike_1 = [21599, 23618]
+    spike_2 = [23618, 25381]
+    E = [26245, 26472]
+    M = [26523, 27191]
+    N = [28274, 29553]
+    annotations['ORF1a'] = [np.where(ref_sequence.aligned_to_trim == ORF1a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1a[1])[0][0]]
+    annotations['ORF1b'] = [np.where(ref_sequence.aligned_to_trim == ORF1b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1b[1])[0][0]]
+    annotations['S1'] = [np.where(ref_sequence.aligned_to_trim == spike_1[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_1[1])[0][0]]
+    annotations['S2'] = [np.where(ref_sequence.aligned_to_trim == spike_2[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_2[1])[0][0]]
+    annotations['E'] = [np.where(ref_sequence.aligned_to_trim == E[0])[0][0], np.where(ref_sequence.aligned_to_trim == E[1])[0][0]]
+    annotations['M'] = [np.where(ref_sequence.aligned_to_trim == M[0])[0][0], np.where(ref_sequence.aligned_to_trim == M[1])[0][0]]
+    annotations['N'] = [np.where(ref_sequence.aligned_to_trim == N[0])[0][0], np.where(ref_sequence.aligned_to_trim == N[1])[0][0]]
+    return annotations
             
 
 if __name__ == '__main__':
@@ -50,7 +78,7 @@ if __name__ == '__main__':
     settings = ['time_experiments/']
     modes = ['Soloplex/']
     parameters = {
-            'ampwidth' : [200],
+            'ampwidth' : [200, 400],
             'ampthresh' : [1],
             'misthresh' : [10],
             'primwidth' : [25],
@@ -64,6 +92,7 @@ if __name__ == '__main__':
     filenames = generate_filenames(base_folder, settings, modes, parameters, parameter_names)
     sequences = generate_sequences('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000', 
                                    '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000')
+    ref_genome = Bio.SeqIO.read(open('NC_045512.2.fasta'), format='fasta')
     amplicons, n_files = parse_amplicons(filenames)
     print(amplicons)
     
@@ -80,103 +109,51 @@ if __name__ == '__main__':
                     counts_200[i] += 1
                 elif a[1] - a[0] == 400:
                     counts_400[i] += 1
+    
+    annotations = determine_annotations(sequences, ref_genome)
+    regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'N']
+    colors = ['red','blue']
+    color_index = 0
     #Aggregated counts 
     fig = plt.figure(figsize=[20,10], dpi=200)
     ax = plt.gca()
-    plt.title('Number of times a nucleotide is covered by an amplicon (' + str(n_files) + ' runs)', size=25)
+    plt.title('Number of times a nucleotide is covered by an amplicon (' + str(n_files[0] + n_files[1]) + ' runs)', size=25)
     plt.xlabel('Nucleotide index', size=18)
     plt.ylabel('Occurrence', size=18)
     plt.plot(counts, color='black', linewidth=2)
-    ORF1a = [266, 13483]
-    plt.axvspan(ORF1a[0], ORF1a[1], color='red', alpha=0.2)
-    plt.annotate('ORF1a', ((ORF1a[0] + ORF1a[1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
-    ORF1b = [13483, 21555]
-    plt.axvspan(ORF1b[0], ORF1b[1], color='blue', alpha=0.2)
-    plt.annotate('ORF1b', ((ORF1b[0] + ORF1b[1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
-    spike_1 = [21599, 23618]
-    plt.axvspan(spike_1[0], spike_1[1], color='red', alpha=0.2)
-    plt.annotate('S1', ((spike_1[0]+spike_1[1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
-    spike_2 = [23618, 25381]
-    plt.axvspan(spike_2[0], spike_2[1], color='blue', alpha=0.2)
-    plt.annotate('S2', ((spike_2[0]+spike_2[1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
-    E = [26245, 26472]
-    plt.axvspan(E[0], E[1], color='red', alpha=0.2)
-    plt.annotate('E', ((E[0] + E[1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
-    M = [26523, 27191]
-    plt.axvspan(M[0], M[1], color='blue', alpha=0.2)
-    plt.annotate('M', ((M[0] + M[1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
-    N = [28274, 29553]
-    plt.axvspan(N[0], N[1], color='red', alpha=0.2)
-    plt.annotate('N', ((N[0] + N[1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
-    
-    y_max = max(counts) + 20
-    plt.ylim([0, y_max])
+    for region in regions:
+        plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
+        color_index += 1
+    plt.ylim([0, max(counts) + 20])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_all.pdf', figsize=[20,10], dpi=200, format='pdf')
     
     #200-width counts
     fig = plt.figure(figsize=[20,10], dpi=200)
     ax = plt.gca()
-    plt.title('Number of times a nucleotide is covered by an amplicon of width 200', size=25)
+    plt.title('Number of times a nucleotide is covered by an amplicon (' + str(n_files[0]) + ' runs) of width 200', size=25)
     plt.xlabel('Nucleotide index', size=18)
     plt.ylabel('Occurrence', size=18)
     plt.plot(counts_200, color='black', linewidth=2)
-    ORF1a = [266, 13483]
-    plt.axvspan(ORF1a[0], ORF1a[1], color='red', alpha=0.2)
-    plt.annotate('ORF1a', ((ORF1a[0] + ORF1a[1])/2, max(counts_200) + 10), color='black', alpha=0.6, size=20)
-    ORF1b = [13483, 21555]
-    plt.axvspan(ORF1b[0], ORF1b[1], color='blue', alpha=0.2)
-    plt.annotate('ORF1b', ((ORF1b[0] + ORF1b[1])/2, max(counts_200) + 10), color='black', alpha=0.6, size=20)
-    spike_1 = [21599, 23618]
-    plt.axvspan(spike_1[0], spike_1[1], color='red', alpha=0.2)
-    plt.annotate('S1', ((spike_1[0]+spike_1[1])/2, max(counts_200) + 10), color='black', alpha=0.6, size=20)
-    spike_2 = [23618, 25381]
-    plt.axvspan(spike_2[0], spike_2[1], color='blue', alpha=0.2)
-    plt.annotate('S2', ((spike_2[0]+spike_2[1])/2, max(counts_200) + 10), color='black', alpha=0.6, size=20)
-    E = [26245, 26472]
-    plt.axvspan(E[0], E[1], color='red', alpha=0.2)
-    plt.annotate('E', ((E[0] + E[1])/2, max(counts_200) + 10), color='black', alpha=0.6, size=20)
-    M = [26523, 27191]
-    plt.axvspan(M[0], M[1], color='blue', alpha=0.2)
-    plt.annotate('M', ((M[0] + M[1])/2, max(counts_200) + 10), color='black', alpha=0.6, size=20)
-    N = [28274, 29553]
-    plt.axvspan(N[0], N[1], color='red', alpha=0.2)
-    plt.annotate('N', ((N[0] + N[1])/2, max(counts_200) + 10), color='black', alpha=0.6, size=20)
-    
-    y_max = max(counts_200) + 20
-    plt.ylim([0, y_max])
+    for region in regions:
+        plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
+        color_index += 1
+    plt.ylim([0, max(counts_200) + 20])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_200.pdf', figsize=[20,10], dpi=200, format='pdf')
     
     #400-width counts
     fig = plt.figure(figsize=[20,10], dpi=200)
     ax = plt.gca()
-    plt.title('Number of times a nucleotide is covered by an amplicon of width 400', size=25)
+    plt.title('Number of times a nucleotide is covered by an amplicon (' + str(n_files[1]) + ' runs) of width 400', size=25)
     plt.xlabel('Nucleotide index', size=18)
     plt.ylabel('Occurrence', size=18)
     plt.plot(counts_400, color='black', linewidth=2)
-    ORF1a = [266, 13483]
-    plt.axvspan(ORF1a[0], ORF1a[1], color='red', alpha=0.2)
-    plt.annotate('ORF1a', ((ORF1a[0] + ORF1a[1])/2, max(counts_400) + 10), color='black', alpha=0.6, size=20)
-    ORF1b = [13483, 21555]
-    plt.axvspan(ORF1b[0], ORF1b[1], color='blue', alpha=0.2)
-    plt.annotate('ORF1b', ((ORF1b[0] + ORF1b[1])/2, max(counts_400) + 10), color='black', alpha=0.6, size=20)
-    spike_1 = [21599, 23618]
-    plt.axvspan(spike_1[0], spike_1[1], color='red', alpha=0.2)
-    plt.annotate('S1', ((spike_1[0]+spike_1[1])/2, max(counts_400) + 10), color='black', alpha=0.6, size=20)
-    spike_2 = [23618, 25381]
-    plt.axvspan(spike_2[0], spike_2[1], color='blue', alpha=0.2)
-    plt.annotate('S2', ((spike_2[0]+spike_2[1])/2, max(counts_400) + 10), color='black', alpha=0.6, size=20)
-    E = [26245, 26472]
-    plt.axvspan(E[0], E[1], color='red', alpha=0.2)
-    plt.annotate('E', ((E[0] + E[1])/2, max(counts_400) + 10), color='black', alpha=0.6, size=20)
-    M = [26523, 27191]
-    plt.axvspan(M[0], M[1], color='blue', alpha=0.2)
-    plt.annotate('M', ((M[0] + M[1])/2, max(counts_400) + 10), color='black', alpha=0.6, size=20)
-    N = [28274, 29553]
-    plt.axvspan(N[0], N[1], color='red', alpha=0.2)
-    plt.annotate('N', ((N[0] + N[1])/2, max(counts_400) + 10), color='black', alpha=0.6, size=20)
-    
-    y_max = max(counts_400) + 20
-    plt.ylim([0, y_max])
+    for region in regions:
+        plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20)
+        color_index += 1
+    plt.ylim([0, max(counts_400) + 20])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_400.pdf', figsize=[20,10], dpi=200, format='pdf')
     
     
