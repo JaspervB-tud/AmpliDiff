@@ -1011,7 +1011,7 @@ def run_greedy(args):
         
         #Generate amplicons
         st = time.time()
-        amplicons = generate_amplicons_mp_exp(sequences, args.amplicon_width, comparison, feasible_amplicons=feasible_amplicons, processors=args.cores, amplicon_threshold=args.amplicon_threshold)
+        amplicons = generate_amplicons_mp_exp_cy(sequences, args.amplicon_width, comparison, feasible_amplicons=feasible_amplicons, processors=args.cores, amplicon_threshold=args.amplicon_threshold)
         with open(args.output + '/runtimes.txt', 'a') as f:
             f.write('Time spent generating amplicon differentiation ' + str(time.time() - st) + '\n')
             f.write('Total feasible amplicons: ' + str(len(amplicons)) + '\n')
