@@ -105,7 +105,7 @@ if __name__ == '__main__':
     sequences = generate_sequences('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000', 
                                    '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000')
     ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
-    counts_200, counts_400, counts, n_files = parse_amplicons(filenames)
+    counts_200, counts_400, counts, n_files = parse_amplicons(filenames, sequences[0].length)
                     
     annotations = determine_annotations(sequences, ref_genome)
     regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'N']
