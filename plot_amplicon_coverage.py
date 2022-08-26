@@ -32,6 +32,7 @@ def parse_amplicons(filenames, sequence_length):
                 n_files[1] += 1
         except:
             print(file + ' does not exist')
+    print('Done determining occurrences')
     return counts_200, counts_400, counts, n_files
 
 def generate_filenames(base_folder, settings, modes, parameters, parameter_names):
