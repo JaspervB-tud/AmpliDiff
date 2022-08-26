@@ -4,6 +4,7 @@ from Scripts import generate_sequences
 from Classes import Sequence
 from Bio import pairwise2
 from Bio.pairwise2 import format_alignment
+import Bio
 
 def parse_amplicons(filenames):
     amplicons = []
