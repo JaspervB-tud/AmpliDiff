@@ -98,7 +98,7 @@ if __name__ == '__main__':
             'searchwidth' : [50],
             'cov' : [1],
             'amps' : ['8_all'],
-            'nseqs' : [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+            'nseqs' : [500, 600, 700, 800, 900, 1000]
         }
     parameter_names = ['ampwidth', 'ampthresh', 'misthresh', 'primwidth', 'searchwidth', 'cov', 'amps', 'nseqs']
     
@@ -119,12 +119,12 @@ if __name__ == '__main__':
     plt.title('Number of times a nucleotide is covered by an amplicon (' + str(n_files[0] + n_files[1]) + ' runs)', size=25)
     plt.xlabel('Nucleotide index', size=18)
     plt.ylabel('Occurrence', size=18)
-    plt.plot(counts, color='black', linewidth=2)
+    plt.plot(counts/(n_files[0] + n_files[1]), color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20, ha='center')
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1, color='black', alpha=0.6, size=20, ha='center')
         color_index += 1
-    plt.ylim([0, max(counts) + 20])
+    plt.ylim([0, 1.2])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_all.pdf', figsize=[20,10], dpi=200, format='pdf')
     del fig, ax
     
@@ -135,12 +135,12 @@ if __name__ == '__main__':
     plt.title('Number of times a nucleotide is covered by an amplicon (' + str(n_files[0]) + ' runs) of width 200', size=25)
     plt.xlabel('Nucleotide index', size=18)
     plt.ylabel('Occurrence', size=18)
-    plt.plot(counts_200, color='black', linewidth=2)
+    plt.plot(counts_200/n_files[0], color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20, ha='center')
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1, color='black', alpha=0.6, size=20, ha='center')
         color_index += 1
-    plt.ylim([0, max(counts_200) + 20])
+    plt.ylim([0, 1.2)
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_200.pdf', figsize=[20,10], dpi=200, format='pdf')
     del fig, ax
     
@@ -150,12 +150,12 @@ if __name__ == '__main__':
     plt.title('Number of times a nucleotide is covered by an amplicon (' + str(n_files[1]) + ' runs) of width 400', size=25)
     plt.xlabel('Nucleotide index', size=18)
     plt.ylabel('Occurrence', size=18)
-    plt.plot(counts_400, color='black', linewidth=2)
+    plt.plot(counts_400/n_files[1], color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, max(counts) + 10), color='black', alpha=0.6, size=20, ha='center')
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
         color_index += 1
-    plt.ylim([0, max(counts_400) + 20])
+    plt.ylim([0, 1.2)
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_400.pdf', figsize=[20,10], dpi=200, format='pdf')
     
     
