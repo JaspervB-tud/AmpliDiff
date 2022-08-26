@@ -98,7 +98,7 @@ if __name__ == '__main__':
             'searchwidth' : [50],
             'cov' : [1],
             'amps' : ['8_all'],
-            'nseqs' : [500, 600, 700, 800, 900, 1000]
+            'nseqs' : [800, 900, 1000]
         }
     parameter_names = ['ampwidth', 'ampthresh', 'misthresh', 'primwidth', 'searchwidth', 'cov', 'amps', 'nseqs']
     
@@ -126,7 +126,7 @@ if __name__ == '__main__':
             plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
             color_index += 1
         plt.ylim([0, 1.2])
-        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_all.pdf', figsize=[20,10], dpi=200, format='pdf')
+        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/plots/amplicon_spread_all.pdf', figsize=[20,10], dpi=200, format='pdf')
         del fig, ax
     
     if n_files[0] > 0:
@@ -142,7 +142,7 @@ if __name__ == '__main__':
             plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
             color_index += 1
         plt.ylim([0, 1.2])
-        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_200.pdf', figsize=[20,10], dpi=200, format='pdf')
+        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/plots/amplicon_spread_200.pdf', figsize=[20,10], dpi=200, format='pdf')
         del fig, ax
     
     if n_files[1] > 0:
@@ -158,6 +158,6 @@ if __name__ == '__main__':
             plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
             color_index += 1
         plt.ylim([0, 1.2])
-        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/amplicon_spread_400.pdf', figsize=[20,10], dpi=200, format='pdf')
+        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/Soloplex/plots/amplicon_spread_400.pdf', figsize=[20,10], dpi=200, format='pdf')
         
     
