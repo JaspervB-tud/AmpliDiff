@@ -1082,7 +1082,7 @@ if __name__ == '__main__':
     amplicon_threshold = 1
     n_cores = 4
     n_seqs = 200
-    
+
     #PI = PrimerIndex.generate_index_mp(sequences, 25, comparison_matrix, processors=3)
     
     st = time.time()

@@ -25,9 +25,7 @@ def determine_differences_exp_cy(amplicons, sequences, lineages, ids, int amplic
     cdef int seq1, seq2
     for seq1 in range(len(sequences)):
         for seq2 in range(seq1):
-            if lineages[seq1] == lineages[seq2]:
-                pass
-            else:
+            if lineages[seq1] != lineages[seq2]:
                 prev_amplicon = (0,0)
                 diffs = []
                 for next_amplicon in amplicons:
