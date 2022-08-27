@@ -873,7 +873,7 @@ def generate_amplicons_mp_exp(sequences, amplicon_width, comparison_matrix, lb=N
             result_amplicons[-1].differences = partition[amp]
     return result_amplicons
 
-def generate_amplicons_mp_exp_cy(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), processors=1):
+def generate_amplicons_mp_exp_cy(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), processors=1, id_type='old'):
     if len(feasible_amplicons) > 0:
         amplicons = list(feasible_amplicons)
         amplicons.sort(key = lambda x : x[0])
@@ -888,7 +888,11 @@ def generate_amplicons_mp_exp_cy(sequences, amplicon_width, comparison_matrix, l
             ub = min(ub, sequences[0].length)
     lineages = [seq.lineage for seq in sequences]
     seqs = [seq.sequence for seq in sequences]
-    ids = [seq.id for seq in sequences]
+    if id_type == 'old':
+        ids = [seq.id for seq in sequences]
+    else:
+        ids = [seq.alt_id for seq in sequences]
+        
     amplicons_part = [ amplicons[i:i+(ceil(len(amplicons)/processors))] for i in range(0, len(amplicons), ceil(len(amplicons)/processors))]
     
     with mp.Pool(processors) as pool:

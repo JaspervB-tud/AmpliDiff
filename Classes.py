@@ -58,12 +58,15 @@ def generate_opportunistic_matrix():
 
 #Updated classes
 class Sequence:
+    existing_sequences = 0
     def __init__(self, sequence, identifier, lineage=None):
         self.sequence = sequence
         self.length = len(sequence)
         self.sequence_raw = sequence.replace('-','')
         self.length_raw = len(self.sequence_raw)
         self.id = identifier
+        self.alt_id = Sequence.existing_sequences
+        Sequence.existing_sequences += 1
         self.lineage = lineage
         self.aligned_to_trim = np.zeros((1))
         
