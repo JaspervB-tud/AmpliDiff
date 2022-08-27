@@ -74,13 +74,15 @@ class Sequence:
         try:
             if type(other) == str:
                 return self.sequence == other or self.sequence_raw == other or self.id == other
+            elif type(other) == int:
+                return self.alt_id == other
             else:
-                return self.id == other.id
+                return self.id == other.id or self.alt_id == other.alt_id
         except:
             return False
         
     def __hash__(self):
-        return hash(self.id)
+        return hash(self.alt_id)
     
     def __repr__(self):
         return 'Sequence'
@@ -199,7 +201,7 @@ class Amplicon:
         try:
             for difference in differences:
                 if difference[0].lineage != difference[1].lineage:
-                    self.differences_proper.add((difference[0].id, difference[1].id))
+                    self.differences_proper.add((difference[0].alt_id, difference[1].alt_id))
         except:
             pass
         
@@ -268,10 +270,10 @@ class Primer:
 
         '''
         if self.feasible:
-            if sequence.id not in self.indices:
-                self.indices[sequence.id] = sequence_index
+            if sequence.alt_id not in self.indices:
+                self.indices[sequence.alt_id] = sequence_index
             else:
-                if not self.indices[sequence.id] == sequence_index:
+                if not self.indices[sequence.alt_id] == sequence_index:
                     self.indices = None
                     self.feasible = False
                     return False
@@ -638,7 +640,7 @@ class PrimerIndex():
         None
         
         '''
-        sequence_ids = [sequence.id for sequence in sequences]
+        sequence_ids = [sequence.alt_id for sequence in sequences]
         amplicon.primers = {'forward' : {s : set() for s in sequence_ids}, 'reverse' : {s : set() for s in sequence_ids}}
         amplicon.full_primerset = {'forward' : set(), 'reverse' : set()}
         for sequence in sequences:
@@ -661,7 +663,7 @@ class PrimerIndex():
                     for forward_primer in disambiguate(current_fwd_primer):
                         if forward_primer in self.primer2index['forward']:
                             if self.index2primer['forward'][self.primer2index['forward'][forward_primer]].feasible:
-                                amplicon.primers['forward'][sequence.id].add(self.primer2index['forward'][forward_primer])
+                                amplicon.primers['forward'][sequence.alt_id].add(self.primer2index['forward'][forward_primer])
                                 amplicon.full_primerset['forward'].add(self.primer2index['forward'][forward_primer])
                 #Iterate over reverse primers for this sequence        
                 current_rev_primer = reverse_complement(sequence.sequence_raw[reverse_start_index + offset : reverse_start_index + primer_width + offset])
@@ -669,7 +671,7 @@ class PrimerIndex():
                     for reverse_primer in disambiguate(current_rev_primer):
                         if reverse_primer in self.primer2index['reverse']:
                             if self.index2primer['reverse'][self.primer2index['reverse'][reverse_primer]].feasible:
-                                amplicon.primers['reverse'][sequence.id].add(self.primer2index['reverse'][reverse_primer])
+                                amplicon.primers['reverse'][sequence.alt_id].add(self.primer2index['reverse'][reverse_primer])
                                 amplicon.full_primerset['reverse'].add(self.primer2index['reverse'][reverse_primer])
 
     def update_conflict_matrix(self, primers):

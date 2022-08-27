@@ -1036,10 +1036,10 @@ def check_primer_feasibility(sequences, amplicons, primer_index, optimize=0, tem
     for amplicon in amplicons:
         #Coverage per sequence per amplicon
         for sequence in sequences:
-            model.addConstr(covered_binary[(sequence.id, amplicon.id)] <= sum(forward_primers[primer][0] for primer in amplicon.primers['forward'][sequence.id]))
-            model.addConstr(covered_binary[(sequence.id, amplicon.id)] <= sum(reverse_primers[primer][0] for primer in amplicon.primers['reverse'][sequence.id]))
+            model.addConstr(covered_binary[(sequence.alt_id, amplicon.id)] <= sum(forward_primers[primer][0] for primer in amplicon.primers['forward'][sequence.alt_id]))
+            model.addConstr(covered_binary[(sequence.alt_id, amplicon.id)] <= sum(reverse_primers[primer][0] for primer in amplicon.primers['reverse'][sequence.alt_id]))
         #At least $coverage (fraction) of the sequences should be covered per amplicon
-        model.addConstr(sum(covered_binary[(sequence.id, amplicon.id)] for sequence in sequences) >= coverage * len(sequences))
+        model.addConstr(sum(covered_binary[(sequence.alt_id, amplicon.id)] for sequence in sequences) >= coverage * len(sequences))
         #Temperature constraints
         for primer in amplicon.full_primerset['forward']: #iterate over forward primers
             model.addConstr( min_temp <= primer_index.index2primer['forward'][primer].temperature * (3 - 2 * forward_primers[primer][0]) )
