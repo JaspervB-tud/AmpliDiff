@@ -1,5 +1,20 @@
 import itertools
 
+def equivalent_characters(c):
+    if c == '-':
+        return set(['-'])
+    else:
+        res = set()
+        if c in ['a','r','m','w','d','h','v','n']:
+            res.add('a')
+        if c in ['c','y','m','s','b','h','v','n']:
+            res.add('c')
+        if c in ['g','r','k','s','b','d','v','n']:
+            res.add('g')
+        if c in ['t','y','k','w','b','d','h','n']:
+            res.add('t')
+        return res
+
 def generate_opportunistic_matrix():
     chars = ['a','c','t','g','u','r','y','k','m','s','w','b','d','h','v','n','-']
     char_comp = {
@@ -34,6 +49,41 @@ def generate_opportunistic_matrix():
                 res[(c1,c2)] = (True,False)
             else:
                 res[(c1,c2)] = (False,False)
+    return res
+
+def generate_comparison_table():
+    chars = ['a','c','t','g','u','r','y','k','m','s','w','b','d','h','v','n','-']
+    char_comp = {
+                'a' : ['a','r','m','w','d','h','v'],
+                'c' : ['c','y','m','s','b','h','v'],
+                't' : ['t','y','k','w','b','d','h'],
+                'g' : ['g','r','k','s','b','d','v'],
+                'u' : ['u','y','k','w','b','d','h'],
+                'r' : ['a','g','r','k','m','s','w','b','d','h','v'],
+                'y' : ['c','t','u','y','k','m','s','w','b','d','h','v'],
+                'k' : ['g','t','u','r','y','k','s','w','b','d','h','v'],
+                'm' : ['a','c','r','y','m','s','w','b','d','h','v'],
+                's' : ['c','g','y','k','m','s','b','d','h','v'],
+                'w' : ['a','t','u','r','y','k','m','w','b','d','h','v'],
+                'b' : ['c','g','t','u','r','y','k','m','s','w','b','d','h','v'],
+                'd' : ['a','g','t','u','r','y','k','m','s','w','b','d','h','v'],
+                'h' : ['a','c','t','u','r','y','k','m','s','w','b','d','h','v'],
+                'v' : ['a','c','g','r','y','k','m','s','w','b','d','h','v'],
+                '-' : ['-']
+        }
+    res = {}
+    for c1 in chars:
+        for c2 in chars:
+            if c1 == c2:
+                res[(c1,c2)] = True
+            elif c1 == 'n' and c2 != '-':
+                res[(c1,c2)] = True
+            elif c2 == 'n' and c2 != '-':
+                res[(c1,c2)] = True
+            elif c1 in char_comp[c2] and c2 in char_comp[c1]:
+                res[(c1,c2)] = True
+            else:
+                res[(c1,c2)] = False
     return res
 
 def reverse_complement(sequence, rev=True):
