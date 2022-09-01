@@ -429,7 +429,7 @@ def generate_amplicons_mp_sequences(sequences, amplicon_width, comparison_matrix
     for amplicon_index in range(len(amplicons)):
         res.append(Amplicon(amplicons[amplicon_index][0], amplicons[amplicon_index][1]))
         cur_diffs = np.where(shared_array[amplicon_index] == 1)
-        res[-1].differences = res[-1].differences.union(set(zip(cur_diffs[0], cur_diffs[1])))
+        res[-1].differences = set(zip(cur_diffs[0], cur_diffs[1]))
 
     shared_mem.close()
     shared_mem.unlink()

@@ -33,8 +33,8 @@ if __name__ == '__main__':
     sequences = sequences[:1000]
     sequences, lb, ub, feasible_amplicons, relevant_nucleotides = preprocess_sequences(sequences, 50, amplicon_width=400, misalign_threshold=10)
 
-    n_seqs = 1000
-    n_amps = 10000
+    n_seqs = 100
+    n_amps = 2000
     amplicon_threshold = 1
     comparison_matrix = generate_opportunistic_matrix()
 
@@ -45,14 +45,12 @@ if __name__ == '__main__':
 
     ids = [s.id_num for s in sequences]
 
-    
+    chars = ['a','c','t','g','u','r','y','k','m','s','w','b','d','h','v','n','-']
 
     st = time.time()
     #amps1 = AmpliconGeneration.determine_differences_cy(amplicons[:n_amps], seqs[:n_seqs], lineages[:n_seqs], ids[:n_seqs], 1, comparison_matrix)
     amps1 = generate_amplicons_mp_exp_cy(sequences[:n_seqs], 200, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=amplicons[:n_amps], processors=5)
     print('Split on amplicons: ' + str(time.time() - st))
-
-    del amps1
 
     st = time.time()
     amps2 = generate_amplicons_mp_sequences(sequences[:n_seqs], 200, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=amplicons[:n_amps], relevant_nucleotides=relevant_nucleotides, processors=5)
@@ -62,7 +60,7 @@ if __name__ == '__main__':
     #amps2 = AmpliconGeneration.determine_differences_cy2(amplicons[:n_amps], seqs[:n_seqs], lineages[:n_seqs], ids[:n_seqs], 1, comparison_table, np.where(final_to_check == 1)[0])
     amps2 = generate_amplicons_mp_exp_cy2(sequences[:n_seqs], 200, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=amplicons[:n_amps], relevant_nucleotides=relevant_nucleotides, processors=2)
     print(time.time() - st)
-
+    """
     print(len(amps1) == len(amps2))
     same = True
     for i in range(len(amps1)):
@@ -74,4 +72,3 @@ if __name__ == '__main__':
             same = False
             break
     print(same)
-    """
