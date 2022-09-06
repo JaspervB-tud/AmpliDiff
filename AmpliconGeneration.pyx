@@ -69,7 +69,34 @@ def shm_test(amplicons, sequences, sequence_pairs, str mem_name, int row_index):
         np_array[row_index][pair[0]][pair[1]] = 1
     print(np.sum(np_array[row_index][:][:]))
 
-def determine_differences_sequencewise_cy(amplicons, sequence_pairs, sequences, lineages, ids, int amplicon_threshold, comparison_matrix, relevant_nucleotides, str mem_name):
+def determine_differences_smart_cy(amplicons, sequence_pairs, sequences, lineages, ids, int amplicon_threshold, comparison_matrix, relevant_nucleotides, diffs_per_amp):
+    cdef int[:] cur_diffs_cum
+    cdef signed char[:] diffs
+    cdef int seq1, seq2, cur_sum, last_update, i, cur_start, cur_end
+    cdef int cur_first = 0
+    cdef int seq_length = len(sequences[0])
+
+    for (seq1, seq2) in sequence_pairs:
+        if lineages[seq1] != lineages[seq2]:
+            cur_sum = 0
+            last_update = 0
+            cur_diffs_cum = np.zeros((seq_length), dtype=np.int32)
+            diffs = np.zeros((seq_length), dtype=np.int8)
+
+            for i in relevant_nucleotides:
+                if not comparison_matrix[(sequences[seq1][i], sequences[seq2][i])][0]:
+                    cur_diffs_cum[last_update:i] = cur_sum
+                    diffs[i] = 1
+                    cur_sum += 1
+                    last_update = i
+            cur_diffs_cum[last_update:] = cur_sum
+            for amplicon in amplicons:
+                cur_start = amplicon[0]
+                cur_end = amplicon[1]-1
+                if cur_diffs_cum[cur_end] - cur_diffs_cum[cur_start] + diffs[cur_start] > amplicon_threshold:
+                    diffs_per_amp[amplicon].append((seq2,seq1))
+
+def determine_differences_sequencewise_cy(amplicons, sequence_pairs, sequences, lineages, ids, int amplicon_threshold, comparison_matrix, relevant_nucleotides, str mem_name, diffs_per_amp):
     shm = shared_memory.SharedMemory(name=mem_name)
     cdef signed char[:,:,:] diff_tensor = np.ndarray((len(amplicons), len(sequences), len(sequences)), dtype=np.int8, buffer=shm.buf)
     cdef int[:] cur_diffs_cum
@@ -117,3 +144,51 @@ def generate_amplicons_sequencewise_cy(amplicons, included_amplicons, str mem_na
         amplicon_index += 1
 
     return res
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def generate_amplicons_smarter_cy(int[:] amplicons, int[:] amplicons_lb, int[:] amplicons_ub, int amplicon_width, int num_amps, int[:,:] sequences, sequence_pairs, lineages, ids, signed char[:,:] comparison_matrix, long[:] relevant_nucleotides, int num_relevant, int amplicon_threshold):
+    cdef int[:] diffs_cum
+    cdef int seq1, seq2, amp, cur_sum, i, cur_index, cur_lb, cur_ub
+    diffs_per_amp = {(a,a + amplicon_width): set() for a in amplicons}
+
+    for (seq1, seq2) in sequence_pairs:
+        cur_sum = 0
+        diffs_cum = np.zeros((num_relevant), dtype=np.int32)
+        cur_index = 0
+        for i in relevant_nucleotides:
+            cur_sum += comparison_matrix[sequences[seq1][i], sequences[seq2][i]]
+            diffs_cum[cur_index] = cur_sum
+            cur_index += 1
+        for amp in range(num_amps):
+            cur_lb = relevant_nucleotides[amplicons_lb[amp]]
+            cur_ub = relevant_nucleotides[amplicons_ub[amp]]
+            if amplicons[amp] <= cur_lb:
+                if diffs_cum[amplicons_ub[amp]] > amplicon_threshold:
+                    diffs_per_amp[(amplicons[amp], amplicons[amp] + amplicon_width)].add((ids[seq1],ids[seq2]))
+            else:
+                if diffs_cum[amplicons_ub[amp]] - diffs_cum[amplicons_lb[amp]] > amplicon_threshold:
+                    diffs_per_amp[(amplicons[amp], amplicons[amp] + amplicon_width)].add((ids[seq1],ids[seq2]))
+    return diffs_per_amp
+    '''
+    for seq1 in range(num_seqs):
+        for seq2 in range(seq1):
+            if lineages[seq1] != lineages[seq2]:
+                cur_sum = 0
+                diffs_cum = np.zeros((num_relevant), dtype=np.int32)
+                cur_index = 0
+                for i in relevant_nucleotides:
+                    cur_sum += comparison_matrix[sequences[seq1][i], sequences[seq2][i]]
+                    diffs_cum[cur_index] = cur_sum
+                    cur_index += 1
+                for amp in range(num_amps):
+                    cur_lb = relevant_nucleotides[amplicons_lb[amp]]
+                    cur_ub = relevant_nucleotides[amplicons_ub[amp]]
+                    if amplicons[amp] <= cur_lb:
+                        if diffs_cum[amplicons_ub[amp]] > amplicon_threshold:
+                            diffs_per_amp[(amplicons[amp], amplicons[amp] + amplicon_width)].add((seq2,seq1))
+                    else:
+                        if diffs_cum[amplicons_ub[amp]] - diffs_cum[amplicons_lb[amp]]> amplicon_threshold:
+                            diffs_per_amp[(amplicons[amp], amplicons[amp] + amplicon_width)].add((seq2,seq1))
+    return diffs_per_amp
+    '''
