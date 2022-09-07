@@ -559,7 +559,7 @@ def translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_
     chars = ['a','c','t','g','u','r','y','k','m','s','w','b','d','h','v','n','-']
     char_comp = np.zeros((len(chars), len(chars)), dtype=np.int8)
     chars2num = {}
-    seqs_num = np.zeros((len(sequences), sequences[0].length), dtype=np.int32)
+    seqs_num = np.zeros((len(sequences), sequences[0].length), dtype=np.int8)
     AMPS = np.zeros((len(amplicons), 3), dtype=np.int32)
     
     for char_index in range(len(chars)):

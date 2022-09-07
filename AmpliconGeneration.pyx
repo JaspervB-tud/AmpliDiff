@@ -147,7 +147,7 @@ def generate_amplicons_sequencewise_cy(amplicons, included_amplicons, str mem_na
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def generate_amplicons_smarter_cy(int[:,:] AMPS, int amplicon_width, int num_amps, int[:,:] sequences, int[:,:] sequence_pairs, int total_sequence_pairs, int[:] ids, signed char[:,:] comparison_matrix, long[:] relevant_nucleotides, int num_relevant, int amplicon_threshold):
+def generate_amplicons_smarter_cy(int[:,:] AMPS, int amplicon_width, int num_amps, signed char[:,:] sequences, int[:,:] sequence_pairs, int total_sequence_pairs, int[:] ids, signed char[:,:] comparison_matrix, long[:] relevant_nucleotides, int num_relevant, int amplicon_threshold):
     cdef int[:] diffs_cum
     cdef int seq1, seq2, amp, cur_sum, j, cur_index, cur_lb, cur_ub
     cdef dict diffs_per_amp = {(AMPS[cur_index][0],AMPS[cur_index][0] + amplicon_width): [] for cur_index in range(num_amps)}
