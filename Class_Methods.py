@@ -509,23 +509,36 @@ def generate_amplicons_mp_smartest(sequences, amplicon_width, comparison_matrix,
     st = time.time()
     lineages_list = [sequence.lineage_num for sequence in sequences]
     ids_list = [sequence.id_num for sequence in sequences]
-    _, comparison_matrix_num, sequences_num, amplicons, amplicons_lb, amplicons_ub = translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_matrix)
+    _, comparison_matrix_num, sequences_num, AMPS = translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_matrix)
 
     sequence_pairs_list = []
     for s1 in range(len(sequences)):
         for s2 in range(s1):
             if sequences[s1].lineage != sequences[s2].lineage:
-                sequence_pairs_list.append((s2,s1))
-    #sequence_pairs_list = list(itertools.combinations(list(range(len(sequences))), 2))
-    sequence_pairs_partition = [ sequence_pairs_list[i:i+ceil(len(sequence_pairs_list)/processors)] for i in range(0, len(sequence_pairs_list), ceil(len(sequence_pairs_list)/processors)) ]
+                sequence_pairs_list.append([s2,s1])
+
+    sequence_pairs_list = np.array(sequence_pairs_list, dtype=np.int32)
+    ids_list = np.array(ids_list, dtype=np.int32)
+    #sequence_pairs_partition = [ sequence_pairs_list[i:i+ceil(len(sequence_pairs_list)/processors)] for i in range(0, len(sequence_pairs_list), ceil(len(sequence_pairs_list)/processors)) ]
+    sequence_pairs_partition = [ sequence_pairs_list[i:i+ceil(sequence_pairs_list.shape[0]/processors)][:] for i in range(0, sequence_pairs_list.shape[0], ceil(sequence_pairs_list.shape[0]/processors)) ]
+    partition_sizes = [spp.shape[0] for spp in sequence_pairs_partition]
+
     print(str(time.time() - st) + 's spent preprocessing')
 
     st = time.time()
     with mp.Pool(processors) as pool:
+        """
         diffs_per_amp = pool.starmap(AmpliconGeneration.generate_amplicons_smarter_cy, zip(itertools.repeat(amplicons), itertools.repeat(amplicons_lb),
                                                                            itertools.repeat(amplicons_ub), itertools.repeat(amplicon_width),
                                                                            itertools.repeat(amplicons.shape[0]), itertools.repeat(sequences_num),
-                                                                           sequence_pairs_partition, itertools.repeat(lineages_list),
+                                                                           sequence_pairs_partition, partition_sizes,
+                                                                           itertools.repeat(ids_list), itertools.repeat(comparison_matrix_num),
+                                                                           itertools.repeat(relevant_nucleotides), itertools.repeat(relevant_nucleotides.shape[0]),
+                                                                           itertools.repeat(amplicon_threshold)))
+        """
+        diffs_per_amp = pool.starmap(AmpliconGeneration.generate_amplicons_smarter_cy, zip(itertools.repeat(AMPS), itertools.repeat(amplicon_width),
+                                                                           itertools.repeat(AMPS.shape[0]), itertools.repeat(sequences_num),
+                                                                           sequence_pairs_partition, partition_sizes,
                                                                            itertools.repeat(ids_list), itertools.repeat(comparison_matrix_num),
                                                                            itertools.repeat(relevant_nucleotides), itertools.repeat(relevant_nucleotides.shape[0]),
                                                                            itertools.repeat(amplicon_threshold)))
@@ -533,10 +546,11 @@ def generate_amplicons_mp_smartest(sequences, amplicon_width, comparison_matrix,
 
     st = time.time()
     res = []
-    for amplicon_index in range(amplicons.shape[0]):
-        res.append(Amplicon(amplicons[amplicon_index], amplicons[amplicon_index]+amplicon_width))
-        cur_diffs = [part[(amplicons[amplicon_index], amplicons[amplicon_index]+amplicon_width)] for part in diffs_per_amp]
-        res[-1].differences = set.union(*cur_diffs)
+    for amplicon_index in range(AMPS.shape[0]):
+        res.append(Amplicon(AMPS[amplicon_index][0], AMPS[amplicon_index][0]+amplicon_width))
+        cur_diffs = [part[(AMPS[amplicon_index][0], AMPS[amplicon_index][0]+amplicon_width)] for part in diffs_per_amp]
+        #res[-1].differences = set.union(*cur_diffs)
+        res[-1].differences = set([item for sublist in cur_diffs for item in sublist])
     print(str(time.time() - st) + 's spent combining')
     return res
 
@@ -546,9 +560,7 @@ def translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_
     char_comp = np.zeros((len(chars), len(chars)), dtype=np.int8)
     chars2num = {}
     seqs_num = np.zeros((len(sequences), sequences[0].length), dtype=np.int32)
-    amplicons_num = np.zeros((len(amplicons)), dtype=np.int32)
-    amplicons_lb = np.zeros((len(amplicons)), dtype=np.int32)
-    amplicons_ub = np.zeros((len(amplicons)), dtype=np.int32)
+    AMPS = np.zeros((len(amplicons), 3), dtype=np.int32)
     
     for char_index in range(len(chars)):
         chars2num[chars[char_index]] = char_index
@@ -563,12 +575,12 @@ def translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_
             seqs_num[s][i] = chars2num[sequences[s].sequence[i]]
             
     for a in range(len(amplicons)):
-        amplicons_num[a] = amplicons[a][0]
+        AMPS[a][0] = amplicons[a][0]
         cur = np.where(relevant_nucleotides < amplicons[a][0])[0]
         if cur.shape[0] > 0:
-            amplicons_lb[a] = cur[-1]
+            AMPS[a][1] = cur[-1]
         cur = np.where(relevant_nucleotides < amplicons[a][1])[0]
         if cur.shape[0] > 0:
-            amplicons_ub[a] = cur[-1]
+            AMPS[a][2] = cur[-1]
                 
-    return chars2num, char_comp, seqs_num, amplicons_num, amplicons_lb, amplicons_ub
+    return chars2num, char_comp, seqs_num, AMPS
