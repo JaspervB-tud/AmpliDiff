@@ -63,7 +63,7 @@ def translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_
 
 if __name__ == '__main__':
     sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/source_code/amplivar/testing', '/Users/jaspervanbemmelen/Documents/Wastewater/source_code/amplivar/testing')
-    sequences = sequences[:600]
+    sequences = sequences[:500]
     sequences, lb, ub, feasible_amplicons, relevant_nucleotides = preprocess_sequences(sequences, 50, amplicon_width=400, misalign_threshold=10)
     
     seqs = [s.sequence for s in sequences]
@@ -72,24 +72,25 @@ if __name__ == '__main__':
 
     amps = list(feasible_amplicons)
     amps.sort(key = lambda x : x[0])
-    amps = amps[:3000]
+    amps = amps[:10000]
 
     amplicon_width = 400
     M = generate_opportunistic_matrix()
     c, C, S, A, A_lb, A_ub = translate_to_numeric(sequences, amps, relevant_nucleotides, M)
     
     rel = relevant_nucleotides[relevant_nucleotides < amps[-1][1]]
-    
+
+    runtimes = 0
 
     st = time.time()
-    amps2 = generate_amplicons_mp_smartest(sequences, 400, M, amplicon_threshold=1, feasible_amplicons=amps, relevant_nucleotides=rel, processors=2)
+    generate_amplicons_mp_smartest(sequences, 400, M, amplicon_threshold=1, feasible_amplicons=amps, relevant_nucleotides=rel, processors=4)
     print('New runtime: ' + str(time.time() - st))
 
     st = time.time()
-    amps1 = generate_amplicons_mp_exp_cy(sequences, 400, M, amplicon_threshold=1, feasible_amplicons=amps, processors=2)
-    print(time.time() - st)
+    generate_amplicons_mp_exp_cy(sequences, 400, M, amplicon_threshold=1, feasible_amplicons=amps, processors=4)
+    print('Old runtime: ' + str(time.time() - st))
 
-
+    '''
     same = True
     if len(amps1) != len(amps2):
         same = False
@@ -100,8 +101,6 @@ if __name__ == '__main__':
             same = False
     print(same)
 
-
-    '''
     st = time.time()
     amps1 = AmpliconGeneration.determine_differences_cy(amps, seqs, lineages, ids, 1, M)
     print('Initial method: ' + str(time.time() - st))

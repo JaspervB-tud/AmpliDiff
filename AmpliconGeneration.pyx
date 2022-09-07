@@ -147,28 +147,32 @@ def generate_amplicons_sequencewise_cy(amplicons, included_amplicons, str mem_na
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-def generate_amplicons_smarter_cy(int[:] amplicons, int[:] amplicons_lb, int[:] amplicons_ub, int amplicon_width, int num_amps, int[:,:] sequences, sequence_pairs, lineages, ids, signed char[:,:] comparison_matrix, long[:] relevant_nucleotides, int num_relevant, int amplicon_threshold):
+def generate_amplicons_smarter_cy(int[:,:] AMPS, int amplicon_width, int num_amps, int[:,:] sequences, int[:,:] sequence_pairs, int total_sequence_pairs, int[:] ids, signed char[:,:] comparison_matrix, long[:] relevant_nucleotides, int num_relevant, int amplicon_threshold):
     cdef int[:] diffs_cum
-    cdef int seq1, seq2, amp, cur_sum, i, cur_index, cur_lb, cur_ub
-    diffs_per_amp = {(a,a + amplicon_width): set() for a in amplicons}
+    cdef int seq1, seq2, amp, cur_sum, j, cur_index, cur_lb, cur_ub
+    cdef dict diffs_per_amp = {(AMPS[cur_index][0],AMPS[cur_index][0] + amplicon_width): [] for cur_index in range(num_amps)}
+    cdef long i
 
-    for (seq1, seq2) in sequence_pairs:
+    for cur_pair in range(total_sequence_pairs):
+        seq1 = sequence_pairs[cur_pair][0]
+        seq2 = sequence_pairs[cur_pair][1]
         cur_sum = 0
         diffs_cum = np.zeros((num_relevant), dtype=np.int32)
         cur_index = 0
-        for i in relevant_nucleotides:
+        for j in range(num_relevant):
+            i = relevant_nucleotides[j]
             cur_sum += comparison_matrix[sequences[seq1][i], sequences[seq2][i]]
             diffs_cum[cur_index] = cur_sum
             cur_index += 1
         for amp in range(num_amps):
-            cur_lb = relevant_nucleotides[amplicons_lb[amp]]
-            cur_ub = relevant_nucleotides[amplicons_ub[amp]]
-            if amplicons[amp] <= cur_lb:
-                if diffs_cum[amplicons_ub[amp]] > amplicon_threshold:
-                    diffs_per_amp[(amplicons[amp], amplicons[amp] + amplicon_width)].add((ids[seq1],ids[seq2]))
+            cur_lb = relevant_nucleotides[AMPS[amp][1]]
+            cur_ub = relevant_nucleotides[AMPS[amp][2]]
+            if AMPS[amp][0] <= cur_lb:
+                if diffs_cum[AMPS[amp][2]] > amplicon_threshold:
+                    diffs_per_amp[(AMPS[amp][0], AMPS[amp][0] + amplicon_width)].append((ids[seq1],ids[seq2]))
             else:
-                if diffs_cum[amplicons_ub[amp]] - diffs_cum[amplicons_lb[amp]] > amplicon_threshold:
-                    diffs_per_amp[(amplicons[amp], amplicons[amp] + amplicon_width)].add((ids[seq1],ids[seq2]))
+                if diffs_cum[AMPS[amp][2]] - diffs_cum[AMPS[amp][1]] > amplicon_threshold:
+                    diffs_per_amp[(AMPS[amp][0], AMPS[amp][0] + amplicon_width)].append((ids[seq1],ids[seq2]))
     return diffs_per_amp
     '''
     for seq1 in range(num_seqs):
