@@ -66,7 +66,7 @@ class Amplicon:
         try:
             for difference in differences:
                 if difference[0].lineage != difference[1].lineage:
-                    self.differences_proper.add((difference[0].alt_id, difference[1].alt_id))
+                    self.differences_proper.add((difference[0].id_num, difference[1].id_num))
         except:
             pass
         
