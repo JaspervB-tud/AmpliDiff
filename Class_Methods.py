@@ -52,7 +52,7 @@ def generate_sequences(in_folder, out_folder):
             else:
                 #meta[0] always contains the id
                 if meta[0] not in to_delete:
-                    sequences.append(Sequence(sequences_temp[meta[0]], meta[0], lineage=meta[skip]))
+                    sequences.append(Sequence(sequences_temp[meta[0].replace(' ', '')], meta[0], lineage=meta[skip]))
                 
     except:
         print('Unable to read metadata from file')
