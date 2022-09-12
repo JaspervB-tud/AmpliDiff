@@ -209,7 +209,7 @@ class PrimerIndex():
         None
         
         '''
-        sequence_ids = [sequence.alt_id for sequence in sequences]
+        sequence_ids = [sequence.id_num for sequence in sequences]
         amplicon.primers = {'forward' : {s : set() for s in sequence_ids}, 'reverse' : {s : set() for s in sequence_ids}}
         amplicon.full_primerset = {'forward' : set(), 'reverse' : set()}
         for sequence in sequences:
@@ -232,7 +232,7 @@ class PrimerIndex():
                     for forward_primer in disambiguate(current_fwd_primer):
                         if forward_primer in self.primer2index['forward']:
                             if self.index2primer['forward'][self.primer2index['forward'][forward_primer]].feasible:
-                                amplicon.primers['forward'][sequence.alt_id].add(self.primer2index['forward'][forward_primer])
+                                amplicon.primers['forward'][sequence.id_num].add(self.primer2index['forward'][forward_primer])
                                 amplicon.full_primerset['forward'].add(self.primer2index['forward'][forward_primer])
                 #Iterate over reverse primers for this sequence        
                 current_rev_primer = reverse_complement(sequence.sequence_raw[reverse_start_index + offset : reverse_start_index + primer_width + offset])
@@ -240,7 +240,7 @@ class PrimerIndex():
                     for reverse_primer in disambiguate(current_rev_primer):
                         if reverse_primer in self.primer2index['reverse']:
                             if self.index2primer['reverse'][self.primer2index['reverse'][reverse_primer]].feasible:
-                                amplicon.primers['reverse'][sequence.alt_id].add(self.primer2index['reverse'][reverse_primer])
+                                amplicon.primers['reverse'][sequence.id_num].add(self.primer2index['reverse'][reverse_primer])
                                 amplicon.full_primerset['reverse'].add(self.primer2index['reverse'][reverse_primer])
 
     def update_conflict_matrix(self, primers):
