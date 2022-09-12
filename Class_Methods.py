@@ -666,6 +666,7 @@ def translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_
 
 def greedy(sequences, amplicons, differences_per_amplicon, primer_width, search_width, primer_index, comparison_matrix, max_amplicons, coverage, temperature_range, logging=False, multiplex=False):
     to_cover = np.sum(differences_per_amplicon, axis=0)
+    to_cover = np.sum(to_cover > 0)
 
     if logging:
         log_results = ['Total to cover based on amplicon feasibility: ' + str(to_cover) + ' with ' + str(len(sequences)) + ' sequences and ' + str(len(amplicons)) + ' amplicons.']
