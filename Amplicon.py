@@ -1,8 +1,11 @@
 class Amplicon:
+    existing_amplicons = 0
     def __init__(self, start, end):
         self.start = start
         self.end = end
         self.id = (start,end)
+        self.id_num = Amplicon.existing_amplicons
+        Amplicon.existing_amplicons += 1
         #Note here that primers are stored as their index in the PrimerIndex, not as Primer object, and every orientation holds the primer indices per sequence
         self.primers = {'forward' : {}, 'reverse': {}} 
         self.differences = set()
