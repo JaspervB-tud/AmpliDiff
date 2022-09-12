@@ -5,6 +5,8 @@ import multiprocessing as mp
 from multiprocessing import shared_memory
 import itertools
 import time
+import gurobipy as gp
+from gurobipy import GRB
 
 from Sequence import *
 from Amplicon import *
@@ -552,7 +554,84 @@ def generate_amplicons_mp_smartest(sequences, amplicon_width, comparison_matrix,
         #res[-1].differences = set.union(*cur_diffs)
         res[-1].differences = set([item for sublist in cur_diffs for item in sublist])
     print(str(time.time() - st) + 's spent combining')
+    print(len(res[0].differences))
     return res
+
+def generate_amplicons_mp_hybrid(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), relevant_nucleotides=None, processors=1):
+    if not lb:
+        lb = 0
+    else:
+        lb = max(lb,0)
+    if not ub:
+        ub = sequences[0].length
+    else:
+        ub = min(ub, sequences[0].length)
+    
+    #Check if feasible amplicons are provided
+    if len(feasible_amplicons) > 0:
+        amplicons = list(feasible_amplicons)
+        amplicons.sort(key = lambda x : x[0])
+    else:
+        amplicons = np.arange(lb, ub-lb-amplicon_width+1, 1, dtype=np.int32)
+    
+    #Transform input to numeric and otherwise relevant variables
+    st = time.time()
+    lineages_list = [sequence.lineage_num for sequence in sequences]
+    ids_list = [sequence.id_num for sequence in sequences]
+    _, comparison_matrix_num, sequences_num, AMPS = translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_matrix)
+
+    sequence_pairs_list = []
+    for s1 in range(len(sequences)):
+        for s2 in range(s1):
+            if sequences[s1].lineage != sequences[s2].lineage:
+                sequence_pairs_list.append([s2,s1])
+
+    sequence_pairs_list = np.array(sequence_pairs_list, dtype=np.int32)
+    ids_list = np.array(ids_list, dtype=np.int32)
+    sequence_pairs_partition = [ sequence_pairs_list[i:i+ceil(sequence_pairs_list.shape[0]/processors)][:] for i in range(0, sequence_pairs_list.shape[0], ceil(sequence_pairs_list.shape[0]/processors)) ]
+    partition_sizes = [spp.shape[0] for spp in sequence_pairs_partition]
+
+    shared_mem = shared_memory.SharedMemory(create=True, size=np.dtype(np.int8).itemsize*np.prod((AMPS.shape[0], len(sequences), len(sequences))))
+    shared_array = np.ndarray((len(amplicons), len(sequences), len(sequences)), dtype=np.int8, buffer=shared_mem.buf)
+    print(str(len(amplicons)) + ', ' + str(len(sequences)))
+    shared_array[:] = 0
+
+    print(str(time.time() - st) + 's spent preprocessing')
+
+    st = time.time()
+    with mp.Pool(processors) as pool:
+        """
+        diffs_per_amp = pool.starmap(AmpliconGeneration.generate_amplicons_smarter_cy, zip(itertools.repeat(amplicons), itertools.repeat(amplicons_lb),
+                                                                           itertools.repeat(amplicons_ub), itertools.repeat(amplicon_width),
+                                                                           itertools.repeat(amplicons.shape[0]), itertools.repeat(sequences_num),
+                                                                           sequence_pairs_partition, partition_sizes,
+                                                                           itertools.repeat(ids_list), itertools.repeat(comparison_matrix_num),
+                                                                           itertools.repeat(relevant_nucleotides), itertools.repeat(relevant_nucleotides.shape[0]),
+                                                                           itertools.repeat(amplicon_threshold)))
+        """
+        pool.starmap(AmpliconGeneration.generate_amplicons_hybrid_cy, zip(itertools.repeat(AMPS), itertools.repeat(amplicon_width),
+                                                                           itertools.repeat(AMPS.shape[0]), itertools.repeat(sequences_num),
+                                                                           sequence_pairs_partition, partition_sizes, itertools.repeat(sequences_num.shape[0]),
+                                                                           itertools.repeat(ids_list), itertools.repeat(comparison_matrix_num),
+                                                                           itertools.repeat(relevant_nucleotides), itertools.repeat(relevant_nucleotides.shape[0]),
+                                                                           itertools.repeat(amplicon_threshold), itertools.repeat(shared_mem.name)))
+    print(str(time.time() - st) + 's spent differentiating')
+
+    st = time.time()
+    res = []
+    for amplicon_index in range(AMPS.shape[0]):
+        res.append(Amplicon(AMPS[amplicon_index][0], AMPS[amplicon_index][0]+amplicon_width))
+    print(str(time.time() - st) + 's spent combining')
+
+    st = time.time()
+    X = np.zeros(shared_array.shape, dtype=np.int8)
+    X[:] = shared_array[:]
+    print(str(time.time() - st) + 's spent copying array')
+
+    shared_mem.close()
+    shared_mem.unlink()
+
+    return res, X
 
 def translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_matrix):
     
@@ -584,3 +663,110 @@ def translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_
             AMPS[a][2] = cur[-1]
                 
     return chars2num, char_comp, seqs_num, AMPS
+
+def greedy(sequences, amplicons, differences_per_amplicon, primer_width, search_width, primer_index, comparison_matrix, max_amplicons, coverage, temperature_range, logging=False, multiplex=False):
+    to_cover = np.sum(differences_per_amplicon, axis=0)
+
+    if logging:
+        log_results = ['Total to cover based on amplicon feasibility: ' + str(to_cover) + ' with ' + str(len(sequences)) + ' sequences and ' + str(len(amplicons)) + ' amplicons.']
+    
+    result_amplicons = []       #this will store the result amplicons
+
+    amplicons.sort(key = lambda x : np.sum(differences_per_amplicon[x.id_num]), reverse=True) #sort based on differentiability
+    while to_cover > 0 and len(result_amplicons) < max_amplicons and len(amplicons) > 0:
+        best_amplicon = amplicons.pop(0)
+
+        if logging:
+            log_results.append('Checking amplicon: ' + str(best_amplicon.id))
+        primer_index.check_amplicon(sequences, best_amplicon, primer_width, search_width)
+        result_amplicons.append(best_amplicon)
+
+        #Check if current amplicon can be added based on primer feasibility
+        if multiplex:
+            check = check_primer_feasibility(sequences, result_amplicons, primer_index, optimize=0, temperature_range=temperature_range, coverage=coverage)
+        else:
+            check = check_primer_feasibility(sequences, [best_amplicon], primer_index, optimize=0, temperature_range=temperature_range, coverage=coverage)
+        
+        #If amplicon can be added
+        if check:
+            to_cover = to_cover - np.sum(differences_per_amplicon[best_amplicon.id_num])
+            if logging:
+                log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(differences_per_amplicon[best_amplicon.id_num])))
+            for amplicon in amplicons:
+                differences_per_amplicon[amplicon.id_num][differences_per_amplicon[best_amplicon.id_num] == 1] = 0
+            amplicons = [a for a in amplicons if np.sum(differences_per_amplicon[a.id_num]) > 0]
+            amplicons.sort(key = lambda x : np.sum(differences_per_amplicon[x.id_num]), reverse=True)
+        else:
+            result_amplicons.pop(-1)
+            if logging:
+                log_results.append('Amplicon ' + str(best_amplicon.id) + ' rejected due to being unable to find primers to cover enough sequences')
+    if logging:
+        return log_results, result_amplicons
+    else:
+        return result_amplicons
+
+def check_primer_feasibility(sequences, amplicons, primer_index, optimize=0, temperature_range=5, coverage=1):
+    env = gp.Env(empty=True)
+    env.setParam('OutputFlag',0) #turns off logging
+    env.start()
+    
+    model = gp.Model(env=env)
+    model.ModelSense = GRB.MINIMIZE
+
+    #Primer variables
+    forward_primers = {} #primer -> (variable, temp)
+    reverse_primers = {} #primer -> (variable, temp)
+    covered_binary = {} #(sequence, amplicon) -> variable
+    #Initialize variables
+    for amplicon in amplicons:
+        for sequence in amplicon.primers['forward']:
+            for primer in amplicon.primers['forward'][sequence]:
+                if primer not in forward_primers:
+                    forward_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=optimize), primer_index.index2primer['forward'][primer].temperature)
+            for primer in amplicon.primers['reverse'][sequence]:
+                if primer not in reverse_primers:
+                    reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=optimize), primer_index.index2primer['reverse'][primer].temperature)
+            covered_binary[(sequence, amplicon.id)] = model.addVar(vtype=GRB.BINARY, obj=0)
+    #Temperature variables
+    max_temp = model.addVar(vtype=GRB.CONTINUOUS, obj=0)
+    min_temp = model.addVar(vtype=GRB.CONTINUOUS, obj=0)
+            
+    #Enforce covered_binary variables to 0 if they aren't covered
+    for amplicon in amplicons:
+        #Coverage per sequence per amplicon
+        for sequence in sequences:
+            model.addConstr(covered_binary[(sequence.alt_id, amplicon.id)] <= sum(forward_primers[primer][0] for primer in amplicon.primers['forward'][sequence.alt_id]))
+            model.addConstr(covered_binary[(sequence.alt_id, amplicon.id)] <= sum(reverse_primers[primer][0] for primer in amplicon.primers['reverse'][sequence.alt_id]))
+        #At least $coverage (fraction) of the sequences should be covered per amplicon
+        model.addConstr(sum(covered_binary[(sequence.alt_id, amplicon.id)] for sequence in sequences) >= coverage * len(sequences))
+        #Temperature constraints
+        for primer in amplicon.full_primerset['forward']: #iterate over forward primers
+            model.addConstr( min_temp <= primer_index.index2primer['forward'][primer].temperature * (3 - 2 * forward_primers[primer][0]) )
+        for primer in amplicon.full_primerset['reverse']:
+            model.addConstr( max_temp >= primer_index.index2primer['reverse'][primer].temperature * reverse_primers[primer][0] )
+    model.addConstr(max_temp - min_temp <= temperature_range)
+        
+    #Check primer conflicts
+    for pair in itertools.combinations(forward_primers.keys(), 2):
+        model.addConstr( forward_primers[pair[0]][0] + forward_primers[pair[1]][0] <= primer_index.check_conflict( [primer_index.index2primer['forward'][pair[0]], primer_index.index2primer['forward'][pair[1]]] ) )
+    for pair in itertools.combinations(reverse_primers.keys(), 2):
+        model.addConstr( reverse_primers[pair[0]][0] + reverse_primers[pair[1]][0] <= primer_index.check_conflict( [primer_index.index2primer['reverse'][pair[1]], primer_index.index2primer['reverse'][pair[1]]] ) )
+    for fwd in forward_primers:
+        for rev in reverse_primers:
+            model.addConstr( forward_primers[fwd][0] + reverse_primers[rev][0] <= primer_index.check_conflict( [primer_index.index2primer['forward'][fwd], primer_index.index2primer['reverse'][rev]] ) )
+    
+    model.optimize()
+    if optimize == 1 and model.Status == 2:
+        res = {'forward' : [], 'reverse' : []}
+        print('Forward primers: ')
+        for primer in forward_primers:
+            if forward_primers[primer][0].x > 0.9:
+                print(primer_index.index2primer['forward'][primer].sequence)
+                res['forward'].append(primer_index.index2primer['forward'][primer].sequence)
+        print('Reverse primers: ')
+        for primer in reverse_primers:
+            if reverse_primers[primer][0].x > 0.9:
+                print(primer_index.index2primer['reverse'][primer].sequence)
+                res['reverse'].append(primer_index.index2primer['reverse'][primer].sequence)
+        return res
+    return model.Status == 2
