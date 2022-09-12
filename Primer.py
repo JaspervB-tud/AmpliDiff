@@ -36,10 +36,10 @@ class Primer:
 
         '''
         if self.feasible:
-            if sequence.alt_id not in self.indices:
-                self.indices[sequence.alt_id] = sequence_index
+            if sequence.id_num not in self.indices:
+                self.indices[sequence.id_num] = sequence_index
             else:
-                if not self.indices[sequence.alt_id] == sequence_index:
+                if not self.indices[sequence.id_num] == sequence_index:
                     self.indices = None
                     self.feasible = False
                     return False
