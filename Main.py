@@ -103,7 +103,7 @@ def run_comparison(args):
         f.write('Total feasible amplicons: ' + str(len(amplicons)) + '\n')
 
     st = time.time()
-    logs, amplicons, result_amplicons = greedy(sequences, amplicons, diffs_per_amplicon, args.primer_width, args.search_width, PI, comparison_matrix, args.amplicons, args.coverage, 5, logging=True, mulitplex=args.multiplex)
+    logs, amplicons, result_amplicons = greedy(sequences, amplicons, diffs_per_amplicon, args.primer_width, args.search_width, PI, comparison_matrix, args.amplicons, args.coverage, 5, logging=True, multiplex=args.multiplex)
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent running greedy algorithm: ' + str(time.time() - st) + '\n')
     
