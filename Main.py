@@ -100,7 +100,6 @@ def run_comparison(args):
     amplicons, diffs_per_amplicon = generate_amplicons_mp_hybrid(sequences, args.amplicon_width, comparison_matrix, amplicon_threshold=args.amplicon_threshold, feasible_amplicons=feasible_amplicons, relevant_nucleotides=relevant_nucleotides, processors=args.cores)
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent generating amplicon differentiation ' + str(time.time() - st) + '\n')
-        f.write('Total feasible amplicons: ' + str(len(amplicons)) + '\n')
 
     st = time.time()
     logs, amplicons, result_amplicons = greedy(sequences, amplicons, diffs_per_amplicon, args.primer_width, args.search_width, PI, comparison_matrix, args.amplicons, args.coverage, 5, logging=True, multiplex=args.multiplex)
