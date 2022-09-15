@@ -43,6 +43,8 @@ def run_plots(args):
                                         + 'amps' + str(namps) + '_'\
                                         + 'nseqs' + str(nseqs) + '/'
 
+                                        print(cur_filename)
+
                                         for seed in range(1,11):
                                             try:
                                                 with open(cur_filename + 'runtimes_' + str(seed) + '.txt', 'r') as f:
@@ -55,7 +57,6 @@ def run_plots(args):
                                                 num_per_ampwidth[ampw] += 1
                                                 num_per_nseqs[nseqs] += 1
                                                 num_total += 1
-                                                print(ampw)
                                             except:
                                                 continue
                                                     
