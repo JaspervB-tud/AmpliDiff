@@ -26,6 +26,8 @@ def run_plots(args):
         counts_aggregated = np.zeros((sequence_length), dtype=np.int16)
         num_total = 0
 
+        print(parameters)
+
         for ampw in parameters['ampwidth']:
             for ampt in parameters['ampthresh']:
                 for mist in parameters['misthresh']:
