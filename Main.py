@@ -11,6 +11,162 @@ from math import ceil
 from multiprocessing import shared_memory
 import argparse
 import random
+import Bio
+from Bio import pairwise2
+from Bio.pairwise2 import format_alignment
+import matplotlib.pyplot as plt
+
+def run_plots(args):
+    def generate_counts(base_folder, parameters, sequence_length):
+        folder_name = base_folder + 'time_experiments/' + 'Soloplex/'
+        counts_per_ampwidth = {width : np.zeros((sequence_length), dtype=np.int16) for width in parameters['ampwidth']}
+        num_per_ampwidth = {width : 0 for width in parameters['ampwidth']}
+        counts_per_nseqs = {nseqs : np.zeros((sequence_length), dtype=np.int16) for nseqs in parameters['nseqs']}
+        num_per_nseqs = {nseqs : 0 for nseqs in parameters['nseqs']}
+        counts_aggregated = np.zeros((sequence_length), dtype=np.int16)
+        num_total = 0
+
+        for ampw in parameters['ampwidth']:
+            for ampt in parameters['ampthresh']:
+                for mist in parameters['misthresh']:
+                    for pwidth in parameters['primwidth']:
+                        for swidth in parameters['searchwidth']:
+                            for cov in parameters['cov']:
+                                for namps in parameters['amps']:
+                                    for nseqs in parameters['nseqs']:
+                                        cur_filename = folder_name + 'ampwidth' + str(ampw) + '_'\
+                                        + 'ampthresh' + str(ampt) + '_'\
+                                        + 'misthresh' + str(mist) + '_'\
+                                        + 'primwidth' + str(pwidth) + '_'\
+                                        + 'searchwidth' + str(swidth) + '_'\
+                                        + 'cov' + str(cov) + '_'\
+                                        + 'amps' + str(namps) + '_'\
+                                        + 'nseqs' + str(nseqs) +'/'
+                                        for seed in range(1,11):
+                                            try:
+                                                with open(cur_filename + 'runtimes_' + str(seed) + '.txt', 'r') as f:
+                                                    for line in f.readlines():
+                                                        if 'Amplicon' in line:
+                                                            cur_amplicon = eval(line.split(':')[-1])
+                                                            counts_per_ampwidth[ampw][range(cur_amplicon[0],cur_amplicon[1])] += 1
+                                                            counts_per_nseqs[nseqs][range(cur_amplicon[0],cur_amplicon[1])] += 1
+                                                            counts_aggregated[range(cur_amplicon[0],cur_amplicon[1])] += 1
+                                                num_per_ampwidth[ampw] += 1
+                                                num_per_nseqs[nseqs] += 1
+                                                num_total += 1
+                                            except:
+                                                continue
+                                                    
+            return counts_per_ampwidth, num_per_ampwidth, counts_per_nseqs, num_per_nseqs, counts_aggregated, num_total
+
+    def determine_annotations(sequences, ref_genome):
+        alignments = pairwise2.align.globalxx(sequences[0].sequence_raw.upper(), str(ref_genome.seq))
+        ref_sequence = Sequence(alignments[0].seqB.lower(), 'NC_045512.2')
+        ref_sequence.align_to_trim()
+        sequences[0].align_to_trim()
+        
+        #Annotations are based on annotations for reference genome "NC_045512.2"
+        annotations = {}
+        annotations2 = {}
+        ORF1a = [266, 13483]
+        ORF1b = [13483, 21555]
+        spike_1 = [21599, 23618]
+        spike_2 = [23618, 25381]
+        E = [26245, 26472]
+        M = [26523, 27191]
+        N = [28274, 29553]
+        
+        #ORF1a
+        annotations['ORF1a'] = [np.where(ref_sequence.aligned_to_trim == ORF1a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1a[1])[0][0]]
+        annotations2['ORF1a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][1])[0][0]]
+        #ORF1b
+        annotations['ORF1b'] = [np.where(ref_sequence.aligned_to_trim == ORF1b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1b[1])[0][0]]
+        annotations2['ORF1b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][1])[0][0]]
+        #S1
+        annotations['S1'] = [np.where(ref_sequence.aligned_to_trim == spike_1[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_1[1])[0][0]]
+        annotations2['S1'] = [np.where(sequences[0].aligned_to_trim == annotations['S1'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S1'][1])[0][0]]
+        #S2
+        annotations['S2'] = [np.where(ref_sequence.aligned_to_trim == spike_2[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_2[1])[0][0]]
+        annotations2['S2'] = [np.where(sequences[0].aligned_to_trim == annotations['S2'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S2'][1])[0][0]]
+        #E
+        annotations['E'] = [np.where(ref_sequence.aligned_to_trim == E[0])[0][0], np.where(ref_sequence.aligned_to_trim == E[1])[0][0]]
+        annotations2['E'] = [np.where(sequences[0].aligned_to_trim == annotations['E'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['E'][1])[0][0]]
+        #M
+        annotations['M'] = [np.where(ref_sequence.aligned_to_trim == M[0])[0][0], np.where(ref_sequence.aligned_to_trim == M[1])[0][0]]
+        annotations2['M'] = [np.where(sequences[0].aligned_to_trim == annotations['M'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['M'][1])[0][0]]
+        #N
+        annotations['N'] = [np.where(ref_sequence.aligned_to_trim == N[0])[0][0], np.where(ref_sequence.aligned_to_trim == N[1])[0][0]]
+        annotations2['N'] = [np.where(sequences[0].aligned_to_trim == annotations['N'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['N'][1])[0][0]]
+        
+        return annotations2
+
+    base_folder = '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/'
+    parameters = {
+            'ampwidth' : [200, 400],
+            'ampthresh' : [1],
+            'misthresh' : [10],
+            'primwidth' : [25],
+            'searchwidth' : [50],
+            'cov' : [1],
+            'amps' : ['8_all'],
+            'nseqs' : list(range(100, 2900, 100)) #there are 2749 reference sequences
+        }
+
+    sequences = generate_sequences(args.metadata, args.sequences)
+    ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
+    counts_per_ampwidth, num_per_ampwidth, counts_per_nseqs, num_per_nseqs, counts_aggregated, num_total = generate_counts(base_folder, parameters, sequences[0].length)
+    annotations = determine_annotations(sequences, ref_genome)
+
+    regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'N']
+    colors = ['red', 'blue']
+
+    for ampwidth in parameters['ampwidth']:
+        color_index = 0
+        fig = plt.figure(figsize=[20,10], dpi=200)
+        ax = plt.gca()
+        plt.title('Number of times a nucleotide is covered by an amplicon (' + str(num_per_ampwidth[ampwidth]) + ' runs)', size=25)
+        plt.xlabel('Nucleotide index', size=18)
+        plt.ylabel('Relative occurrence', size=18)
+        plt.plot(counts_per_ampwidth[ampwidth]/(num_per_ampwidth[ampwidth]), color='black', linewidth=2)
+        for region in regions:
+            plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+            plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+            color_index += 1
+        plt.ylim([0, 1.2])
+        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+        del fig, ax
+
+    for nseqs in parameters['nseqs']:
+        color_index = 0
+        fig = plt.figure(figsize=[20,10], dpi=200)
+        ax = plt.gca()
+        plt.title('Number of times a nucleotide is covered by an amplicon (' + str(num_per_nseqs[nseqs]) + ' runs)', size=25)
+        plt.xlabel('Nucleotide index', size=18)
+        plt.ylabel('Relative occurrence', size=18)
+        plt.plot(counts_per_nseqs[nseqs]/(num_per_nseqs[nseqs]), color='black', linewidth=2)
+        for region in regions:
+            plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+            plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+            color_index += 1
+        plt.ylim([0, 1.2])
+        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/nseqs' + str(nseqs) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+        del fig, ax
+
+    color_index = 0
+    fig = plt.figure(figsize=[20,10], dpi=200)
+    ax = plt.gca()
+    plt.title('Number of times a nucleotide is covered by an amplicon (' + str(num_total) + ' runs)', size=25)
+    plt.xlabel('Nucleotide index', size=18)
+    plt.ylabel('Relative occurrence', size=18)
+    plt.plot(counts_aggregated/(num_total), color='black', linewidth=2)
+    for region in regions:
+        plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+        color_index += 1
+    plt.ylim([0, 1.2])
+    plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/all.pdf', figsize=[20,10], dpi=200, format='pdf')
+    del fig, ax
+
 
 def run_comparison(args):
     #initialize variables to store information
@@ -218,10 +374,11 @@ if __name__ == '__main__':
     
     if args.run_type == 'runtime_comparison':
         run_comparison(args)
-    
     elif args.run_type == 'greedy':
         print('test')
         #run_greedy(args)
+    elif args.run_type == 'plot':
+        run_plots(args)
 
 
 
