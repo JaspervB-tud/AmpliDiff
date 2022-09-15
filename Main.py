@@ -41,21 +41,21 @@ def run_plots(args):
                                         + 'searchwidth' + str(swidth) + '_'\
                                         + 'cov' + str(cov) + '_'\
                                         + 'amps' + str(namps) + '_'\
-                                        + 'nseqs' + str(nseqs) +'/'
+                                        + 'nseqs' + str(nseqs) + '/'
+
                                         for seed in range(1,11):
                                             try:
                                                 with open(cur_filename + 'runtimes_' + str(seed) + '.txt', 'r') as f:
                                                     for line in f.readlines():
                                                         if 'Amplicon' in line:
                                                             cur_amplicon = eval(line.split(':')[-1])
-                                                            print(cur_amplicon)
-                                                            print(type(cur_amplicon[0]))
                                                             counts_per_ampwidth[ampw][range(cur_amplicon[0],cur_amplicon[1])] += 1
                                                             counts_per_nseqs[nseqs][range(cur_amplicon[0],cur_amplicon[1])] += 1
                                                             counts_aggregated[range(cur_amplicon[0],cur_amplicon[1])] += 1
                                                 num_per_ampwidth[ampw] += 1
                                                 num_per_nseqs[nseqs] += 1
                                                 num_total += 1
+                                                print(ampw)
                                             except:
                                                 continue
                                                     
