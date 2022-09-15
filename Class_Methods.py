@@ -313,251 +313,43 @@ def preprocess_sequences(sequences, min_non_align, variants_location=None, varia
     
     return sequences, lb, ub, feasible_amplicons, relevant_nucleotides
 
-def generate_amplicons_mp_exp_cy(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), processors=1):
-
-    #Check if there are feasible amplicons in input
-    if len(feasible_amplicons) > 0:
-        amplicons = list(feasible_amplicons)
-        amplicons.sort(key = lambda x : x[0])
-    else:
-        if not lb:
-            lb = 0
-        else:
-            lb = max(lb, 0)
-        if not ub:
-            ub = sequences[0].length
-        else:
-            ub = min(ub, sequences[0].length)
-        amplicons = [(i,i+amplicon_width) for i in range(ub - lb - amplicon_width + 1)]
-    #Store information of interest in lists as to not pass entire sequence objects to Pool
-    lins = [seq.lineage_num for seq in sequences]
-    seqs = [seq.sequence for seq in sequences]
-    ids = [seq.id_num for seq in sequences]
-    #Partition the amplicon set which will get passed on different poolworkers
-    amplicons_part = [ amplicons[i:i+(ceil(len(amplicons)/processors))] for i in range(0, len(amplicons), ceil(len(amplicons)/processors))]
-    
-    with mp.Pool(processors) as pool:
-        res = pool.starmap(AmpliconGeneration.determine_differences_cy, zip(amplicons_part, itertools.repeat(seqs), itertools.repeat(lins), itertools.repeat(ids), itertools.repeat(amplicon_threshold), itertools.repeat(comparison_matrix)))
-    
-    result_amplicons = []
-    for partition in res:
-        for amp in partition:
-            result_amplicons.append(Amplicon(amp[0], amp[1]))
-            result_amplicons[-1].differences = partition[amp]
-    return result_amplicons    
-
-def generate_amplicons_mp_exp_cy2(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), relevant_nucleotides=None, processors=1):
-
-    if not lb:
-        lb = 0
-    else:
-        lb = max(lb, 0)
-    if not ub:
-        ub = sequences[0].length
-    else:
-        ub = min(ub, sequences[0].length)
-
-    #Check if there are feasible amplicons in input
-    if len(feasible_amplicons) > 0:
-        amplicons = list(feasible_amplicons)
-        amplicons.sort(key = lambda x : x[0])
-    else:
-        amplicons = [(i,i+amplicon_width) for i in range(ub - lb - amplicon_width + 1)]
-    #Store information of interest in lists as to not pass entire sequence objects to Pool
-    lins = [seq.lineage_num for seq in sequences]
-    seqs = [seq.sequence for seq in sequences]
-    ids = [seq.id_num for seq in sequences]
-
-    if not type(relevant_nucleotides) == np.ndarray:
-        relevant_nucleotides = np.arange(lb, ub, 1, dtype = int)
-
-    #Partition the amplicon set which will get passed on different poolworkers
-    amplicons_part = [ amplicons[i:i+(ceil(len(amplicons)/processors))] for i in range(0, len(amplicons), ceil(len(amplicons)/processors))]
-    to_check_part = [relevant_nucleotides[(relevant_nucleotides >= part[0][0])*(relevant_nucleotides <= part[-1][1])] for part in amplicons_part]
-    
-    with mp.Pool(processors) as pool:
-        res = pool.starmap(AmpliconGeneration.determine_differences_cy2, zip(amplicons_part, itertools.repeat(seqs), itertools.repeat(lins), itertools.repeat(ids), itertools.repeat(amplicon_threshold), itertools.repeat(comparison_matrix), to_check_part))
-
-    result_amplicons = []
-    for partition in res:
-        for amp in partition:
-            result_amplicons.append(Amplicon(amp[0], amp[1]))
-            result_amplicons[-1].differences = partition[amp]
-    return result_amplicons  
-
-def generate_amplicons_mp_sequences(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), relevant_nucleotides=None, processors=1):
-    if not lb:
-        lb = 0
-    else:
-        lb = max(lb, 0)
-    if not ub:
-        ub = sequences[0].length
-    else:
-        ub = min(ub, sequences[0].length)
-
-    #Check for feasible amplicons in input
-    if len(feasible_amplicons) > 0:
-        amplicons = list(feasible_amplicons)
-        amplicons.sort(key = lambda x : x[0])
-    else:
-        amplicons = [(i,i+amplicon_width) for i in range(ub - lb - amplicon_width + 1)]
-
-    #Store information of interest in lists as to not pass entire sequence objects to Pool
-    lineages_list = [sequence.lineage_num for sequence in sequences]
-    sequences_list = [sequence.sequence for sequence in sequences]
-    ids_list = [sequence.id_num for sequence in sequences]
-    index_list = list(range(len(sequences)))
-    index_list_amplicons = list(range(len(amplicons)))
-
-    sequence_pairs_list = list(itertools.combinations(index_list, 2))
-    sequence_pair_partition = [ sequence_pairs_list[i:i+(ceil(len(sequence_pairs_list)/processors))] for i in range(0, len(sequence_pairs_list), ceil(len(sequence_pairs_list)/processors)) ]
-    #amplicons_part = [ amplicons[i:i+(ceil(len(amplicons)/processors))] for i in range(0, len(amplicons), ceil(len(amplicons)/processors)) ]
-    #included_amplicons = [ index_list_amplicons[i:i+(ceil(len(index_list_amplicons)/processors))] for i in range(0, len(index_list_amplicons), ceil(len(index_list_amplicons)/processors)) ]
-
-    #Check which nucleotides have to be considered
-    if not type(relevant_nucleotides) == np.ndarray:
-        relevant_nucleotides = np.arange(lb,ub,1,dtype=int)
-
-    shared_mem = shared_memory.SharedMemory(create=True, size=np.dtype(np.int8).itemsize*np.prod((len(amplicons), len(sequences), len(sequences))))
-    shared_array = np.ndarray((len(amplicons), len(sequences), len(sequences)), dtype=np.int8, buffer=shared_mem.buf)
-    shared_array[:] = 0
-
-    with mp.Pool(processors) as pool:
-        pool.starmap(AmpliconGeneration.determine_differences_sequencewise_cy, 
-        zip(itertools.repeat(amplicons), sequence_pair_partition, itertools.repeat(sequences_list), itertools.repeat(lineages_list), itertools.repeat(ids_list), 
-        itertools.repeat(amplicon_threshold), itertools.repeat(comparison_matrix), itertools.repeat(relevant_nucleotides),
-        itertools.repeat(shared_mem.name)))
-
-    res = []
-    for amplicon_index in range(len(amplicons)):
-        res.append(Amplicon(amplicons[amplicon_index][0], amplicons[amplicon_index][1]))
-        cur_diffs = np.where(shared_array[amplicon_index] == 1)
-        res[-1].differences = set(zip(cur_diffs[0], cur_diffs[1]))
-
-    shared_mem.close()
-    shared_mem.unlink()
-
-    return res
-
-#Smart and new and better
-def generate_amplicons_mp_smart(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), relevant_nucleotides=None, processors=1):
-    if not lb:
-        lb = 0
-    else:
-        lb = max(lb, 0)
-    if not ub:
-        ub = sequences[0].length
-    else:
-        ub = min(ub, sequences[0].length)
-
-    #Check for feasible amplicons in input
-    if len(feasible_amplicons) > 0:
-        amplicons = list(feasible_amplicons)
-        amplicons.sort(key = lambda x : x[0])
-    else:
-        amplicons = [(i,i+amplicon_width) for i in range(ub - lb - amplicon_width + 1)]
-    #Dictionary that will contain differences per amplicon
-    manager = mp.Manager()
-    diffs_per_amplicon = manager.dict()
-    for a in amplicons:
-        diffs_per_amplicon[a] = '{'
-
-    #Store information of interest in lists as to not pass entire sequence objects to Pool
-    lineages_list = [sequence.lineage_num for sequence in sequences]
-    sequences_list = [sequence.sequence for sequence in sequences]
-    ids_list = [sequence.id_num for sequence in sequences]
-    index_list = list(range(len(sequences)))
-
-    sequence_pairs_list = list(itertools.combinations(index_list, 2))
-    sequence_pair_partition = [ sequence_pairs_list[i:i+(ceil(len(sequence_pairs_list)/processors))] for i in range(0, len(sequence_pairs_list), ceil(len(sequence_pairs_list)/processors)) ]
-    #amplicons_part = [ amplicons[i:i+(ceil(len(amplicons)/processors))] for i in range(0, len(amplicons), ceil(len(amplicons)/processors)) ]
-    #included_amplicons = [ index_list_amplicons[i:i+(ceil(len(index_list_amplicons)/processors))] for i in range(0, len(index_list_amplicons), ceil(len(index_list_amplicons)/processors)) ]
-
-    #Check which nucleotides have to be considered
-    if not type(relevant_nucleotides) == np.ndarray:
-        relevant_nucleotides = np.arange(lb,ub,1,dtype=int)
-
-    with mp.Pool(processors) as pool:
-        pool.starmap(AmpliconGeneration.determine_differences_smart_cy, 
-        zip(itertools.repeat(amplicons), sequence_pair_partition, itertools.repeat(sequences_list), itertools.repeat(lineages_list), itertools.repeat(ids_list), 
-        itertools.repeat(amplicon_threshold), itertools.repeat(comparison_matrix), itertools.repeat(relevant_nucleotides),
-        itertools.repeat(diffs_per_amplicon)))
-
-    res = []
-    for amplicon in amplicons:
-        res.append(Amplicon(amplicon[0], amplicon[1]))
-        res[-1].differences = eval(diffs_per_amplicon[amplicon][:len(diffs_per_amplicon[amplicon])-1] + '}')
-
-    return res
-
-def generate_amplicons_mp_smartest(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), relevant_nucleotides=None, processors=1):
-    if not lb:
-        lb = 0
-    else:
-        lb = max(lb,0)
-    if not ub:
-        ub = sequences[0].length
-    else:
-        ub = min(ub, sequences[0].length)
-    
-    #Check if feasible amplicons are provided
-    if len(feasible_amplicons) > 0:
-        amplicons = list(feasible_amplicons)
-        amplicons.sort(key = lambda x : x[0])
-    else:
-        amplicons = np.arange(lb, ub-lb-amplicon_width+1, 1, dtype=np.int32)
-    
-    #Transform input to numeric and otherwise relevant variables
-    st = time.time()
-    lineages_list = [sequence.lineage_num for sequence in sequences]
-    ids_list = [sequence.id_num for sequence in sequences]
-    _, comparison_matrix_num, sequences_num, AMPS = translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_matrix)
-
-    sequence_pairs_list = []
-    for s1 in range(len(sequences)):
-        for s2 in range(s1):
-            if sequences[s1].lineage != sequences[s2].lineage:
-                sequence_pairs_list.append([s2,s1])
-
-    sequence_pairs_list = np.array(sequence_pairs_list, dtype=np.int32)
-    ids_list = np.array(ids_list, dtype=np.int32)
-    #sequence_pairs_partition = [ sequence_pairs_list[i:i+ceil(len(sequence_pairs_list)/processors)] for i in range(0, len(sequence_pairs_list), ceil(len(sequence_pairs_list)/processors)) ]
-    sequence_pairs_partition = [ sequence_pairs_list[i:i+ceil(sequence_pairs_list.shape[0]/processors)][:] for i in range(0, sequence_pairs_list.shape[0], ceil(sequence_pairs_list.shape[0]/processors)) ]
-    partition_sizes = [spp.shape[0] for spp in sequence_pairs_partition]
-
-    print(str(time.time() - st) + 's spent preprocessing')
-
-    st = time.time()
-    with mp.Pool(processors) as pool:
-        """
-        diffs_per_amp = pool.starmap(AmpliconGeneration.generate_amplicons_smarter_cy, zip(itertools.repeat(amplicons), itertools.repeat(amplicons_lb),
-                                                                           itertools.repeat(amplicons_ub), itertools.repeat(amplicon_width),
-                                                                           itertools.repeat(amplicons.shape[0]), itertools.repeat(sequences_num),
-                                                                           sequence_pairs_partition, partition_sizes,
-                                                                           itertools.repeat(ids_list), itertools.repeat(comparison_matrix_num),
-                                                                           itertools.repeat(relevant_nucleotides), itertools.repeat(relevant_nucleotides.shape[0]),
-                                                                           itertools.repeat(amplicon_threshold)))
-        """
-        diffs_per_amp = pool.starmap(AmpliconGeneration.generate_amplicons_smarter_cy, zip(itertools.repeat(AMPS), itertools.repeat(amplicon_width),
-                                                                           itertools.repeat(AMPS.shape[0]), itertools.repeat(sequences_num),
-                                                                           sequence_pairs_partition, partition_sizes,
-                                                                           itertools.repeat(ids_list), itertools.repeat(comparison_matrix_num),
-                                                                           itertools.repeat(relevant_nucleotides), itertools.repeat(relevant_nucleotides.shape[0]),
-                                                                           itertools.repeat(amplicon_threshold)))
-    print(str(time.time() - st) + 's spent differentiating')
-
-    st = time.time()
-    res = []
-    for amplicon_index in range(AMPS.shape[0]):
-        res.append(Amplicon(AMPS[amplicon_index][0], AMPS[amplicon_index][0]+amplicon_width))
-        cur_diffs = [part[(AMPS[amplicon_index][0], AMPS[amplicon_index][0]+amplicon_width)] for part in diffs_per_amp]
-        #res[-1].differences = set.union(*cur_diffs)
-        res[-1].differences = set([item for sublist in cur_diffs for item in sublist])
-    print(str(time.time() - st) + 's spent combining')
-    print(len(res[0].differences))
-    return res
-
 def generate_amplicons_mp_hybrid(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), relevant_nucleotides=None, processors=1):
+    '''
+    Function that determines which sequence pairs can be differentiated for every amplicon in either $feasible_amplicons or in all possible amplicons.
+
+    Parameters
+    ----------
+    sequences : list[ Sequence ]
+        List of sequences that will be differentiated.
+    amplicon_width : int
+        Width of amplicons in number of nucleotides.
+    comparison_matrix : dict [ (char,char) ]
+        Dictionary that determines which characters should be considered equal.
+    lb : int, optional
+        Index from which amplicons should be generated if no feasible amplicons are supplied. The default is None in which case it is set to 0.
+    ub : int, optional
+        Last index (exclusive) where the final amplicon ends if they need to be generated. The default is None it is set to the length of the sequences.
+    amplicon_threshold : int, optional
+        Maximum number of allowed nucleotide mismatches between sequences in an amplicon. The default is 1.
+    feasible_amplicons : set( (int,int) ), optional
+        Set of amplicons which are defined as (start_index, end_index) where the end index is exclusive. The default is set() in which case amplicons will be generated.
+    relevant_nucleotides : np.array, optional
+        Numpy array with indices of nucleotides that can be different among sequences. The default is None.
+    processors : int, optional
+        Number of processors to use for multiprocessing. The default is 1.
+
+    Returns
+    -------
+    res : list[ Amplicon ]
+        List of final amplicons.
+    X : np.array
+        Numpy array containing 3 axes:
+            amplicon
+            sequence
+            sequence
+        where X[k,i,j] = 1 iff sequence i and j can be differentiated according to amplicon k.
+
+    '''
     if not lb:
         lb = 0
     else:
@@ -600,15 +392,6 @@ def generate_amplicons_mp_hybrid(sequences, amplicon_width, comparison_matrix, l
 
     st = time.time()
     with mp.Pool(processors) as pool:
-        """
-        diffs_per_amp = pool.starmap(AmpliconGeneration.generate_amplicons_smarter_cy, zip(itertools.repeat(amplicons), itertools.repeat(amplicons_lb),
-                                                                           itertools.repeat(amplicons_ub), itertools.repeat(amplicon_width),
-                                                                           itertools.repeat(amplicons.shape[0]), itertools.repeat(sequences_num),
-                                                                           sequence_pairs_partition, partition_sizes,
-                                                                           itertools.repeat(ids_list), itertools.repeat(comparison_matrix_num),
-                                                                           itertools.repeat(relevant_nucleotides), itertools.repeat(relevant_nucleotides.shape[0]),
-                                                                           itertools.repeat(amplicon_threshold)))
-        """
         pool.starmap(AmpliconGeneration.generate_amplicons_hybrid_cy, zip(itertools.repeat(AMPS), itertools.repeat(amplicon_width),
                                                                            itertools.repeat(AMPS.shape[0]), itertools.repeat(sequences_num),
                                                                            sequence_pairs_partition, partition_sizes, itertools.repeat(sequences_num.shape[0]),
