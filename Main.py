@@ -48,6 +48,8 @@ def run_plots(args):
                                                     for line in f.readlines():
                                                         if 'Amplicon' in line:
                                                             cur_amplicon = eval(line.split(':')[-1])
+                                                            print(cur_amplicon)
+                                                            print(type(cur_amplicon[0]))
                                                             counts_per_ampwidth[ampw][range(cur_amplicon[0],cur_amplicon[1])] += 1
                                                             counts_per_nseqs[nseqs][range(cur_amplicon[0],cur_amplicon[1])] += 1
                                                             counts_aggregated[range(cur_amplicon[0],cur_amplicon[1])] += 1
