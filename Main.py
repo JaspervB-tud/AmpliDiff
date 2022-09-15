@@ -135,7 +135,7 @@ def run_plots(args):
         plt.ylim([0, 1.2])
         plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
         del fig, ax
-    print(counts_per_ampwidth[200])
+    print(np.max(counts_per_ampwidth[200]))
     print(num_per_ampwidth[200])
 
     for nseqs in parameters['nseqs']:
