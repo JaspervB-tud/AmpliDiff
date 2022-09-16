@@ -478,7 +478,7 @@ def greedy(sequences, amplicons, differences_per_amplicon, primer_width, search_
                 log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(differences_per_amplicon[best_amplicon.id_num])))
             for amplicon in amplicons:
                 differences_per_amplicon[amplicon.id_num][differences_per_amplicon[best_amplicon.id_num] == 1] = 0
-            amplicons = [a for a in amplicons if np.sum(differences_per_amplicon[a.id_num]) > 0]
+            amplicons = [a for a in amplicons if np.sum(differences_per_amplicon[a.id_num]) > 0 and abs(a.start - best_amplicon.start) >= (a.end - a.start) + search_width]
             amplicons.sort(key = lambda x : np.sum(differences_per_amplicon[x.id_num]), reverse=True)
         else:
             result_amplicons.pop(-1)

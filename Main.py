@@ -26,8 +26,6 @@ def run_plots(args):
         counts_aggregated = np.zeros((sequence_length), dtype=np.int16)
         num_total = 0
 
-        print(parameters)
-
         for ampw in parameters['ampwidth']:
             for ampt in parameters['ampthresh']:
                 for mist in parameters['misthresh']:
@@ -62,7 +60,7 @@ def run_plots(args):
                                             except:
                                                 continue
                                                     
-            return counts_per_ampwidth, num_per_ampwidth, counts_per_nseqs, num_per_nseqs, counts_aggregated, num_total
+        return counts_per_ampwidth, num_per_ampwidth, counts_per_nseqs, num_per_nseqs, counts_aggregated, num_total
 
     def determine_annotations(sequences, ref_genome):
         alignments = pairwise2.align.globalxx(sequences[0].sequence_raw.upper(), str(ref_genome.seq))
