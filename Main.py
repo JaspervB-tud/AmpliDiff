@@ -124,38 +124,38 @@ def run_plots(args):
     colors = ['red', 'blue']
 
     for ampwidth in parameters['ampwidth']:
-        color_index = 0
-        fig = plt.figure(figsize=[20,10], dpi=200)
-        ax = plt.gca()
-        plt.title('Number of times a nucleotide is covered by an amplicon (' + str(num_per_ampwidth[ampwidth]) + ' runs)', size=25)
-        plt.xlabel('Nucleotide index', size=18)
-        plt.ylabel('Relative occurrence', size=18)
-        plt.plot(counts_per_ampwidth[ampwidth]/num_per_ampwidth[ampwidth], color='black', linewidth=2)
-        for region in regions:
-            plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-            plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
-            color_index += 1
-        plt.ylim([0, 1.2])
-        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
-        del fig, ax
-    print(np.max(counts_per_ampwidth[200]))
-    print(num_per_ampwidth[200])
+        if num_per_ampwidth[ampwidth] > 0:
+            color_index = 0
+            fig = plt.figure(figsize=[20,10], dpi=200)
+            ax = plt.gca()
+            plt.title('Number of times a nucleotide is covered by an amplicon (' + str(num_per_ampwidth[ampwidth]) + ' runs)', size=25)
+            plt.xlabel('Nucleotide index', size=18)
+            plt.ylabel('Relative occurrence', size=18)
+            plt.plot(counts_per_ampwidth[ampwidth]/num_per_ampwidth[ampwidth], color='black', linewidth=2)
+            for region in regions:
+                plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+                plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+                color_index += 1
+            plt.ylim([0, 1.2])
+            plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+            del fig, ax
 
     for nseqs in parameters['nseqs']:
-        color_index = 0
-        fig = plt.figure(figsize=[20,10], dpi=200)
-        ax = plt.gca()
-        plt.title('Number of times a nucleotide is covered by an amplicon (' + str(num_per_nseqs[nseqs]) + ' runs)', size=25)
-        plt.xlabel('Nucleotide index', size=18)
-        plt.ylabel('Relative occurrence', size=18)
-        plt.plot(counts_per_nseqs[nseqs]/(num_per_nseqs[nseqs]), color='black', linewidth=2)
-        for region in regions:
-            plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-            plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
-            color_index += 1
-        plt.ylim([0, 1.2])
-        plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/nseqs' + str(nseqs) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
-        del fig, ax
+        if num_per_nseqs[nseqs] > 0:
+            color_index = 0
+            fig = plt.figure(figsize=[20,10], dpi=200)
+            ax = plt.gca()
+            plt.title('Number of times a nucleotide is covered by an amplicon (' + str(num_per_nseqs[nseqs]) + ' runs)', size=25)
+            plt.xlabel('Nucleotide index', size=18)
+            plt.ylabel('Relative occurrence', size=18)
+            plt.plot(counts_per_nseqs[nseqs]/(num_per_nseqs[nseqs]), color='black', linewidth=2)
+            for region in regions:
+                plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+                plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+                color_index += 1
+            plt.ylim([0, 1.2])
+            plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/nseqs' + str(nseqs) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+            del fig, ax
 
     color_index = 0
     fig = plt.figure(figsize=[20,10], dpi=200)
