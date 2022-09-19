@@ -83,7 +83,7 @@ def run_plot_differences(args):
         plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
         color_index += 1
     plt.ylim([0, 1.2])
-    plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/amplicon_differentiation_ampwidth' + str(args.ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+    plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/amplicon_differentiation_ampwidth' + str(args.amplicon_width) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
 
 
 
