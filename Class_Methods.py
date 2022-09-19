@@ -455,7 +455,7 @@ def calculate_differences_per_amplicon_mp(sequences, amplicon_width, comparison_
     partition_sizes = [spp.shape[0] for spp in sequence_pairs_partition]
 
     with mp.Pool(processors) as pool:
-        diffs = pool.starmap(AmpliconGeneration.generate_amplicons_hybrid_cy, zip(itertools.repeat(amplicon_width), itertools.repeat(sequences[0].length-amplicon_width+1), 
+        diffs = pool.starmap(AmpliconGeneration.calculate_amplicon_differences_cy, zip(itertools.repeat(amplicon_width), itertools.repeat(sequences[0].length-amplicon_width+1), 
                                                                             itertools.repeat(sequences_num), itertools.repeat(sequences[0].length),
                                                                             sequence_pairs_partition, partition_sizes, itertools.repeat(sequences_num.shape[0]),
                                                                             itertools.repeat(comparison_matrix_num), itertools.repeat(amplicon_threshold)))
