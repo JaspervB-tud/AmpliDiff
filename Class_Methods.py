@@ -416,6 +416,54 @@ def generate_amplicons_mp_hybrid(sequences, amplicon_width, comparison_matrix, l
 
     return res, X
 
+def calculate_differences_per_amplicon_mp(sequences, amplicon_width, comparison_matrix, amplicon_threshold=1, processors=1):
+    '''
+    Function that determines which sequence pairs can be differentiated for every amplicon in either $feasible_amplicons or in all possible amplicons.
+
+    Parameters
+    ----------
+    sequences : list[ Sequence ]
+        List of sequences that will be differentiated.
+    amplicon_width : int
+        Width of amplicons in number of nucleotides.
+    comparison_matrix : dict [ (char,char) ]
+        Dictionary that determines which characters should be considered equal.
+    amplicon_threshold : int, optional
+        Maximum number of allowed nucleotide mismatches between sequences in an amplicon. The default is 1.
+    processors : int, optional
+        Number of processors to use for multiprocessing. The default is 1.
+
+    Returns
+    -------
+    res : np.array
+        Numpy array with the differences per amplicon (start index is equal to index in array).
+
+    '''
+    #Transform input to numeric and otherwise relevant variables
+    ids_list = [sequence.id_num for sequence in sequences]
+    _, comparison_matrix_num, sequences_num, _ = translate_to_numeric(sequences, [], [], comparison_matrix)
+
+    sequence_pairs_list = []
+    for s1 in range(len(sequences)):
+        for s2 in range(s1):
+            if sequences[s1].lineage != sequences[s2].lineage:
+                sequence_pairs_list.append([s2,s1])
+    max_possible_differences = len(sequence_pairs_list)
+
+    sequence_pairs_list = np.array(sequence_pairs_list, dtype=np.int32)
+    sequence_pairs_partition = [ sequence_pairs_list[i:i+ceil(sequence_pairs_list.shape[0]/processors)][:] for i in range(0, sequence_pairs_list.shape[0], ceil(sequence_pairs_list.shape[0]/processors)) ]
+    partition_sizes = [spp.shape[0] for spp in sequence_pairs_partition]
+
+    with mp.Pool(processors) as pool:
+        diffs = pool.starmap(AmpliconGeneration.generate_amplicons_hybrid_cy, zip(itertools.repeat(amplicon_width), itertools.repeat(sequences[0].length-amplicon_width+1), 
+                                                                            itertools.repeat(sequences_num), itertools.repeat(sequences[0].length),
+                                                                            sequence_pairs_partition, partition_sizes, itertools.repeat(sequences_num.shape[0]),
+                                                                            itertools.repeat(comparison_matrix_num), itertools.repeat(amplicon_threshold)))
+    res = diffs[0]
+    for i in range(1, len(diffs)):
+        res += diffs[i]
+    return res, max_possible_differences
+
 def translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_matrix):
     
     chars = ['a','c','t','g','u','r','y','k','m','s','w','b','d','h','v','n','-']

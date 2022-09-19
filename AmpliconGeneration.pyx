@@ -231,3 +231,25 @@ def generate_amplicons_hybrid_cy(int[:,:] AMPS, int amplicon_width, int num_amps
                             diffs_per_amp[(amplicons[amp], amplicons[amp] + amplicon_width)].add((seq2,seq1))
     return diffs_per_amp
     '''
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+def calculate_amplicon_differences_cy(int amplicon_width, int num_amps, signed char[:,:] sequences, int sequence_length, int[:,:] sequence_pairs, int total_sequence_pairs, int num_sequences, signed char[:,:] comparison_matrix, int amplicon_threshold):
+    num_diffs = np.zeros((num_amps), dtype=np.int32)
+    cdef int seq1, seq2, amp, i
+
+    for cur_pair in range(total_sequence_pairs):
+        seq1 = sequence_pairs[cur_pair][0]
+        seq2 = sequence_pairs[cur_pair][1]
+        cur_diffs = []
+        for i in range(amplicon_width-1):
+            if comparison_matrix[sequences[seq1][i], sequences[seq2][i]] == 1:
+                cur_diffs.append(i)
+        for i in range(num_amps):
+            if comparison_matrix[sequences[seq1][i+amplicon_width-1], sequences[seq2][i+amplicon_width-1]] == 1:
+                cur_diffs.append(i)
+            if len(cur_diffs) > amplicon_threshold:
+                num_diffs[i] += 1
+            cur_diffs = [c for c in cur_diffs if c > i]
+    return num_diffs
