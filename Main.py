@@ -19,12 +19,18 @@ import matplotlib.pyplot as plt
 def run_plots(args):
     def generate_counts(base_folder, parameters, sequence_length):
         folder_name = base_folder + 'time_experiments/' + 'Soloplex/'
+        #Amplicon counts
         counts_per_ampwidth = {width : np.zeros((sequence_length), dtype=np.int16) for width in parameters['ampwidth']}
         num_per_ampwidth = {width : 0 for width in parameters['ampwidth']}
         counts_per_nseqs = {nseqs : np.zeros((sequence_length), dtype=np.int16) for nseqs in parameters['nseqs']}
         num_per_nseqs = {nseqs : 0 for nseqs in parameters['nseqs']}
         counts_aggregated = np.zeros((sequence_length), dtype=np.int16)
         num_total = 0
+        #Runtimes
+        runtimes_preprocessing = {width : [] for width in parameters['ampwidth']}
+        runtimes_primerindex = {width : [] for width in parameters['ampwidth']}
+        runtimes_ampdiff = {width : [] for width in parameters['ampwidth']}
+        runtimes_greedy = {width : [] for width in parameters['ampwidth']}
 
         for ampw in parameters['ampwidth']:
             for ampt in parameters['ampthresh']:
@@ -43,7 +49,11 @@ def run_plots(args):
                                         + 'amps' + str(namps) + '_'\
                                         + 'nseqs' + str(nseqs) + '/'
 
-                                        print(cur_filename)
+                                        #Iterate over the 10 seeds
+                                        cur_preprocessing = []
+                                        cur_primerindex = []
+                                        cur_ampdiff = []
+                                        cur_greedy = []
 
                                         for seed in range(1,11):
                                             try:
@@ -54,13 +64,25 @@ def run_plots(args):
                                                             counts_per_ampwidth[ampw][range(cur_amplicon[0],cur_amplicon[1])] += 1
                                                             counts_per_nseqs[nseqs][range(cur_amplicon[0],cur_amplicon[1])] += 1
                                                             counts_aggregated[range(cur_amplicon[0],cur_amplicon[1])] += 1
+                                                        elif 'Time spent pre-processing' in line:
+                                                            cur_preprocessing.append(float(line.split(':')[1].split(',')[0]))
+                                                        elif 'Time spent generating primer index' in line:
+                                                            cur_primerindex.append(float(line.split(':')[-1]))
+                                                        elif 'Time spent generating amplicon differentiation' in line:
+                                                            cur_ampdiff.append(float(line.split(' ')[-1]))
+                                                        elif 'Time spent running greedy algorithm' in line:
+                                                            cur_greedy.append(float(line.split(':')[-1]))
                                                 num_per_ampwidth[ampw] += 1
                                                 num_per_nseqs[nseqs] += 1
                                                 num_total += 1
                                             except:
                                                 continue
+                                        runtimes_preprocessing[ampw].append(cur_preprocessing)
+                                        runtimes_primerindex[ampw].append(cur_primerindex)
+                                        runtimes_ampdiff[ampw].append(cur_ampdiff)
+                                        runtimes_greedy[ampw].append(cur_greedy)
                                                     
-        return counts_per_ampwidth, num_per_ampwidth, counts_per_nseqs, num_per_nseqs, counts_aggregated, num_total
+        return counts_per_ampwidth, num_per_ampwidth, counts_per_nseqs, num_per_nseqs, counts_aggregated, num_total, runtimes_preprocessing, runtimes_primerindex, runtimes_ampdiff, runtimes_greedy
 
     def determine_annotations(sequences, ref_genome):
         alignments = pairwise2.align.globalxx(sequences[0].sequence_raw.upper(), str(ref_genome.seq))
@@ -117,7 +139,7 @@ def run_plots(args):
 
     sequences = generate_sequences(args.metadata, args.sequences)
     ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
-    counts_per_ampwidth, num_per_ampwidth, counts_per_nseqs, num_per_nseqs, counts_aggregated, num_total = generate_counts(base_folder, parameters, sequences[0].length)
+    counts_per_ampwidth, num_per_ampwidth, counts_per_nseqs, num_per_nseqs, counts_aggregated, num_total, runtimes_preprocessing, runtimes_primerindex, runtimes_ampdiff, runtimes_greedy = generate_counts(base_folder, parameters, sequences[0].length)
     annotations = determine_annotations(sequences, ref_genome)
 
     regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'N']
@@ -138,6 +160,46 @@ def run_plots(args):
                 color_index += 1
             plt.ylim([0, 1.2])
             plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+            del fig, ax
+        if len(runtimes_preprocessing[ampwidth]) > 0:
+            fig = plt.figure(figsize=[20,10], dpi=200)
+            ax = plt.gca()
+            plt.title('Runtimes preprocessing', size=25)
+            plt.xlabel('Number of sequences', size=18)
+            plt.ylabel('Runtime in seconds', size=18)
+            ax.boxplot(runtimes_preprocessing[ampwidth])
+            plt.xticks(list(range(1,len(parameters['nseqs'])+1)), parameters['nseqs'])
+            plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/runtimes_preprocessing_ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+            del fig, ax
+        if len(runtimes_primerindex[ampwidth]) > 0:
+            fig = plt.figure(figsize=[20,10], dpi=200)
+            ax = plt.gca()
+            plt.title('Runtimes generating primer index', size=25)
+            plt.xlabel('Number of sequences', size=18)
+            plt.ylabel('Runtime in seconds', size=18)
+            ax.boxplot(runtimes_primerindex[ampwidth])
+            plt.xticks(list(range(1,len(parameters['nseqs'])+1)), parameters['nseqs'])
+            plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/runtimes_primerindex_ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+            del fig, ax
+        if len(runtimes_ampdiff[ampwidth]) > 0:
+            fig = plt.figure(figsize=[20,10], dpi=200)
+            ax = plt.gca()
+            plt.title('Runtimes amplicon differentiation', size=25)
+            plt.xlabel('Number of sequences', size=18)
+            plt.ylabel('Runtime in seconds', size=18)
+            ax.boxplot(runtimes_ampdiff[ampwidth])
+            plt.xticks(list(range(1,len(parameters['nseqs'])+1)), parameters['nseqs'])
+            plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/runtimes_ampdiff_ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+            del fig, ax
+        if len(runtimes_greedy[ampwidth]) > 0:
+            fig = plt.figure(figsize=[20,10], dpi=200)
+            ax = plt.gca()
+            plt.title('Runtimes greedy', size=25)
+            plt.xlabel('Number of sequences', size=18)
+            plt.ylabel('Runtime in seconds', size=18)
+            ax.boxplot(runtimes_greedy[ampwidth])
+            plt.xticks(list(range(1,len(parameters['nseqs'])+1)), parameters['nseqs'])
+            plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/runtimes_greedy_ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
             del fig, ax
 
     for nseqs in parameters['nseqs']:
