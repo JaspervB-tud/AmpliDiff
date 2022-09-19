@@ -16,6 +16,77 @@ from Bio import pairwise2
 from Bio.pairwise2 import format_alignment
 import matplotlib.pyplot as plt
 
+def run_plot_differences(args):
+    def determine_annotations(sequences, ref_genome):
+        alignments = pairwise2.align.globalxx(sequences[0].sequence_raw.upper(), str(ref_genome.seq))
+        ref_sequence = Sequence(alignments[0].seqB.lower(), 'NC_045512.2')
+        ref_sequence.align_to_trim()
+        sequences[0].align_to_trim()
+        
+        #Annotations are based on annotations for reference genome "NC_045512.2"
+        annotations = {}
+        annotations2 = {}
+        ORF1a = [266, 13483]
+        ORF1b = [13483, 21555]
+        spike_1 = [21599, 23618]
+        spike_2 = [23618, 25381]
+        E = [26245, 26472]
+        M = [26523, 27191]
+        N = [28274, 29553]
+        
+        #ORF1a
+        annotations['ORF1a'] = [np.where(ref_sequence.aligned_to_trim == ORF1a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1a[1])[0][0]]
+        annotations2['ORF1a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][1])[0][0]]
+        #ORF1b
+        annotations['ORF1b'] = [np.where(ref_sequence.aligned_to_trim == ORF1b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1b[1])[0][0]]
+        annotations2['ORF1b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][1])[0][0]]
+        #S1
+        annotations['S1'] = [np.where(ref_sequence.aligned_to_trim == spike_1[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_1[1])[0][0]]
+        annotations2['S1'] = [np.where(sequences[0].aligned_to_trim == annotations['S1'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S1'][1])[0][0]]
+        #S2
+        annotations['S2'] = [np.where(ref_sequence.aligned_to_trim == spike_2[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_2[1])[0][0]]
+        annotations2['S2'] = [np.where(sequences[0].aligned_to_trim == annotations['S2'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S2'][1])[0][0]]
+        #E
+        annotations['E'] = [np.where(ref_sequence.aligned_to_trim == E[0])[0][0], np.where(ref_sequence.aligned_to_trim == E[1])[0][0]]
+        annotations2['E'] = [np.where(sequences[0].aligned_to_trim == annotations['E'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['E'][1])[0][0]]
+        #M
+        annotations['M'] = [np.where(ref_sequence.aligned_to_trim == M[0])[0][0], np.where(ref_sequence.aligned_to_trim == M[1])[0][0]]
+        annotations2['M'] = [np.where(sequences[0].aligned_to_trim == annotations['M'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['M'][1])[0][0]]
+        #N
+        annotations['N'] = [np.where(ref_sequence.aligned_to_trim == N[0])[0][0], np.where(ref_sequence.aligned_to_trim == N[1])[0][0]]
+        annotations2['N'] = [np.where(sequences[0].aligned_to_trim == annotations['N'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['N'][1])[0][0]]
+        
+        return annotations2
+
+    sequences = generate_sequences(args.metadata, args.sequences)
+    for i in range(len(sequences)):
+        sequences[i].align_to_trim()
+    
+    comparison_matrix = generate_opportunistic_matrix()
+
+    diffs, max_diffs = calculate_differences_per_amplicon_mp(sequences, args.amplicon_width, comparison_matrix, amplicon_threshold=args.amplicon_threshold, processors=args.cores)
+
+    ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
+    annotations = determine_annotations(sequences, ref_genome)
+    regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'N']
+    colors = ['red', 'blue']
+
+    color_index = 0
+    fig = plt.figure(figsize=[20,10], dpi=200)
+    ax = plt.gca()
+    plt.title('Amplicon differentiation power (amplicon width = ' + str(args.amplicon_width) + ')', size=25)
+    plt.xlabel('Amplicon start', size=18)
+    plt.ylabel('Relative number of sequence pairs (different lineage) differentiated', size=18)
+    plt.plot(diffs/max_diffs, color='black', linewidth=2)
+    for region in regions:
+        plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+        color_index += 1
+    plt.ylim([0, 1.2])
+    plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/amplicon_differentiation_ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+
+
+
 def run_plots(args):
     def generate_counts(base_folder, parameters, sequence_length):
         folder_name = base_folder + 'time_experiments/' + 'Soloplex/'
@@ -446,6 +517,8 @@ if __name__ == '__main__':
         #run_greedy(args)
     elif args.run_type == 'plot':
         run_plots(args)
+    elif args.run_type == 'plot_differences':
+        run_plot_differences(args)
 
 
 
