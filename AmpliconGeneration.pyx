@@ -252,4 +252,5 @@ def calculate_amplicon_differences_cy(int amplicon_width, int num_amps, signed c
             if len(cur_diffs) > amplicon_threshold:
                 num_diffs[i] += 1
             cur_diffs = [c for c in cur_diffs if c > i]
+    print(num_diffs)
     return num_diffs
