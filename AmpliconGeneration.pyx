@@ -175,7 +175,38 @@ def generate_amplicons_smarter_cy(int[:,:] AMPS, int amplicon_width, int num_amp
                     diffs_per_amp[(AMPS[amp][0], AMPS[amp][0] + amplicon_width)].append((ids[seq1],ids[seq2]))
     return diffs_per_amp
 
-@cython.boundscheck(False)
+@cython.wraparound(False)
+def generate_amplicons_hybrid_sp_cy(int[:,:] AMPS, int amplicon_width, int num_amps, signed char[:,:] sequences, int[:,:] sequence_pairs, int total_sequence_pairs, int num_sequences, int[:] ids, signed char[:,:] comparison_matrix, long[:] relevant_nucleotides, int num_relevant, int amplicon_threshold):
+    cdef signed char[:,:,:] diff_tensor = np.zeros((num_amps, num_sequences, num_sequences), dtype=np.int8)
+
+    cdef int[:] diffs_cum
+    cdef int seq1, seq2, amp, cur_sum, j, cur_index, cur_lb, cur_ub
+    cdef long i
+
+    for cur_pair in range(total_sequence_pairs):
+        seq1 = sequence_pairs[cur_pair][0]
+        seq2 = sequence_pairs[cur_pair][1]
+        cur_sum = 0
+        diffs_cum = np.zeros((num_relevant), dtype=np.int32)
+        cur_index = 0
+        for j in range(num_relevant):
+            i = relevant_nucleotides[j]
+            cur_sum += comparison_matrix[sequences[seq1][i], sequences[seq2][i]]
+            diffs_cum[cur_index] = cur_sum
+            cur_index += 1
+        for amp in range(num_amps):
+            cur_lb = relevant_nucleotides[AMPS[amp][1]]
+            cur_ub = relevant_nucleotides[AMPS[amp][2]]
+            if AMPS[amp][0] <= cur_lb:
+                if diffs_cum[AMPS[amp][2]] > amplicon_threshold:
+                    #diffs_per_amp[(AMPS[amp][0], AMPS[amp][0] + amplicon_width)].append((ids[seq1],ids[seq2]))
+                    diff_tensor[amp][ids[seq1]][ids[seq2]] = 1
+            else:
+                if diffs_cum[AMPS[amp][2]] - diffs_cum[AMPS[amp][1]] > amplicon_threshold:
+                    #diffs_per_amp[(AMPS[amp][0], AMPS[amp][0] + amplicon_width)].append((ids[seq1],ids[seq2]))
+                    diff_tensor[amp][ids[seq1]][ids[seq2]] = 1
+    return diff_tensor
+
 @cython.wraparound(False)
 def generate_amplicons_hybrid_cy(int[:,:] AMPS, int amplicon_width, int num_amps, signed char[:,:] sequences, int[:,:] sequence_pairs, int total_sequence_pairs, int num_sequences, int[:] ids, signed char[:,:] comparison_matrix, long[:] relevant_nucleotides, int num_relevant, int amplicon_threshold, str mem_name):
     shm = shared_memory.SharedMemory(name=mem_name)
@@ -238,7 +269,6 @@ def generate_amplicons_hybrid_cy(int[:,:] AMPS, int amplicon_width, int num_amps
 def calculate_amplicon_differences_cy(int amplicon_width, int num_amps, signed char[:,:] sequences, int sequence_length, int[:,:] sequence_pairs, int total_sequence_pairs, int num_sequences, signed char[:,:] comparison_matrix, int amplicon_threshold):
     num_diffs = np.zeros((num_amps), dtype=np.int32)
     cdef int seq1, seq2, amp, i
-
     for cur_pair in range(total_sequence_pairs):
         seq1 = sequence_pairs[cur_pair][0]
         seq2 = sequence_pairs[cur_pair][1]
@@ -246,11 +276,12 @@ def calculate_amplicon_differences_cy(int amplicon_width, int num_amps, signed c
         for i in range(amplicon_width-1):
             if comparison_matrix[sequences[seq1][i], sequences[seq2][i]] == 1:
                 cur_diffs.append(i)
-        for i in range(num_amps):
+        for i in range(sequence_length - amplicon_width + 1):
             if comparison_matrix[sequences[seq1][i+amplicon_width-1], sequences[seq2][i+amplicon_width-1]] == 1:
-                cur_diffs.append(i)
+                cur_diffs.append(i+amplicon_width-1)
             if len(cur_diffs) > amplicon_threshold:
                 num_diffs[i] += 1
-            cur_diffs = [c for c in cur_diffs if c > i]
-    print(num_diffs)
+            if len(cur_diffs) > 0:
+                if cur_diffs[0] == i:
+                    cur_diffs.pop(0)
     return num_diffs

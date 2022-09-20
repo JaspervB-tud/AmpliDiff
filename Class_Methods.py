@@ -416,6 +416,91 @@ def generate_amplicons_mp_hybrid(sequences, amplicon_width, comparison_matrix, l
 
     return res, X
 
+def generate_amplicons_sp_hybrid(sequences, amplicon_width, comparison_matrix, lb=None, ub=None, amplicon_threshold=1, feasible_amplicons=set(), relevant_nucleotides=None):
+    '''
+    Function that determines which sequence pairs can be differentiated for every amplicon in either $feasible_amplicons or in all possible amplicons.
+
+    Parameters
+    ----------
+    sequences : list[ Sequence ]
+        List of sequences that will be differentiated.
+    amplicon_width : int
+        Width of amplicons in number of nucleotides.
+    comparison_matrix : dict [ (char,char) ]
+        Dictionary that determines which characters should be considered equal.
+    lb : int, optional
+        Index from which amplicons should be generated if no feasible amplicons are supplied. The default is None in which case it is set to 0.
+    ub : int, optional
+        Last index (exclusive) where the final amplicon ends if they need to be generated. The default is None it is set to the length of the sequences.
+    amplicon_threshold : int, optional
+        Maximum number of allowed nucleotide mismatches between sequences in an amplicon. The default is 1.
+    feasible_amplicons : set( (int,int) ), optional
+        Set of amplicons which are defined as (start_index, end_index) where the end index is exclusive. The default is set() in which case amplicons will be generated.
+    relevant_nucleotides : np.array, optional
+        Numpy array with indices of nucleotides that can be different among sequences. The default is None.
+    processors : int, optional
+        Number of processors to use for multiprocessing. The default is 1.
+
+    Returns
+    -------
+    res : list[ Amplicon ]
+        List of final amplicons.
+    X : np.array
+        Numpy array containing 3 axes:
+            amplicon
+            sequence
+            sequence
+        where X[k,i,j] = 1 iff sequence i and j can be differentiated according to amplicon k.
+
+    '''
+    if not lb:
+        lb = 0
+    else:
+        lb = max(lb,0)
+    if not ub:
+        ub = sequences[0].length
+    else:
+        ub = min(ub, sequences[0].length)
+    
+    #Check if feasible amplicons are provided
+    if len(feasible_amplicons) > 0:
+        amplicons = list(feasible_amplicons)
+        amplicons.sort(key = lambda x : x[0])
+    else:
+        amplicons = np.arange(lb, ub-lb-amplicon_width+1, 1, dtype=np.int32)
+    
+    #Transform input to numeric and otherwise relevant variables
+    st = time.time()
+    lineages_list = [sequence.lineage_num for sequence in sequences]
+    ids_list = [sequence.id_num for sequence in sequences]
+    _, comparison_matrix_num, sequences_num, AMPS = translate_to_numeric(sequences, amplicons, relevant_nucleotides, comparison_matrix)
+
+    sequence_pairs_list = []
+    for s1 in range(len(sequences)):
+        for s2 in range(s1):
+            if sequences[s1].lineage != sequences[s2].lineage:
+                sequence_pairs_list.append([s2,s1])
+
+    sequence_pairs_list = np.array(sequence_pairs_list, dtype=np.int32)
+    ids_list = np.array(ids_list, dtype=np.int32)
+
+    print(str(len(amplicons)) + ', ' + str(len(sequences)))
+    print(str(time.time() - st) + 's spent preprocessing')
+
+    st = time.time()
+    X = AmpliconGeneration.generate_amplicons_hybrid_sp_cy(AMPS, amplicon_width, AMPS.shape[0], sequences_num, sequence_pairs_list, len(sequence_pairs_list), sequences_num.shape[0],
+                                                            ids_list, comparison_matrix_num, relevant_nucleotides, relevant_nucleotides.shape[0], amplicon_threshold)
+
+    print(str(time.time() - st) + 's spent differentiating')
+
+    st = time.time()
+    res = []
+    for amplicon_index in range(AMPS.shape[0]):
+        res.append(Amplicon(AMPS[amplicon_index][0], AMPS[amplicon_index][0]+amplicon_width))
+    print(str(time.time() - st) + 's spent combining')
+
+    return res, X
+
 def calculate_differences_per_amplicon_mp(sequences, amplicon_width, comparison_matrix, amplicon_threshold=1, processors=1):
     '''
     Function that determines which sequence pairs can be differentiated for every amplicon in either $feasible_amplicons or in all possible amplicons.
