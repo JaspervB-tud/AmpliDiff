@@ -32,6 +32,9 @@ def run_plot_differences(args):
         spike_2 = [23618, 25381]
         E = [26245, 26472]
         M = [26523, 27191]
+        ORF6 = [27202, 27384]
+        ORF7a = [27439, 27756]
+        ORF7b = [27756, 27884]
         N = [28274, 29553]
         
         #ORF1a
@@ -52,6 +55,15 @@ def run_plot_differences(args):
         #M
         annotations['M'] = [np.where(ref_sequence.aligned_to_trim == M[0])[0][0], np.where(ref_sequence.aligned_to_trim == M[1])[0][0]]
         annotations2['M'] = [np.where(sequences[0].aligned_to_trim == annotations['M'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['M'][1])[0][0]]
+        #ORF6
+        annotations['ORF6'] = [np.where(ref_sequence.aligned_to_trim == ORF6[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF6[1])[0][0]]
+        annotations2['ORF6'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF6'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF6'][1])[0][0]]
+        #ORF7a
+        annotations['ORF7a'] = [np.where(ref_sequence.aligned_to_trim == ORF7a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF7a[1])[0][0]]
+        annotations2['ORF7a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF7a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF7a'][1])[0][0]]
+        #ORF7b
+        annotations['ORF7b'] = [np.where(ref_sequence.aligned_to_trim == ORF7b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF7b[1])[0][0]]
+        annotations2['ORF7b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF7b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF7b'][1])[0][0]]
         #N
         annotations['N'] = [np.where(ref_sequence.aligned_to_trim == N[0])[0][0], np.where(ref_sequence.aligned_to_trim == N[1])[0][0]]
         annotations2['N'] = [np.where(sequences[0].aligned_to_trim == annotations['N'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['N'][1])[0][0]]
@@ -68,7 +80,7 @@ def run_plot_differences(args):
 
     ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
     annotations = determine_annotations(sequences, ref_genome)
-    regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'N']
+    regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'ORF6', 'ORF7a', 'ORF7b', 'N']
     colors = ['red', 'blue']
 
     color_index = 0
