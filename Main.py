@@ -92,7 +92,7 @@ def run_plot_differences(args):
     plt.plot(diffs/max_diffs, color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=15, ha='center', rotation=90)
         color_index += 1
     plt.ylim([0, 1.2])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/amplicon_differentiation_ampwidth' + str(args.amplicon_width) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
@@ -251,7 +251,7 @@ def run_plots(args):
             plt.plot(counts_per_ampwidth[ampwidth]/num_per_ampwidth[ampwidth], color='black', linewidth=2)
             for region in regions:
                 plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-                plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+                plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=15, ha='center', rotation=90)
                 color_index += 1
             plt.ylim([0, 1.2])
             plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/ampwidth' + str(ampwidth) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
@@ -308,7 +308,7 @@ def run_plots(args):
             plt.plot(counts_per_nseqs[nseqs]/(num_per_nseqs[nseqs]), color='black', linewidth=2)
             for region in regions:
                 plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-                plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+                plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=15, ha='center', rotation=90)
                 color_index += 1
             plt.ylim([0, 1.2])
             plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/nseqs' + str(nseqs) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
@@ -323,7 +323,7 @@ def run_plots(args):
     plt.plot(counts_aggregated/(num_total), color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=20, ha='center')
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 1.1), color='black', alpha=0.6, size=15, ha='center')
         color_index += 1
     plt.ylim([0, 1.2])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/all.pdf', figsize=[20,10], dpi=200, format='pdf')
