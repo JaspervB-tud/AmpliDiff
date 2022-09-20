@@ -391,7 +391,7 @@ def run_comparison(args):
 
     #Generate amplicons
     st = time.time()
-    amplicons, diffs_per_amplicon = generate_amplicons_mp_hybrid(sequences, args.amplicon_width, comparison_matrix, amplicon_threshold=args.amplicon_threshold, feasible_amplicons=feasible_amplicons, relevant_nucleotides=relevant_nucleotides, processors=args.cores)
+    amplicons, diffs_per_amplicon = generate_amplicons_sp_hybrid(sequences, args.amplicon_width, comparison_matrix, amplicon_threshold=args.amplicon_threshold, feasible_amplicons=feasible_amplicons, relevant_nucleotides=relevant_nucleotides, processors=args.cores)
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent generating amplicon differentiation ' + str(time.time() - st) + '\n')
 
