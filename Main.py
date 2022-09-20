@@ -323,7 +323,7 @@ def run_plots(args):
     plt.plot(counts_aggregated/(num_total), color='black', linewidth=2)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.9), color='black', alpha=0.6, size=15, ha='center', rotate=90)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.9), color='black', alpha=0.6, size=15, ha='center', rotation=90)
         color_index += 1
     plt.ylim([0, 1.2])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/all.pdf', figsize=[20,10], dpi=200, format='pdf')
