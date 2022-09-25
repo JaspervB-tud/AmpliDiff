@@ -97,6 +97,8 @@ def run_plot_differences(args):
     plt.ylim([0, 1.2])
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/amplicon_differentiation_ampwidth' + str(args.amplicon_width) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
 
+    np.savetxt("/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/amplicon_differentiation_array_ampwidth" + str(args.amplicon_width) + ".csv", diffs/max_diffs, delimiter=",")
+
 
 
 def run_plots(args):
