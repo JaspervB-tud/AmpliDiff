@@ -231,7 +231,7 @@ def run_plots(args):
             'searchwidth' : [50],
             'cov' : [1],
             'amps' : ['8_all'],
-            'nseqs' : list(range(100, 2900, 100)) #there are 2749 reference sequences
+            'nseqs' : list(range(2000, 2900, 100)) #there are 2749 reference sequences
         }
 
     sequences = generate_sequences(args.metadata, args.sequences)
