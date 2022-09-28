@@ -490,7 +490,7 @@ def generate_amplicons_sp_hybrid(sequences, amplicon_width, comparison_matrix, l
     st = time.time()
     X = AmpliconGeneration.generate_amplicons_hybrid_sp_cy(AMPS, amplicon_width, AMPS.shape[0], sequences_num, sequence_pairs_list, len(sequence_pairs_list), sequences_num.shape[0],
                                                             ids_list, comparison_matrix_num, relevant_nucleotides, relevant_nucleotides.shape[0], amplicon_threshold)
-
+    X = np.asarray(X, dtype=np.int8)
     print(str(time.time() - st) + 's spent differentiating')
 
     st = time.time()
