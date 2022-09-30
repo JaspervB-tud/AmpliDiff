@@ -124,7 +124,7 @@ class Primer:
         end_at_threshold : int, optional
             Maximal number of allowed A/T characters in final 3 nucleotides (3'-end). The default is 2.
         end_gc_threshold : int, optional
-            Maximal number of allowed C/G characters in final 5 nucleotides (5'-end). The default is 3.
+            Maximal number of allowed C/G characters in final 5 nucleotides (3'-end). The default is 3.
         monorun_threshold : int, optional
             Maximal length of a run of a single nucleotide. The default is 3.
         duorun_threshold : int, optional

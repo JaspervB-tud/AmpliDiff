@@ -455,6 +455,148 @@ def run_comparison(args):
         for line in logs:
             f.write(line + '\n')
 
+def run_comparison_fancy(args):
+    #initialize variables to store information
+    runtimes = []
+    cur_time = time.time()
+
+    #Read sequences
+    st = time.time()
+    sequences = generate_sequences(args.metadata, args.sequences)
+    with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'w+') as f:
+        f.write('Time spent generating sequences: ' + str(time.time() - st) + '\n')
+    
+    #Randomize sequences
+    random.seed(args.seed)
+    random.shuffle(sequences)
+    sequences = sequences[:args.n_sequences]
+    #Note that we should change the numerical sequence ids
+    for i in range(len(sequences)):
+        sequences[i].id_num = i
+    
+    #Generate comparison matrix
+    comparison_matrix = generate_opportunistic_matrix()
+
+    #Sequence preprocessing
+    st = time.time()
+    #Check of variant locations is supplied and if list of variants to include is supplied
+    if args.variants_location and args.variants:
+        variants = []
+        for variant in args.variants:
+            if variant == 'a' and 'Alpha' not in variants:
+                variants.append('Alpha')
+            elif variant == 'b' and 'Beta' not in variants:
+                variants.append('Beta')
+            elif variant == 'c' and 'Gamma' not in variants:
+                variants.append('Gamma')
+            elif variant == 'd' and 'Delta' not in variants:
+                variants.append('Delta')
+            elif variant == 'e' and 'Epsilon' not in variants:
+                variants.append('Epsilon')
+            elif variant == 'z' and 'Zeta' not in variants:
+                variants.append('Zeta')
+            elif variant == 'n' and 'Eta' not in variants:
+                variants.append('Eta')
+            elif variant == 'k' and 'Kappa' not in variants:
+                variants.append('Kappa')
+            elif variant == 'm' and 'Mu' not in variants:
+                variants.append('Mu')
+            elif variant == 'o' and 'Omicron' not in variants:
+                variants.append('Omicron')
+        sequences, lb, ub, feasible_amplicons, relevant_nucleotides = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+    
+        with open(args.output + '/sequences_included_' + str(args.seed) + '.txt', 'w+') as f:
+            for sequence in sequences:
+                f.write(sequence.id + '\n')
+        
+        with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+            f.write('Variants considered:\n')
+            for variant in variants:
+                f.write(variant + '\n')
+            f.write('Total sequences = ' + str(len(sequences)) + '\n')
+        
+    else:
+        sequences, lb, ub, feasible_amplicons, relevant_nucleotides = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+        
+        with open(args.output + '/sequences_included_' + str(args.seed) + '.txt', 'w+') as f:
+            for sequence in sequences:
+                f.write(sequence.id + '\n')
+        
+        with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+            f.write('Variants considered:\n')
+            for variant in ['Alpha','Beta','Gamma','Delta','Epsilon','Zeta','Eta','Kappa','Mu','Omicron']:
+                f.write(variant + '\n')
+            f.write('Total sequences = ' + str(len(sequences)) + '\n')
+
+    with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+        f.write('Time spent pre-processing sequences and determining feasible amplicons: ' + str(time.time() - st) + ', number of feasible amplicons: ' + str(len(feasible_amplicons)) + '\n')
+    
+    #Generate primer index
+    st = time.time()
+    PI = PrimerIndex.PrimerIndex.generate_index_mp(sequences, args.primer_width, comparison_matrix, processors=args.cores)
+    PI.remove_redundant()
+    with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+        f.write('Time spent generating primer index and filtering for feasible primers: ' + str(time.time() - st) + '\n')
+
+    #Generate amplicons
+    st = time.time()
+    amplicons, diffs_per_amplicon = generate_amplicons_sp_hybrid(sequences, args.amplicon_width, comparison_matrix, amplicon_threshold=args.amplicon_threshold, feasible_amplicons=feasible_amplicons, relevant_nucleotides=relevant_nucleotides)
+    with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+        f.write('Time spent generating amplicon differentiation ' + str(time.time() - st) + '\n')
+
+    st = time.time()
+    logs, result_amplicons, result_primers = greedy_fancy(sequences, amplicons, diffs_per_amplicon, args.primer_width, args.search_width, PI, comparison_matrix, args.amplicons, args.coverage, 5, logging=True, multiplex=args.multiplex)
+    with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+        f.write('Time spent running greedy algorithm: ' + str(time.time() - st) + '\n')
+
+    with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+        n_fwd = 0
+        n_rev = 0
+        cur = 0
+        for primer_set in result_primers:
+            f.write('Amplicon: ' + str(result_amplicons[cur].id) + '\n')
+            f.write('Forward primers\n')
+            for primer in primer_set['forward']:
+                f.write('>F' + str(n_fwd) + '\n')
+                f.write(primer + '\n')
+                n_fwd += 1
+            f.write('Reverse primers\n')
+            for primer in primer_set['reverse']:
+                f.write('>R' + str(n_rev) + '\n')
+                f.write(primer + '\n')
+                n_rev += 1
+            cur += 1
+                
+    
+    #Run final optimization
+    if args.multiplex:
+        st = time.time()
+        cur_primers = check_primer_feasibility(sequences, result_amplicons, PI, optimize=1, coverage=args.coverage)
+        with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+            f.write('Time spent doing final primer optimization: ' + str(time.time() - st) + '\n')
+            f.write('Forward primers\n')
+            for fwd in cur_primers['forward']:
+                f.write(fwd + '\n')
+            f.write('Reverse primers\n')
+            for rev in cur_primers['reverse']:
+                f.write(rev + '\n')
+    else:
+        st = time.time()
+        for amplicon in result_amplicons:
+            cur_primers = check_primer_feasibility(sequences, [amplicon], PI, optimize=1, coverage=args.coverage)
+            with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
+                f.write('Amplicon: ' + str(amplicon.id) + '\n')
+                f.write('Forward primers\n')
+                for fwd in cur_primers['forward']:
+                    f.write(fwd + '\n')
+                f.write('Reverse primers\n')
+                for rev in cur_primers['reverse']:
+                    f.write(rev + '\n')
+                
+    with open(args.output + '/logfile_' + str(args.seed) + '.txt', 'w') as f:
+        for line in logs:
+            f.write(line + '\n')
+
 def sm_test(sequences, amplicons):
     OG_copy = np.zeros((len(amplicons), len(sequences), len(sequences)), dtype=np.int8)
 
@@ -538,6 +680,8 @@ if __name__ == '__main__':
     
     if args.run_type == 'runtime_comparison':
         run_comparison(args)
+    elif args.run_type == 'runtime_comparison_fancy':
+        run_comparison_fancy(args)
     elif args.run_type == 'greedy':
         print('test')
         #run_greedy(args)
