@@ -807,7 +807,6 @@ def check_primer_feasibility_single_amplicon_max_coverage(sequences, amplicon, d
         realized_differences = np.zeros(differences.shape, dtype=np.int8)
         for pair in covered_pairs:
             if covered_pairs[pair].x > 0.9:
-                print('Pair covered: ' + str(pair))
-                realized_differences[pair[0], pair[1]] = 1
+                realized_differences[pair[1], pair[0]] = 1
         return [True, res, realized_differences]
     return [False, None, None]
