@@ -736,7 +736,7 @@ def check_primer_feasibility_single_amplicon_max_coverage(sequences, amplicon, d
     env.start()
 
     model = gp.Model(env=env)
-    model.ModelSense = GRB.MINIMIZE
+    model.ModelSense = GRB.MAXIMIZE
 
     #Primer variables
     forward_primers = {} #primer -> (variable, temperature)
