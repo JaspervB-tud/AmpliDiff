@@ -756,7 +756,7 @@ def check_primer_feasibility_single_amplicon_max_coverage(sequences, amplicon, d
         covered_binary[sequence] = model.addVar(vtype=GRB.BINARY, obj=0)
     for s1 in range(len(sequences)):
         for s2 in range(s1):
-            if sequences[s1].lineage != sequences[s2].lineage and differences[sequences[s1].id_num, sequences[s2].id_num] == 1:
+            if sequences[s1].lineage != sequences[s2].lineage and differences[sequences[s2].id_num, sequences[s1].id_num] == 1:
                 covered_pairs[(sequences[s1].id_num, sequences[s2].id_num)] = model.addVar(vtype=GRB.BINARY, obj=1)
                 model.addConstr(covered_pairs[(sequences[s1].id_num, sequences[s2].id_num)] <= 0.5*covered_binary[sequences[s1].id_num] + 0.5*covered_binary[sequences[s2].id_num])
     num_primer_pairs = model.addVar(vtype=GRB.INTEGER, obj=-0.1*total_differences)
