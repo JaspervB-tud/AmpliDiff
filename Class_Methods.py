@@ -649,7 +649,7 @@ def greedy_fancy(sequences, amplicons, differences_per_amplicon, primer_width, s
         if check:
             to_cover = to_cover - np.sum(covered_differences)
             if logging:
-                log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(covered_differences)))
+                log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(covered_differences)) + '(frac covered: ' + str(np.sum(covered_differences)/np.sum(differences_per_amplicon[best_amplicon.id_num])))
             for amplicon in amplicons:
                 differences_per_amplicon[amplicon.id_num][covered_differences == 1] = 0
             amplicons = [a for a in amplicons if np.sum(differences_per_amplicon[a.id_num]) > 0]
