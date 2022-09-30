@@ -752,7 +752,7 @@ def check_primer_feasibility_single_amplicon_max_coverage(sequences, amplicon, d
                 forward_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['forward'][primer].temperature)
         for primer in amplicon.primers['reverse'][sequence]:
             if primer not in reverse_primers:
-                reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=optimize), primer_index.index2primer['reverse'][primer].temperature)
+                reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['reverse'][primer].temperature)
         covered_binary[sequence] = model.addVar(vtype=GRB.BINARY, obj=0)
     for s1 in range(len(sequences)):
         for s2 in range(s1):
