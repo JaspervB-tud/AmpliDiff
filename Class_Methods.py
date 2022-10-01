@@ -813,4 +813,4 @@ def check_primer_feasibility_single_amplicon_max_coverage(sequences, amplicon, d
             if covered_binary[sequence].x > 0.9:
                 seqs_covered += 1/len(sequences)
         return [True, res, realized_differences, seqs_covered]
-    return [False, None, None]
+    return [False, None, None, None]
