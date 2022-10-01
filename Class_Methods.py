@@ -645,11 +645,11 @@ def greedy_fancy(sequences, amplicons, differences_per_amplicon, primer_width, s
         result_amplicons.append(best_amplicon)
 
         #Check if current amplicon can be added based on primer feasibility
-        [check, cur_primers, covered_differences] = check_primer_feasibility_single_amplicon_max_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], np.sum(differences_per_amplicon[best_amplicon.id_num]), primer_index, temperature_range=temperature_range, coverage=coverage)
+        [check, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_max_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], np.sum(differences_per_amplicon[best_amplicon.id_num]), primer_index, temperature_range=temperature_range, coverage=coverage)
         if check:
             to_cover = to_cover - np.sum(covered_differences)
             if logging:
-                log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(covered_differences)) + '(frac covered: ' + str(np.sum(covered_differences)/np.sum(differences_per_amplicon[best_amplicon.id_num])))
+                log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(covered_differences)) + '(fraction differences covered: ' + str(np.sum(covered_differences)/np.sum(differences_per_amplicon[best_amplicon.id_num])) + '), (fraction sequences covered: ' + str(sequences_covered) + ')')
             for amplicon in amplicons:
                 differences_per_amplicon[amplicon.id_num][covered_differences == 1] = 0
             amplicons = [a for a in amplicons if np.sum(differences_per_amplicon[a.id_num]) > 0]
@@ -794,6 +794,7 @@ def check_primer_feasibility_single_amplicon_max_coverage(sequences, amplicon, d
     model.optimize()
     if model.Status == 2:
         res = {'forward' : [], 'reverse' : []}
+        seqs_covered = 0
         print('Forward primers: ')
         for primer in forward_primers:
             if forward_primers[primer][0].x > 0.9:
@@ -808,5 +809,8 @@ def check_primer_feasibility_single_amplicon_max_coverage(sequences, amplicon, d
         for pair in covered_pairs:
             if covered_pairs[pair].x > 0.9:
                 realized_differences[pair[1], pair[0]] = 1
-        return [True, res, realized_differences]
+        for sequence in covered_binary:
+            if covered_binary[sequence].x > 0.9:
+                seqs_covered += 1/len(sequences)
+        return [True, res, realized_differences, seqs_covered]
     return [False, None, None]
