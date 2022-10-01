@@ -701,7 +701,9 @@ def check_primer_feasibility(sequences, amplicons, primer_index, optimize=0, tem
         #Temperature constraints
         for primer in amplicon.full_primerset['forward']: #iterate over forward primers
             model.addConstr( min_temp <= primer_index.index2primer['forward'][primer].temperature * (3 - 2 * forward_primers[primer][0]) )
+            model.addConstr( max_temp >= primer_index.index2primer['forward'][primer].temperature * forward_primers[primer][0] )
         for primer in amplicon.full_primerset['reverse']:
+            model.addConstr( min_temp <= primer_index.index2primer['reverse'][primer].temperature * (3 - 2 * forward_primers[primer][0]) )
             model.addConstr( max_temp >= primer_index.index2primer['reverse'][primer].temperature * reverse_primers[primer][0] )
     model.addConstr(max_temp - min_temp <= temperature_range)
         
