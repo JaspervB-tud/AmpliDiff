@@ -566,33 +566,7 @@ def run_comparison_fancy(args):
                 f.write(primer + '\n')
                 n_rev += 1
             cur += 1
-                
-    
-    #Run final optimization
-    if args.multiplex:
-        st = time.time()
-        cur_primers = check_primer_feasibility(sequences, result_amplicons, PI, optimize=1, coverage=args.coverage)
-        with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
-            f.write('Time spent doing final primer optimization: ' + str(time.time() - st) + '\n')
-            f.write('Forward primers\n')
-            for fwd in cur_primers['forward']:
-                f.write(fwd + '\n')
-            f.write('Reverse primers\n')
-            for rev in cur_primers['reverse']:
-                f.write(rev + '\n')
-    else:
-        st = time.time()
-        for amplicon in result_amplicons:
-            cur_primers = check_primer_feasibility(sequences, [amplicon], PI, optimize=1, coverage=args.coverage)
-            with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
-                f.write('Amplicon: ' + str(amplicon.id) + '\n')
-                f.write('Forward primers\n')
-                for fwd in cur_primers['forward']:
-                    f.write(fwd + '\n')
-                f.write('Reverse primers\n')
-                for rev in cur_primers['reverse']:
-                    f.write(rev + '\n')
-                
+            
     with open(args.output + '/logfile_' + str(args.seed) + '.txt', 'w') as f:
         for line in logs:
             f.write(line + '\n')
