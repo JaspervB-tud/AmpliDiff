@@ -98,7 +98,7 @@ if __name__ == '__main__':
             'searchwidth' : [50],
             'cov' : [1],
             'amps' : ['8_all'],
-            'nseqs' : [1000]
+            'nseqs' : [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100, 1200]
         }
     parameter_names = ['ampwidth', 'ampthresh', 'misthresh', 'primwidth', 'searchwidth', 'cov', 'amps', 'nseqs']
     
