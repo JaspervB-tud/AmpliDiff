@@ -263,6 +263,27 @@ def calculate_longest_duorun(sequence, comparison_matrix):
             current_duo = (sequence[index-1], sequence[index])
             index += 1
     return max(stats)
+
+def calculate_hairpin_formation(sequence):
+    last_nucleotides_reverse = reverse_complement(sequence[-6:], rev=True)
+    binding_locations = []
+    res = (0, 0)
+    for c in range(len(sequence)-5):
+        if sequence[c] == last_nucleotides_reverse[0]:
+            binding_locations.append(c)
+    for binding_location in binding_locations:
+        max_overlap = min(6, len(sequence) - binding_location - 1)
+        cur_overlap = 0
+        for i in range(max_overlap):
+            if sequence[binding_location + i] == last_nucleotides_reverse[i]:
+                cur_overlap += 1
+        if cur_overlap > res[0]:
+            res = (cur_overlap, binding_location)
+    print(sequence)
+    print(sequence[res[1]:res[1] + min(6, len(sequence) - res[1] - 1)])
+    print(last_nucleotides_reverse[:min(6, len(sequence) - res[1] - 1)])
+    print(res[0])
+    
             
 def disambiguate(sequence):
     '''
