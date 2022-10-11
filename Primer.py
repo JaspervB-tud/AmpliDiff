@@ -1,5 +1,6 @@
-from Scripts import reverse_complement, calculate_degeneracy, calculate_GC, calculate_end_stats, calculate_longest_monorun, calculate_longest_duorun
+from Generic_Methods import reverse_complement, calculate_degeneracy, calculate_GC, calculate_end_stats, calculate_longest_monorun, calculate_longest_duorun
 from Bio.SeqUtils import MeltingTemp as mt
+import RNA
 
 class Primer:
     def __init__(self, sequence, orientation):
@@ -133,7 +134,7 @@ class Primer:
             Minimal allowed MFE representing the "risk" of hairpin formation. The default is -5.
         self_complementarity_threshold : int, optional
             Maximal number of complementary base-pairs in every alignment of this primer with its own reverse. The default is 10.
-        verbose : bobl, optional
+        verbose : bool, optional
             True if everything should be saved and outputted, False for fast check. The default is False.
 
         Returns
@@ -174,6 +175,9 @@ class Primer:
             self.self_complementarity = self.check_compatibility(self, comparison_matrix, self_complementarity_threshold)
             if self.self_complementarity[0] > self_complementarity_threshold:
                 problems.append('Self complementarity risk too high')
+            self.mfe_hairpin = RNA.fold(self.sequence)[1]
+            if self.mfe_hairpin < mfe_threshold:
+                problems.append('Risk of hairpin/secondary structure formation too high')
             #Print all issues with the current primer and then return whether it is feasible
             for p in problems: print(p)
             return len(problems) == 0
@@ -200,6 +204,9 @@ class Primer:
                 self.feasible = False
                 return False
             if self.check_compatibility(self, comparison_matrix, self_complementarity_threshold)[0] > self_complementarity_threshold:
+                self.feasible = False
+                return False
+            if RNA.fold(self.sequence)[1] < mfe_threshold:
                 self.feasible = False
                 return False
             return True
