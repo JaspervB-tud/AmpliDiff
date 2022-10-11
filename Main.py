@@ -456,10 +456,6 @@ def run_comparison(args):
             f.write(line + '\n')
 
 def run_comparison_fancy(args):
-    #initialize variables to store information
-    runtimes = []
-    cur_time = time.time()
-
     #Read sequences
     st = time.time()
     sequences = generate_sequences(args.metadata, args.sequences)
@@ -503,7 +499,7 @@ def run_comparison_fancy(args):
                 variants.append('Mu')
             elif variant == 'o' and 'Omicron' not in variants:
                 variants.append('Omicron')
-        sequences, lb, ub, feasible_amplicons, relevant_nucleotides = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+        sequences, _, _, feasible_amplicons, relevant_nucleotides = preprocess_sequences(sequences, args.search_width, variants_location=args.variants_location, variants=variants, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
     
         with open(args.output + '/sequences_included_' + str(args.seed) + '.txt', 'w+') as f:
             for sequence in sequences:
@@ -516,7 +512,7 @@ def run_comparison_fancy(args):
             f.write('Total sequences = ' + str(len(sequences)) + '\n')
         
     else:
-        sequences, lb, ub, feasible_amplicons, relevant_nucleotides = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
+        sequences, _, _, feasible_amplicons, relevant_nucleotides = preprocess_sequences(sequences, args.search_width, amplicon_width=args.amplicon_width, misalign_threshold=args.misalign_threshold)
         
         with open(args.output + '/sequences_included_' + str(args.seed) + '.txt', 'w+') as f:
             for sequence in sequences:
