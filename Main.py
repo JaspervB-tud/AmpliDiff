@@ -637,6 +637,7 @@ if __name__ == '__main__':
     parser.add_argument('-pw', '--primer_width', default=25, type=int, help='Primer size')
     parser.add_argument('-sw', '--search_width', default=50, type=int, help='Search window for finding primers')
     parser.add_argument('-cov', '--coverage', default=1.0, type=float, help='Fraction of sequences that should be covered by both a forward and reverse primer for every amplicon')
+    parser.add_argument('-b', '--beta', default=0.05, type=float, help='Trade-off parameter between adding primer pairs and differentiation power')
     #Greedy parameters
     parser.add_argument('-amps', '--amplicons', default=5, type=int, help='Number of amplicons to find')
     parser.add_argument('-mp', '--multiplex', action='store_true', help='If supplied, will find primers that work in a single batch (multiplex)')
