@@ -646,7 +646,7 @@ def greedy_fancy(sequences, amplicons, differences_per_amplicon, primer_width, s
 
         #Check if current amplicon can be added based on primer feasibility
         if coverage >= 1:
-            [check, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_full_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], np.sum(differences_per_amplicon[best_amplicon.id_num]), primer_index, temperature_range=temperature_range)
+            [check, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_full_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], primer_index, temperature_range=temperature_range)
         else:
             [check, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_variable_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], np.sum(differences_per_amplicon[best_amplicon.id_num]), primer_index, temperature_range=temperature_range, beta=beta, coverage=coverage)
         if check:
@@ -775,7 +775,7 @@ def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, 
         model.addConstr(covered_binary[sequence.id_num] <= sum(forward_primers[primer][0] for primer in amplicon.primers['forward'][sequence.id_num]))
         model.addConstr(covered_binary[sequence.id_num] <= sum(reverse_primers[primer][0] for primer in amplicon.primers['reverse'][sequence.id_num]))
         #At least $coverage (fraction) of the sequences should be covered per amplicon
-        model.addConstr(sum(covered_binary[sequence.id_num] for sequence in sequences) >= coverage * len(sequences))
+        model.addConstr(sum(covered_binary[sequence.id_num] for sequence in sequences) == len(sequences))
         #Temperature constraints
         for primer in amplicon.full_primerset['forward']: #iterate over forward primers
             model.addConstr( min_temp <= primer_index.index2primer['forward'][primer].temperature * (3 - 2 * forward_primers[primer][0]) )
