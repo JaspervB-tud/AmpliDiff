@@ -748,7 +748,6 @@ def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, 
     reverse_primers = {} #primer -> (variable, temperature)
     #Sequence variables
     covered_binary = {} #sequence_id -> variable
-    covered_pairs = {} #(sequence_id, sequence_id) -> variable
 
     #Initialize primer and sequence variables
     for sequence in amplicon.primers['forward']:
@@ -759,11 +758,6 @@ def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, 
             if primer not in reverse_primers:
                 reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['reverse'][primer].temperature)
         covered_binary[sequence] = model.addVar(vtype=GRB.BINARY, obj=0)
-    for s1 in range(len(sequences)):
-        for s2 in range(s1):
-            if sequences[s1].lineage != sequences[s2].lineage and differences[sequences[s2].id_num, sequences[s1].id_num] == 1:
-                covered_pairs[(sequences[s1].id_num, sequences[s2].id_num)] = model.addVar(vtype=GRB.BINARY, obj=0)
-                model.addConstr(covered_pairs[(sequences[s1].id_num, sequences[s2].id_num)] <= 0.5*covered_binary[sequences[s1].id_num] + 0.5*covered_binary[sequences[s2].id_num])
     num_primer_pairs = model.addVar(vtype=GRB.INTEGER, obj=1)
 
     #Temperature variables
@@ -812,14 +806,10 @@ def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, 
             if reverse_primers[primer][0].x > 0.9:
                 print(primer_index.index2primer['reverse'][primer].sequence)
                 res['reverse'].append(primer_index.index2primer['reverse'][primer].sequence)
-        realized_differences = np.zeros(differences.shape, dtype=np.int8)
-        for pair in covered_pairs:
-            if covered_pairs[pair].x > 0.9:
-                realized_differences[pair[1], pair[0]] = 1
         for sequence in covered_binary:
             if covered_binary[sequence].x > 0.9:
                 seqs_covered += 1/len(sequences)
-        return [True, res, realized_differences, seqs_covered]
+        return [True, res, differences, seqs_covered]
     return [False, None, None, None]
 
 def check_primer_feasibility_single_amplicon_variable_coverage(sequences, amplicon, differences, total_differences, primer_index, temperature_range=5, beta=0.05, coverage=1):
