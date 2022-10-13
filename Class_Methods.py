@@ -646,10 +646,11 @@ def greedy_fancy(sequences, amplicons, differences_per_amplicon, primer_width, s
 
         #Check if current amplicon can be added based on primer feasibility
         if coverage >= 1:
-            [check, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_full_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], primer_index, temperature_range=temperature_range)
+            [check, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_full_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], primer_index, temperature_range=temperature_range, feasibility_check=True)
         else:
             [check, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_variable_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], np.sum(differences_per_amplicon[best_amplicon.id_num]), primer_index, temperature_range=temperature_range, beta=beta, coverage=coverage)
         if check:
+            [_, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_full_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], primer_index, temperature_range=temperature_range, feasibility_check=False)
             to_cover = to_cover - np.sum(covered_differences)
             if logging:
                 log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(covered_differences)) + '(fraction differences covered: ' + str(np.sum(covered_differences)/np.sum(differences_per_amplicon[best_amplicon.id_num])) + '), (fraction sequences covered: ' + str(sequences_covered) + ')')
@@ -735,7 +736,7 @@ def check_primer_feasibility(sequences, amplicons, primer_index, optimize=0, tem
         return res
     return model.Status == 2
 
-def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, differences, primer_index, temperature_range=5):
+def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, differences, primer_index, temperature_range=5, feasibility_check=False):
     env = gp.Env(empty=True)
     env.setParam('OutputFlag',0)
     env.start()
@@ -753,12 +754,15 @@ def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, 
     for sequence in amplicon.primers['forward']:
         for primer in amplicon.primers['forward'][sequence]:
             if primer not in forward_primers:
-                forward_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=1), primer_index.index2primer['forward'][primer].temperature)
+                forward_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['forward'][primer].temperature)
         for primer in amplicon.primers['reverse'][sequence]:
             if primer not in reverse_primers:
-                reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=1), primer_index.index2primer['reverse'][primer].temperature)
+                reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['reverse'][primer].temperature)
         covered_binary[sequence] = model.addVar(vtype=GRB.BINARY, obj=0)
-    #num_primer_pairs = model.addVar(vtype=GRB.INTEGER, obj=1)
+    if feasibility_check:
+        num_primer_pairs = model.addVar(vtype=GRB.INTEGER, obj=0)
+    else:
+        num_primer_pairs = model.addVar(vtype=GRB.INTEGER, obj=1)
 
     #Temperature variables
     max_temp = model.addVar(vtype=GRB.CONTINUOUS, obj=0)
@@ -789,8 +793,8 @@ def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, 
             model.addConstr( forward_primers[fwd][0] + reverse_primers[rev][0] <= primer_index.check_conflict( [primer_index.index2primer['forward'][fwd], primer_index.index2primer['reverse'][rev]] ) )
 
     #Set variable for primer pairs
-    #model.addConstr(num_primer_pairs >= sum(forward_primers[primer][0] for primer in forward_primers))
-    #model.addConstr(num_primer_pairs >= sum(reverse_primers[primer][0] for primer in reverse_primers))
+    model.addConstr(num_primer_pairs >= sum(forward_primers[primer][0] for primer in forward_primers))
+    model.addConstr(num_primer_pairs >= sum(reverse_primers[primer][0] for primer in reverse_primers))
 
     model.optimize()
     if model.Status == 2:
