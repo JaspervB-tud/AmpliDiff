@@ -409,7 +409,7 @@ def run_plot_amplicons(args):
             data = [data for data in data_iter]
         differences = np.asarray(data, dtype=np.int32)
     except:
-        differences = calculate_differences_per_amplicon_mp(sequences, args.amplicon_width, comparison_matrix, amplicon_threshold=args.amplicon_threshold, processors=args.cores)
+        differences, _ = calculate_differences_per_amplicon_mp(sequences, args.amplicon_width, comparison_matrix, amplicon_threshold=args.amplicon_threshold, processors=args.cores)
         np.savetxt(args.output + '/amplicon_differentiation_' + str(args.seed) + '.csv', differences, delimiter=",")
     
     #Read amplicons from logfile
