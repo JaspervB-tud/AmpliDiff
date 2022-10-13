@@ -451,9 +451,9 @@ def run_plot_amplicons(args):
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     if args.coverage >= 1:
-        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%')
+        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%%')
     else:
-        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%, beta=' + str(args.beta))
+        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%%, beta=' + str(args.beta))
     plt.ylim([0, 1])
     plt.draw()
     plt.savefig(args.output + '/amplicons_' + str(args.seed) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
@@ -475,9 +475,9 @@ def run_plot_amplicons(args):
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     if args.coverage >= 1:
-        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) +'%')
+        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) +'%%')
     else:
-        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%, beta=' + str(args.beta))
+        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%%, beta=' + str(args.beta))
     plt.savefig(args.output + '/amplicons_cumulative_' + str(args.seed) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
 
 def run_comparison(args):
