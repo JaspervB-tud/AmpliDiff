@@ -4,6 +4,7 @@ import PrimerIndex
 
 #Can be removed later
 import AmpliconGeneration
+import csv
 import time
 import numpy as np
 import multiprocessing
@@ -98,8 +99,6 @@ def run_plot_differences(args):
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/amplicon_differentiation_ampwidth' + str(args.amplicon_width) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
 
     np.savetxt("/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/amplicon_differentiation_array_ampwidth" + str(args.amplicon_width) + ".csv", diffs/max_diffs, delimiter=",")
-
-
 
 def run_plots(args):
     def generate_counts(base_folder, parameters, sequence_length):
@@ -331,6 +330,155 @@ def run_plots(args):
     plt.savefig('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/time_experiments/plots/all.pdf', figsize=[20,10], dpi=200, format='pdf')
     del fig, ax
 
+def run_plot_amplicons(args):
+    def determine_annotations(sequences, ref_genome):
+        alignments = pairwise2.align.globalxx(sequences[0].sequence_raw.upper(), str(ref_genome.seq))
+        ref_sequence = Sequence(alignments[0].seqB.lower(), 'NC_045512.2')
+        ref_sequence.align_to_trim()
+        sequences[0].align_to_trim()
+        
+        #Annotations are based on annotations for reference genome "NC_045512.2"
+        annotations = {}
+        annotations2 = {}
+        ORF1a = [266, 13483]
+        ORF1b = [13483, 21555]
+        spike_1 = [21599, 23618]
+        spike_2 = [23618, 25381]
+        E = [26245, 26472]
+        M = [26523, 27191]
+        ORF6 = [27202, 27384]
+        ORF7a = [27439, 27756]
+        ORF7b = [27756, 27884]
+        N = [28274, 29553]
+        
+        #ORF1a
+        annotations['ORF1a'] = [np.where(ref_sequence.aligned_to_trim == ORF1a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1a[1])[0][0]]
+        annotations2['ORF1a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][1])[0][0]]
+        #ORF1b
+        annotations['ORF1b'] = [np.where(ref_sequence.aligned_to_trim == ORF1b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1b[1])[0][0]]
+        annotations2['ORF1b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][1])[0][0]]
+        #S1
+        annotations['S1'] = [np.where(ref_sequence.aligned_to_trim == spike_1[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_1[1])[0][0]]
+        annotations2['S1'] = [np.where(sequences[0].aligned_to_trim == annotations['S1'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S1'][1])[0][0]]
+        #S2
+        annotations['S2'] = [np.where(ref_sequence.aligned_to_trim == spike_2[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_2[1])[0][0]]
+        annotations2['S2'] = [np.where(sequences[0].aligned_to_trim == annotations['S2'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S2'][1])[0][0]]
+        #E
+        annotations['E'] = [np.where(ref_sequence.aligned_to_trim == E[0])[0][0], np.where(ref_sequence.aligned_to_trim == E[1])[0][0]]
+        annotations2['E'] = [np.where(sequences[0].aligned_to_trim == annotations['E'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['E'][1])[0][0]]
+        #M
+        annotations['M'] = [np.where(ref_sequence.aligned_to_trim == M[0])[0][0], np.where(ref_sequence.aligned_to_trim == M[1])[0][0]]
+        annotations2['M'] = [np.where(sequences[0].aligned_to_trim == annotations['M'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['M'][1])[0][0]]
+        #ORF6
+        annotations['ORF6'] = [np.where(ref_sequence.aligned_to_trim == ORF6[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF6[1])[0][0]]
+        annotations2['ORF6'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF6'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF6'][1])[0][0]]
+        #ORF7a
+        annotations['ORF7a'] = [np.where(ref_sequence.aligned_to_trim == ORF7a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF7a[1])[0][0]]
+        annotations2['ORF7a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF7a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF7a'][1])[0][0]]
+        #ORF7b
+        annotations['ORF7b'] = [np.where(ref_sequence.aligned_to_trim == ORF7b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF7b[1])[0][0]]
+        annotations2['ORF7b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF7b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF7b'][1])[0][0]]
+        #N
+        annotations['N'] = [np.where(ref_sequence.aligned_to_trim == N[0])[0][0], np.where(ref_sequence.aligned_to_trim == N[1])[0][0]]
+        annotations2['N'] = [np.where(sequences[0].aligned_to_trim == annotations['N'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['N'][1])[0][0]]
+        
+        return annotations2
+
+    #Read and randomize sequences
+    sequences = generate_sequences(args.metadata, args.sequences)
+    random.seed(args.seed)
+    random.shuffle(sequences)
+    sequences = sequences[:args.n_sequences]
+    #Note that we should change the numerical sequence ids
+    total_differences = 0
+    for i in range(len(sequences)):
+        sequences[i].id_num = i
+        for j in range(i):
+            if sequences[i].lineage != sequences[j].lineage:
+                total_differences += 1
+
+    #Read reference genome and determine annotations
+    ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
+    annotations = determine_annotations(sequences, ref_genome)
+
+    #Read or determine differentiation per amplicon
+    comparison_matrix = generate_opportunistic_matrix()
+    try:
+        with open(args.output + '/amplicon_differentiation_' + str(args.seed), 'r') as f:
+            data_iter = csv.read(f, delimiter=',')
+            data = [data for data in data_iter]
+        differences = np.asarray(data, dtype=np.int32)
+    except:
+        differences = calculate_differences_per_amplicon_mp(sequences, args.amplicon_width, comparison_matrix, amplicon_threshold=args.amplicon_threshold, processors=args.cores)
+        np.savetxt(args.output + '/amplicon_differentiation_' + str(args.seed) + '.csv', differences, delimiter=",")
+    
+    #Read amplicons from logfile
+    amplicons = []
+    coverages = []
+    with open(args.output + '/logfile_' + str(args.seed) + '.txt', 'r') as f:
+        for line in f.readlines():
+            if 'succesfully' in line:
+                amplicons.append(eval(line.split(':')[0].split('Amplicon')[1].split('succesfully')[0]))
+                coverages.append(int(line.split('covered:')[1].split('(')[0])/total_differences)
+    
+    #Annotations
+    regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'ORF6', 'ORF7a', 'ORF7b', 'N']
+    colors = ['red', 'blue']
+    #Make figure for independent amplicons
+    fig = plt.figure(figsize=[20,10], dpi=200)
+    ax = plt.gca()
+    #Plot amplicons
+    for i in range(len(amplicons)):
+        cur_amplicon = amplicons[i]
+        cur_coverage = coverages[i]
+        #Amplicons
+        cur_line, = plt.plot([cur_amplicon[0], cur_amplicon[1]], [cur_coverage, cur_coverage], label='Amplicon ' + str(i+1), linewidth=3)
+        plt.plot([cur_amplicon[0]]*2, [0, cur_coverage], color=cur_line.get_color(), linestyle='--', alpha=0.5)
+        plt.plot([cur_amplicon[1]]*2, [0, cur_coverage], color=cur_line.get_color(), linestyle='--', alpha=0.5)
+        plt.plot([cur_amplicon[0], cur_amplicon[1]], [0,0], color=cur_line.get_color(), linewidth=3, alpha=0.8)
+        plt.annotate(str(i+1), (cur_amplicon[0], cur_coverage+0.005), ha='center')
+    #Plot key regions (genes)
+    color_index = 0
+    for region in regions:
+        plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.8), color='black', alpha=0.6, size=8, ha='center', rotation=90)
+        color_index += 1
+    #Plot differences
+    plt.plot(differences, color='black', alpha=0.3, linewidth=0.5)
+    #Figure makeup
+    plt.xlabel('Nucleotide index', size=5)
+    plt.ylabel('Relative number of sequence pairs differentiated', size=5)
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    if args.coverage >= 1:
+        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%')
+    else:
+        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%, beta=' + str(args.beta))
+    plt.ylim([0, 1])
+    plt.draw()
+    plt.savefig(args.output + '/amplicons_' + str(args.seed) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
+
+    #Make figure for cumulative amplicons
+    fig = plt.figure(figsize=[20,10], dpi=200)
+    ax = plt.gca()
+    #Plot amplicon coverages
+    for i in range(len(amplicons)):
+        plt.plot([i+1, i+1], [0, sum(coverages[:i+1])], linewidth=2, color='black', alpha=0.6)
+    plt.plot(range(1, len(amplicons)+1), [sum(coverages[:i+1]) for i in range(len(amplicons))], 'ro', markersize=3)
+    plt.plot(range(len(amplicons)+1), [sum(coverages)]*(len(amplicons)+1), color='red', linewidth=1.5, alpha=0.4)
+    plt.annotate('{0:.4f}'.format(sum(coverages)), (len(amplicons), sum(coverages)+0.05), color='black', ha='center')
+    plt.ylim([0, 1])
+    plt.xlim([0, len(amplicons) + 1])
+    plt.xticks(range(1, len(amplicons)+1), [str(amplicon) for amplicon in amplicons], rotation=45)
+    plt.xlabel('Amplicon', size=8)
+    plt.ylabel('Cumulative relative number of sequence pairs differentiated', size=8)
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    if args.coverage >= 1:
+        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) +'%')
+    else:
+        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%, beta=' + str(args.beta))
+    plt.savefig(args.output + '/amplicons_cumulative_' + str(args.seed) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
 
 def run_comparison(args):
     #initialize variables to store information
@@ -660,6 +808,8 @@ if __name__ == '__main__':
         run_plots(args)
     elif args.run_type == 'plot_differences':
         run_plot_differences(args)
+    elif args.run_type == 'plot_amplicons':
+        run_plot_amplicons(args)
 
 
 
