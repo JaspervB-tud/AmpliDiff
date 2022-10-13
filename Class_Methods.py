@@ -650,7 +650,8 @@ def greedy_fancy(sequences, amplicons, differences_per_amplicon, primer_width, s
         else:
             [check, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_variable_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], np.sum(differences_per_amplicon[best_amplicon.id_num]), primer_index, temperature_range=temperature_range, beta=beta, coverage=coverage)
         if check:
-            [_, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_full_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], primer_index, temperature_range=temperature_range, feasibility_check=False)
+            if coverage >= 1:
+                [_, cur_primers, covered_differences, sequences_covered] = check_primer_feasibility_single_amplicon_full_coverage(sequences, best_amplicon, differences_per_amplicon[best_amplicon.id_num], primer_index, temperature_range=temperature_range, feasibility_check=False)
             to_cover = to_cover - np.sum(covered_differences)
             if logging:
                 log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(covered_differences)) + '(fraction differences covered: ' + str(np.sum(covered_differences)/np.sum(differences_per_amplicon[best_amplicon.id_num])) + '), (fraction sequences covered: ' + str(sequences_covered) + ')')
