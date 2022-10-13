@@ -404,7 +404,7 @@ def run_plot_amplicons(args):
     #Read or determine differentiation per amplicon
     comparison_matrix = generate_opportunistic_matrix()
     try:
-        with open(args.output + '/amplicon_differentiation_' + str(args.seed), 'r') as f:
+        with open(args.output + '/amplicon_differentiation_' + str(args.seed) + '.csv', 'r') as f:
             data_iter = csv.read(f, delimiter=',')
             data = [data for data in data_iter]
         differences = np.asarray(data, dtype=np.int32)
@@ -444,7 +444,7 @@ def run_plot_amplicons(args):
         plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.8), color='black', alpha=0.6, size=8, ha='center', rotation=90)
         color_index += 1
     #Plot differences
-    plt.plot(differences, color='black', alpha=0.3, linewidth=0.5)
+    plt.plot([d/total_differences for d in differences], color='black', alpha=0.3, linewidth=0.5)
     #Figure makeup
     plt.xlabel('Nucleotide index', size=5)
     plt.ylabel('Relative number of sequence pairs differentiated', size=5)
