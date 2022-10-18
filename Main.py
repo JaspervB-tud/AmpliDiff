@@ -688,8 +688,11 @@ def run_comparison_fancy(args):
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent generating amplicon differentiation ' + str(time.time() - st) + '\n')
 
+    #Run greedy
     st = time.time()
-    logs, result_amplicons, result_primers = greedy_fancy(sequences, amplicons, diffs_per_amplicon, args.primer_width, args.search_width, PI, comparison_matrix, args.amplicons, args.coverage, 5, logging=True, multiplex=args.multiplex)
+    logs, result_amplicons, result_primers = greedy_fancy(sequences, amplicons, diffs_per_amplicon, args.primer_width, args.search_width, PI, 
+                                                            comparison_matrix, args.amplicons, args.coverage, 5, logging=True, 
+                                                            multiplex=args.multiplex, output_file=args.output+'/primers_'+str(args.seed)+'.txt')
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent running greedy algorithm: ' + str(time.time() - st) + '\n')
 

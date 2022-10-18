@@ -625,7 +625,7 @@ def greedy(sequences, amplicons, differences_per_amplicon, primer_width, search_
     else:
         return result_amplicons
 
-def greedy_fancy(sequences, amplicons, differences_per_amplicon, primer_width, search_width, primer_index, comparison_matrix, max_amplicons, coverage, temperature_range, beta=0.05, logging=False, multiplex=False):
+def greedy_fancy(sequences, amplicons, differences_per_amplicon, primer_width, search_width, primer_index, comparison_matrix, max_amplicons, coverage, temperature_range, beta=0.05, logging=False, multiplex=False, output_file=None):
     to_cover = np.sum(differences_per_amplicon, axis=0)
     to_cover = np.sum(to_cover > 0)
 
@@ -655,6 +655,18 @@ def greedy_fancy(sequences, amplicons, differences_per_amplicon, primer_width, s
             to_cover = to_cover - np.sum(covered_differences)
             if logging:
                 log_results.append('Amplicon ' + str(best_amplicon.id) + ' succesfully added, new sequence pairs covered: ' + str(np.sum(covered_differences)) + '(fraction differences covered: ' + str(np.sum(covered_differences)/np.sum(differences_per_amplicon[best_amplicon.id_num])) + '), (fraction sequences covered: ' + str(sequences_covered) + ')')
+                if output_file:
+                    with open(output_file, 'a') as f:
+                        cur_count = 1
+                        for primer in cur_primers['forward']:
+                            f.write('>AMPLICON_' + str(len(result_amplicons)) + '_F' + str(cur_count) +'\n')
+                            f.write(primer + '\n')
+                            cur_count += 1
+                        cur_count = 1
+                        for primer in cur_primers['reverse']:
+                            f.write('>AMPLICON_' + str(len(result_amplicons)) + '_R' + str(cur_count) + '\n')
+                            f.write(primer + '\n')
+                            cur_count += 1
             for amplicon in amplicons:
                 differences_per_amplicon[amplicon.id_num][covered_differences == 1] = 0
             amplicons = [a for a in amplicons if np.sum(differences_per_amplicon[a.id_num]) > 0]
