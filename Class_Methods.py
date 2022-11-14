@@ -768,10 +768,23 @@ def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, 
         for primer in amplicon.primers['forward'][sequence]:
             if primer not in forward_primers:
                 forward_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['forward'][primer].temperature)
+    for sequence in amplicon.primers['reverse']:
+        for primer in amplicon.primers['reverse'][sequence]:
+            if primer not in reverse_primers:
+                reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['reverse'][primer].temperature)
+    for sequence in sequences:
+        covered_binary[sequence.id_num] = model.addVar(vtype=GRB.BINARY, obj=0)
+    
+    '''
+    for sequence in amplicon.primers['forward']:
+        for primer in amplicon.primers['forward'][sequence]:
+            if primer not in forward_primers:
+                forward_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['forward'][primer].temperature)
         for primer in amplicon.primers['reverse'][sequence]:
             if primer not in reverse_primers:
                 reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['reverse'][primer].temperature)
         covered_binary[sequence] = model.addVar(vtype=GRB.BINARY, obj=0)
+    '''
     if feasibility_check:
         num_primer_pairs = model.addVar(vtype=GRB.INTEGER, obj=0)
     else:
@@ -786,7 +799,7 @@ def check_primer_feasibility_single_amplicon_full_coverage(sequences, amplicon, 
         model.addConstr(covered_binary[sequence.id_num] <= sum(forward_primers[primer][0] for primer in amplicon.primers['forward'][sequence.id_num]))
         model.addConstr(covered_binary[sequence.id_num] <= sum(reverse_primers[primer][0] for primer in amplicon.primers['reverse'][sequence.id_num]))
         #Every sequence should be covered
-        model.addConstr(covered_binary[sequence.id_num] == 1)
+        model.addConstr(covered_binary[sequence.id_num] >= 1)
         #Temperature constraints
         for primer in amplicon.full_primerset['forward']: #iterate over forward primers
             model.addConstr( min_temp <= primer_index.index2primer['forward'][primer].temperature * (3 - 2 * forward_primers[primer][0]) )
@@ -849,10 +862,22 @@ def check_primer_feasibility_single_amplicon_variable_coverage(sequences, amplic
         for primer in amplicon.primers['forward'][sequence]:
             if primer not in forward_primers:
                 forward_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['forward'][primer].temperature)
+    for sequence in amplicon.primers['reverse']:
+        for primer in amplicon.primers['reverse'][sequence]:
+            if primer not in reverse_primers:
+                reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['reverse'][primer].temperature)
+    for sequence in sequences:
+        covered_binary[sequence.id_num] = model.addVar(vtype=GRB.BINARY, obj=0)
+    '''
+    for sequence in amplicon.primers['forward']:
+        for primer in amplicon.primers['forward'][sequence]:
+            if primer not in forward_primers:
+                forward_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['forward'][primer].temperature)
         for primer in amplicon.primers['reverse'][sequence]:
             if primer not in reverse_primers:
                 reverse_primers[primer] = (model.addVar(vtype=GRB.BINARY, obj=0), primer_index.index2primer['reverse'][primer].temperature)
         covered_binary[sequence] = model.addVar(vtype=GRB.BINARY, obj=0)
+    '''
     for s1 in range(len(sequences)):
         for s2 in range(s1):
             if sequences[s1].lineage != sequences[s2].lineage and differences[sequences[s2].id_num, sequences[s1].id_num] == 1:
