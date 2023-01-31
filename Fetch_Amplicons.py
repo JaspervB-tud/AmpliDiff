@@ -343,7 +343,7 @@ def main():
     ART_intput = generate_simulationfile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
     Kallisto_input = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
     with open(args.output_path + '/ART_input.fasta', 'w') as f:
-        for line in ART_output:
+        for line in ART_input:
             f.write(line + '\n')
     with open(args.output_path + '/Kallisto_input.fasta', 'w') as f:
         for line in Kallisto_input:
