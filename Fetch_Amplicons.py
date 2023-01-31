@@ -319,7 +319,7 @@ def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfil
         realized_amplicons = locate_amplicons(sequence.sequence_raw, amplicons, M)
         amplicon_index = 0
         s = ''
-        fasta_list.append('>' + sequence.lineage + '_' + sequence.id + '\n')
+        fasta_list.append('>' + sequence.id + '\n')
         for amplicon in realized_amplicons:
             amplicon_index += 1
             if realized_amplicons[amplicon]:
