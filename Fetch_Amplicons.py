@@ -6,7 +6,7 @@ import math
 import itertools
 import csv
 
-def generate_sequences(seq_path, meta_path):
+def generate_sequences(seq_path, meta_path, max_n=10):
     '''
     Function that reads sequences from a fasta file and saves them as Sequence objects with metadata from "metadata.tsv".
 
@@ -15,7 +15,9 @@ def generate_sequences(seq_path, meta_path):
     seq_path: str
         Absolute path of the sequences.
     meta_path : str
-        Absolute path to the folder containing the metadata.tsv file
+        Absolute path to the metadata.tsv file
+    max_n : int, optional
+        Maximum number of fully degenerate nucleotides allowed. The default is 10.
 
     Returns
     -------
@@ -30,13 +32,13 @@ def generate_sequences(seq_path, meta_path):
     sequences_object = SeqIO.parse(open(seq_path), 'fasta')
     for sequence in sequences_object:
         sequences_temp[sequence.id.split('|')[0]] = str(sequence.seq.lower())
-        if len(sequence.seq.replace('-','')) < 29000 or sequence.seq.lower().count('n') > 10: #require sequences to have length at least 29k
+        if len(sequence.seq.replace('-','')) < 29000 or sequence.seq.lower().count('n') > max_n: #require sequences to have length at least 29k
             to_delete.append(sequence.id.split('|')[0]) #store sequences that should be removed due to too many 'n's or being too short
     #Read metadata unless impossible in which case we assign every sequence its own "lineage"
     skip = -1
     try:
         sequences = []
-        for meta in csv.reader(open(meta_path + '/metadata.tsv'), delimiter='\t'):
+        for meta in csv.reader(open(meta_path), delimiter='\t'):
             if skip == -1: #first line is always the header line
                 for cur_meta in range(len(meta)):
                     if 'lineage' in meta[cur_meta].lower():
@@ -119,12 +121,56 @@ def read_primerfile(filename, amplicons):
     return amplicons, primerlist
 
 def locate_primers(sequence, primerlist, comparison_matrix, max_degen=10):
+    '''
+    Function that determines the primer binding sites of given primers in the given sequence by considering every exact binding location while
+    allowing for degenerate nucleotides (i.e. if the sequence contains an N, any nucleotide will bind here).
+
+    Parameters
+    ----------
+    sequence : Sequence
+        Sequence object for which to determine primer binding sites.
+    primerlist : dict{ 'forward':[], 'reverse':[] }
+        Dictionary containing a forward and reverse key along with primers (strings) for which binding sites have to be determined.
+    comparison_matrix : dict{ char : [] }
+        Dictionary which dictates which nucleotides are considered equal.
+    max_degen : int, optional
+        Number of degenerate nucleotides in the sequence. This guides the k-mer based match finding method. 
+        Note that this parameter is essentially redundant and can therefore be ignored. The default is 10.
+
+    Returns
+    -------
+    hits_fwd : dict{ str : set() }
+        Dictionary with the binding sites for every forward primer in $primerlist.
+    hits_rev : dict{ str : set() }
+        Dictionary with the binding sites for every reverse primer in $primerlist.
+    '''
     sequence_reverse = reverse_complement(sequence, rev=True)
     max_degen = min(max_degen, len(sequence)-sequence.count('a')-sequence.count('c')-sequence.count('g')-sequence.count('t'))
     
     def find_hits(sequence, primers, max_degen, comparison_matrix, reverse=False):
+        '''
+        Function that performs degenerate elastic string matching by doing k-mer based matching.
+
+        Parameters
+        ----------
+        sequence : Sequence
+            Sequence object for which to determine primer binding sites.
+        primers : list[ str ]
+            List with primers for which binding sites have to be determined.
+        max_degen : int
+            Number of degenerate nucleotides in the sequence. This guides the matching approach.
+        comparison_matrix : dict{ char : [] }
+            Dictionary which dictates which nucleotides are considered equal.
+        reverse : bool, optional
+            Boolean which should be set to true if the primers are based on the reverse complement of the sequence. The default is False.
+
+        Returns
+        -------
+        hits : dict{ str : set() }
+            Dictionary with the binding sites for every primer in $primers.
+
+        '''
         hits = {primer: set() for primer in primers}
-        hits_translated = {primer: set() for primer in primers}
         
         #Iterate over primers
         for primer in primers:
@@ -165,7 +211,31 @@ def locate_primers(sequence, primerlist, comparison_matrix, max_degen=10):
     return hits_fwd, hits_rev
                             
 def locate_amplicons(sequence, amplicons, comparison_matrix, max_degen=10, primer_length=25):
-    
+    '''
+    Function that locates the realized amplicons based on the amplicons and corresponding primers in $amplicons in $sequence.
+    Note that if the sequence has a stretch of $primer_length degenerate nucleotides, the results can potentially be uninterpretable.
+
+    Parameters
+    ----------
+    sequence : Sequence
+        Sequence object for which to determine primer binding sites.
+    amplicons : list[ [(int,int), dict] ]
+        List of amplicons in the form of a tuple (start, end), and a dictionary containing the keys forward and reverse which
+        contain for every amplicon the corresponding forward and reverse primers in a list as values.
+    comparison_matrix : dict{ char : [] }
+        Dictionary which dictates which nucleotides are considered equal.
+    max_degen : int
+        Number of degenerate nucleotides in the sequence. This guides the matching approach. The default is 10.
+    primer_length : int, optional
+        Length of the primer sequence. Theoretically this could be omitted, but since AmpliVar generates primers of fixed length
+        it made sense to just include it as a parameter. The default is 25.
+
+    Returns
+    -------
+    binding_sites : dict{ (int,int) : (int, int) }
+        Dictionary with AmpliVar based amplicons as keys, and realized amplicons as values.
+
+    '''
     binding_sites = {amplicon[0]: None for amplicon in amplicons}
     #Iterate over amplicons
     for amplicon in amplicons:
@@ -190,6 +260,32 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, max_degen=10, prime
     return binding_sites
 
 def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
+    '''
+    Function that generates a fasta file which has entries for every amplicon for the amplicons in $logfile_path, for every sequence in $sequences_path.
+    The intended use for this file is to use with the ART read simulator in amplicon mode.
+
+    Parameters
+    ----------
+    sequences_path : str
+        Absolute path to the sequences fasta file.
+    metadata_path : str
+        Absolute path to the metadata file.
+    logfile_path : str
+        Absolute path to the log file of an AmpliVar run. For more info check read_logfile.
+    primerfile_path : str
+        Absolute path to the primers file of an AmpliVar run. For more info check read_primerfile
+    max_degen : int, optional
+        Number of degenerate nucleotides in the sequences. Note that this parameter is essentially redundant and can be ignored. The default is 10.
+    primer_length : int, optional
+        Length of the primer sequence. Theoretically this could be omitted, but since AmpliVar generates primers of fixed length
+        it made sense to just include it as a parameter. The default is 25.
+
+    Returns
+    -------
+    fasta_list : TYPE
+        DESCRIPTION.
+
+    '''
     sequences = generate_sequences(sequences_path, metadata_path) #read sequences
     amplicons = read_logfile(logfile_path) #generate amplicons from logfile
     amplicons, primerlist = read_primerfile(primerfile_path, amplicons) #refine amplicons and determine corresponding primers
@@ -197,26 +293,57 @@ def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerf
     
     fasta_list = []
     S = set()
-    for sequence in sequences[:100]:
+    for sequence in sequences[:10]:
         print(sequence.id, sequence.lineage)
         S.add(sequence.lineage)
         realized_amplicons = locate_amplicons(sequence.sequence_raw, amplicons, M)
+        amplicon_index = 0
         for amplicon in realized_amplicons:
+            amplicon_index += 1
             if realized_amplicons[amplicon]:
+                fasta_list.append('>' + sequence.lineage + '_' + sequence.id + '_A' + str(amplicon_index))
+                fasta_list.append(sequence.sequence_raw[realized_amplicons[amplicon][0]:realized_amplicons[amplicon][1]])
                 print(amplicon, realized_amplicons[amplicon][1] - realized_amplicons[amplicon][0])
             else:
                 print('Amplicon not amplifiable')
-    print(len(sequences))
-    print(len(S))
+    print(fasta_list)
+    return fasta_list
 
-            
+def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
+    sequences = generate_sequences(sequences_path, metadata_path) #read sequences
+    amplicons = read_logfile(logfile_path) #generate amplicons from logfile
+    amplicons, primerlist = read_primerfile(primerfile_path, amplicons) #refine amplicons and determine corresponding primers
+    M = generate_opportunistic_matrix() #generate matrix used to determine which nucleotides are identical
+    
+    fasta_list = []
+    for sequence in sequences[:10]:
+        realized_amplicons = locate_amplicons(sequence.sequence_raw, amplicons, M)
+        amplicon_index = 0
+        s = ''
+        fasta_list.append('>' + sequence.lineage + '_' + sequence.id + '\n')
+        for amplicon in realized_amplicons:
+            amplicon_index += 1
+            if realized_amplicons[amplicon]:
+                s += sequence.sequence_raw[realized_amplicons[amplicon][0]:realized_amplicons[amplicon][1]] +'A'*200
+        fasta_list.append(s[:-200] + '\n')
+    return fasta_list
+        
+    
     
 
 def main():
-    generate_simulationfile('/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/sequences.fasta', 
-                            '/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022',
+    F = generate_simulationfile('/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/sequences.fasta', 
+                            '/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/metadata.tsv',
                             '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/logfile_1.txt',
                             '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/primers_1.txt')
+    F2 = generate_kallistofile('/Users/jaspervanbemmelen/Downloads/Netherlands_September_2022/sequences.fasta', 
+                            '/Users/jaspervanbemmelen/Downloads/Netherlands_September_2022/metadata.tsv',
+                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/logfile_1.txt',
+                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/primers_1.txt')
+    fasta_str = ''
+    for i in range(0, len(F), 2):
+        fasta_str += F[i] + '\n' + F[i+1] + '\n'
+    return fasta_str
     sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/source_code/amplivar/testing', '/Users/jaspervanbemmelen/Documents/Wastewater/source_code/amplivar/testing')
     M = generate_opportunistic_matrix()
     return None
@@ -244,120 +371,18 @@ def main():
         i += 1
     return sequences, A, primerlist
     print(time.time() - t)
-    '''
-    
-def read_logfile(filename):
-    amplicons = []
-    with open(filename, 'r') as fn:
-        lines = fn.readlines()
-        for line in lines:
-            if 'succesfully' in line:
-                amplicons.append( [(int(line.split(')')[0].split('(')[-1].split(',')[0]), int(line.split(')')[0].split('(')[-1].split(',')[1])), {'forward': [], 'reverse': []}] )
-                
-    return amplicons
-
-def read_primerfile(filename, amplicons):
-    primerlist = {'forward': [], 'reverse': []}
-    
-    with open(filename, 'r') as fn:
-        lines = fn.readlines()
-        line_index = 0
-        while line_index < len(lines):
-            cur_amplicon = lines[line_index]
-            if cur_amplicon.split('_')[-1][0] == 'F':
-                amplicons[int(cur_amplicon.split('_')[1]) - 1][1]['forward'].append(lines[line_index+1].strip())
-                primerlist['forward'].append(lines[line_index+1].strip())
-            else:
-                amplicons[int(cur_amplicon.split('_')[1]) - 1][1]['reverse'].append(lines[line_index+1].strip())
-                primerlist['reverse'].append(lines[line_index+1].strip())
-            line_index += 2
-            
-    return amplicons, primerlist
-'''
-def locate_primers(sequence, primerlist, comparison_matrix, max_degen=10):
-    def all_hits(t, p):
-        res = []
-        offset = -1
-        while True:
-            try:
-                offset = t.index(p, offset+1)
-                res.append(offset)
-            except:
-                return res
-            
-    sequence_reverse = reverse_complement(sequence, rev=True)
-    max_degen = min(max_degen, len(sequence)-sequence.count('a')-sequence.count('c')-sequence.count('g')-sequence.count('t'))
-    #print(max_degen)
-    hits_fwd = {primer: set() for primer in primerlist['forward']}
-    hits_rev = {primer: set() for primer in primerlist['reverse']}
-    hits_rev_translated = {primer: set() for primer in primerlist['reverse']}
-
-    #Forward
-    num_hits = 0
-    for primer in primerlist['forward']:
-        min_stretch = math.ceil((len(primer) - max_degen)/(max_degen + 1))
-        cur_kmers = [(primer[kmer:kmer+min_stretch],kmer) for kmer in range(len(primer) - min_stretch + 1)]
-        for kmer, index in cur_kmers:
-            offset = -1
-            cont = True
-            while cont:
-                try:
-                    offset = sequence.index(kmer, offset+1)
-                    hit = True
-                    if offset >= index and len(sequence) >= offset + len(primer) - index:
-                        for i in range(index):
-                            if not comparison_matrix[(primer[i], sequence[offset-index+i])][0]:
-                                hit = False
-                                break
-                        if hit:
-                            for i in range(len(primer) - min_stretch - index):
-                                if not comparison_matrix[(primer[index + min_stretch + i], sequence[offset + min_stretch + i])][0]:
-                                    hit = False
-                                    break
-                        if hit:
-                            hits_fwd[primer].add(offset - index)
-                            num_hits += 1
-                except:
-                    cont = False
-    #print('number of hits in forward primers:', num_hits)
-    #print(hits_fwd)
-    #Reverse
-    num_hits = 0
-    for primer in primerlist['reverse']:
-        min_stretch = math.ceil((len(primer) - max_degen)/(max_degen + 1))
-        cur_kmers = [(primer[kmer:kmer+min_stretch],kmer) for kmer in range(len(primer) - min_stretch + 1)]
-        for kmer, index in cur_kmers:
-            offset = -1
-            cont = True
-            while cont:
-                try:
-                    offset = sequence_reverse.index(kmer, offset+1)
-                    hit = True
-                    if offset >= index and len(sequence_reverse) >= offset + len(primer) - index:
-                        for i in range(index):
-                            if not comparison_matrix[(primer[i], sequence_reverse[offset-index+i])][0]:
-                                hit = False
-                                break
-                        if hit:
-                            for i in range(len(primer) - min_stretch - index):
-                                if not comparison_matrix[(primer[index + min_stretch + i], sequence_reverse[offset + min_stretch + i])][0]:
-                                    hit = False
-                                    break
-                        if hit:
-                            hits_rev[primer].add(offset - index)
-                            hits_rev_translated[primer].add(len(sequence_reverse) - (offset - index) - len(primer))
-                            #To find starting index of reverse primer in original sequence: len(sequence) - start in rev comp - length : len(sequence) - start in rev comp
-                            num_hits += 1
-                except:
-                    cont = False
-    #print('number of hits in reverse primers:', num_hits)
-    #print(hits_rev)
-    return hits_fwd, hits_rev, hits_rev_translated
-'''
-        
+    '''      
 
 if __name__ == '__main__':
     #sequences, A, primerlist = main()
+    F = generate_simulationfile('/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/sequences.fasta', 
+                            '/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/metadata.tsv',
+                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/logfile_1.txt',
+                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/primers_1.txt')
+    F2 = generate_kallistofile('/Users/jaspervanbemmelen/Downloads/Netherlands_September_2022/sequences.fasta', 
+                            '/Users/jaspervanbemmelen/Downloads/Netherlands_September_2022/metadata.tsv',
+                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/logfile_1.txt',
+                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/primers_1.txt')
     sequences, primerlist, M, A, lins = main()
     sequence_bindings = [{amp[0]:0 for amp in A} for s in sequences]
     
