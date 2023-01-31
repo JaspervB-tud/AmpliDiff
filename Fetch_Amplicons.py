@@ -5,6 +5,7 @@ from Generic_Methods import reverse_complement, calculate_degeneracy, generate_o
 import math
 import itertools
 import csv
+import argparse
 
 def generate_sequences(seq_path, meta_path, max_n=10):
     '''
@@ -293,8 +294,7 @@ def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerf
     
     fasta_list = []
     S = set()
-    for sequence in sequences[:10]:
-        print(sequence.id, sequence.lineage)
+    for sequence in sequences[:]:
         S.add(sequence.lineage)
         realized_amplicons = locate_amplicons(sequence.sequence_raw, amplicons, M)
         amplicon_index = 0
@@ -303,10 +303,9 @@ def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerf
             if realized_amplicons[amplicon]:
                 fasta_list.append('>' + sequence.lineage + '_' + sequence.id + '_A' + str(amplicon_index))
                 fasta_list.append(sequence.sequence_raw[realized_amplicons[amplicon][0]:realized_amplicons[amplicon][1]])
-                print(amplicon, realized_amplicons[amplicon][1] - realized_amplicons[amplicon][0])
+                #print(amplicon, realized_amplicons[amplicon][1] - realized_amplicons[amplicon][0])
             else:
-                print('Amplicon not amplifiable')
-    print(fasta_list)
+                print('Amplicon', amplicon_index, 'not amplifiable in sequence', sequence.id)
     return fasta_list
 
 def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
@@ -316,7 +315,7 @@ def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfil
     M = generate_opportunistic_matrix() #generate matrix used to determine which nucleotides are identical
     
     fasta_list = []
-    for sequence in sequences[:10]:
+    for sequence in sequences[:]:
         realized_amplicons = locate_amplicons(sequence.sequence_raw, amplicons, M)
         amplicon_index = 0
         s = ''
@@ -332,48 +331,27 @@ def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfil
     
 
 def main():
-    F = generate_simulationfile('/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/sequences.fasta', 
-                            '/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/metadata.tsv',
-                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/logfile_1.txt',
-                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/primers_1.txt')
-    F2 = generate_kallistofile('/Users/jaspervanbemmelen/Downloads/Netherlands_September_2022/sequences.fasta', 
-                            '/Users/jaspervanbemmelen/Downloads/Netherlands_September_2022/metadata.tsv',
-                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/logfile_1.txt',
-                            '/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/primers_1.txt')
-    fasta_str = ''
-    for i in range(0, len(F), 2):
-        fasta_str += F[i] + '\n' + F[i+1] + '\n'
-    return fasta_str
-    sequences = generate_sequences('/Users/jaspervanbemmelen/Documents/Wastewater/source_code/amplivar/testing', '/Users/jaspervanbemmelen/Documents/Wastewater/source_code/amplivar/testing')
-    M = generate_opportunistic_matrix()
-    return None
-    '''
-    for s in sequences:
-        s.align_to_trim()
-    print(s.aligned_to_trim)
-    '''
-    #A = read_logfile('/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-0.999/beta-0.05/misthresh20_searchwidth50_amps10_all_nseqs2800/logfile_1.txt')
-    A = read_logfile('/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/logfile_1.txt')
-    print(A)
+    parser = argparse.ArgumentParser(description='Generate input for ART and Kallisto')
+    parser.add_argument('-s', '--sequences_path', type=str, help='Sequences file location', required=True)
+    parser.add_argument('-m', '--metadata_path', type=str, help='Metadata file location', required=True)
+    parser.add_argument('-p', '--primerfile_path', type=str, help='Primerfile location', required=True)
+    parser.add_argument('-l', '--logfile_path', type=str, help='Logfile location', required=True)
+    parser.add_argument('-o', '--output_path', type=str, help='Output location (folder)', required=True)
     
-    #A, primerlist = read_primerfile('/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-0.999/beta-0.05/misthresh20_searchwidth50_amps10_all_nseqs2800/primers_1.txt', A)
-    A, primerlist = read_primerfile('/Users/jaspervanbemmelen/Documents/Wastewater/Primers_Davida/coverage-1.000/misthresh20_searchwidth50_amps10_all_nseqs2800/primers_1.txt', A)
-    print(A)
-        
-    seqs = [s.sequence_raw for s in sequences]
-    lins = [s.lineage for s in sequences]
-    return seqs, primerlist, M, A, lins
-    '''
-    i = 1
-    t = time.time()
-    for s in seqs:
-        print(str(i) + ': ' + str(locate_primers(s, primerlist, M)))
-        i += 1
-    return sequences, A, primerlist
-    print(time.time() - t)
-    '''      
+    args = parser.parse_args()
+    
+    ART_intput = generate_simulationfile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
+    Kallisto_input = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
+    with open(args.output_path + '/ART_input.fasta', 'w') as f:
+        for line in ART_output:
+            f.write(line + '\n')
+    with open(args.output_path + '/Kallisto_input.fasta', 'w') as f:
+        for line in Kallisto_input:
+            f.write(line + '\n')
 
 if __name__ == '__main__':
+    main()
+    '''
     #sequences, A, primerlist = main()
     F = generate_simulationfile('/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/sequences.fasta', 
                             '/Users/jaspervanbemmelen/Downloads/Netherlands_October_2022/metadata.tsv',
@@ -402,8 +380,7 @@ if __name__ == '__main__':
             if not subseq in diff:
                 diff[subseq] = []
             diff[subseq].append(lins[index])
-        index += 1
-    '''    
+        index += 1 
     diff1 = {}
     S = []
     index = 0
