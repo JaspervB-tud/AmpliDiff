@@ -340,7 +340,7 @@ def main():
     
     args = parser.parse_args()
     
-    ART_intput = generate_simulationfile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
+    ART_input = generate_simulationfile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
     Kallisto_input = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
     with open(args.output_path + '/ART_input.fasta', 'w') as f:
         for line in ART_input:
