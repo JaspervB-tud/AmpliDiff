@@ -337,17 +337,21 @@ def main():
     parser.add_argument('-p', '--primerfile_path', type=str, help='Primerfile location', required=True)
     parser.add_argument('-l', '--logfile_path', type=str, help='Logfile location', required=True)
     parser.add_argument('-o', '--output_path', type=str, help='Output location (folder)', required=True)
+    parser.add_argument('--art', action='store_true')
+    parser.add_argument('--kallisto', action='store_true')
     
     args = parser.parse_args()
     
-    ART_input = generate_simulationfile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
-    Kallisto_input = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
-    with open(args.output_path + '/ART_input.fasta', 'w') as f:
-        for line in ART_input:
-            f.write(line + '\n')
-    with open(args.output_path + '/Kallisto_input.fasta', 'w') as f:
-        for line in Kallisto_input:
-            f.write(line + '\n')
+    if args.art:
+        ART_input = generate_simulationfile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
+        with open(args.output_path + '/ART_input.fasta', 'w') as f:
+            for line in ART_input:
+                f.write(line + '\n')
+    if args.kallisto:
+        Kallisto_input = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
+        with open(args.output_path + '/Kallisto_input.fasta', 'w') as f:
+            for line in Kallisto_input:
+                f.write(line + '\n')
 
 if __name__ == '__main__':
     main()
