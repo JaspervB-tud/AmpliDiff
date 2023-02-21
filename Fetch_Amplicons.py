@@ -354,7 +354,7 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
         #print(amplicon[0], fwd_indices, rev_indices)
         
         for fwd, rev in itertools.product(fwd_indices, rev_indices):
-            print(fwd, rev)
+            #print(fwd, rev)
             if rev - fwd >= 0 and rev - fwd  < amplified[1] - amplified[0] - primer_length:
                 amplified = (fwd, rev+primer_length, True)
         if amplified[2]:
@@ -412,6 +412,89 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, max_degen=10, prime
             
     return binding_sites
 """
+
+def count_primerbindings_amplicons(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
+    amplicons = read_logfile(logfile_path) #generate amplicons from logfile
+    amplicons, primerlist = read_primerfile(primerfile_path, amplicons) #refine amplicons and determine corresponding primers
+    M = generate_opportunistic_matrix() #generate matrix used to determine which nucleotides are identical
+    
+    metadata = {} #Stores the lineage for every genome
+    meta_works = True
+    lineages = set()
+    skip = -1
+    try:
+        for meta in csv.reader(open(metadata_path), delimiter='\t'):
+            if skip == -1:
+                for cur_meta in range(len(meta)):
+                    if 'lineage' in meta[cur_meta].lower():
+                        skip = cur_meta
+                        break
+            else:
+                metadata['>' + meta[0]] = meta[skip]
+                lineages.add(meta[skip])
+    except Exception as e:
+        print('Metadata file does not exist')
+        meta_works = False
+    num_genomes = len(metadata)
+    
+    primers_per_lineage = {lin: {} for lin in lineages}
+    amplicons_per_lineage = {lin: {} for lin in lineages}
+    total_per_lineage = {lin: 0 for lin in lineages}
+    total_amplicon_bindings = {amplicon[0]: 0 for amplicon in amplicons}
+    total_primer_bindings = {'forward': {}, 'reverse': {}}
+    for primer in primerlist['forward']:
+        total_primer_bindings['forward'][primer] = 0
+    for primer in primerlist['reverse']:
+        total_primer_bindings['reverse'][primer] = 0
+    cur_sequence = []
+    done = 0
+    with open(sequences_path, 'r') as f:
+        for line in f:
+            if '>' in line:
+                if len(cur_sequence) == 0:
+                    cur_sequence = [line.strip(), '']
+                else:
+                    cur_fwd, cur_rev = locate_primers(cur_sequence[1], primerlist, M, max_degen=max_degen)
+                    cur_amplicons = locate_amplicons(cur_sequence[1], amplicons, M, primer_length=primer_length, max_degen=max_degen)
+                    #print(cur_amplicons)
+                    #Check which primers bind to current sequence
+                    #print(metadata)
+                    #print(primers_per_lineage)
+                    #print(metadata[cur_sequence[0]])
+                    #print(primers_per_lineage[metadata[cur_sequence[0]]])
+                    if len(primers_per_lineage[metadata[cur_sequence[0]]]) == 0:
+                        primers_per_lineage[metadata[cur_sequence[0]]]['forward'] = {primer: 0 for primer in cur_fwd}
+                        primers_per_lineage[metadata[cur_sequence[0]]]['reverse'] = {primer: 0 for primer in cur_rev}
+                    for primer in cur_fwd:
+                        if len(cur_fwd[primer]) > 0:
+                            primers_per_lineage[metadata[cur_sequence[0]]]['forward'][primer] += 1
+                            total_primer_bindings['forward'][primer] += 1/num_genomes
+                    for primer in cur_rev:
+                        if len(cur_rev[primer]) > 0:
+                            primers_per_lineage[metadata[cur_sequence[0]]]['reverse'][primer] += 1
+                            total_primer_bindings['reverse'][primer] += 1/num_genomes
+                    #Check which amplicons are amplified in current sequence
+                    if len(amplicons_per_lineage[metadata[cur_sequence[0]]]) == 0:
+                        amplicons_per_lineage[metadata[cur_sequence[0]]] = {amplicon: 0 for amplicon in cur_amplicons}
+                    for amplicon in cur_amplicons:
+                        if cur_amplicons[amplicon]:
+                            amplicons_per_lineage[metadata[cur_sequence[0]]][amplicon] += 1
+                            total_amplicon_bindings[amplicon] += 1/num_genomes
+                    total_per_lineage[metadata[cur_sequence[0]]] += 1
+                    cur_sequence = [line.strip(), '']
+                done += 1
+                print(done)
+            else:
+                cur_sequence[1] += line.strip().lower()
+    for lineage in lineages:
+        for primer in primers_per_lineage[lineage]['forward']:
+            primers_per_lineage[lineage]['forward'][primer] /= total_per_lineage[lineage]
+        for primer in primers_per_lineage[lineage]['reverse']:
+            primers_per_lineage[lineage]['reverse'][primer] /= total_per_lineage[lineage]
+        for amplicon in amplicons_per_lineage[lineage]:
+            amplicons_per_lineage[lineage][amplicon] /= total_per_lineage[lineage]
+    return primers_per_lineage, amplicons_per_lineage, total_per_lineage, total_primer_bindings, total_amplicon_bindings
+                
 
 def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
     '''
