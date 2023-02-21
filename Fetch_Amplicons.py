@@ -7,7 +7,7 @@ import itertools
 import csv
 import argparse
 
-def generate_sequences(seq_path, meta_path, max_n=10):
+def generate_sequences(seq_path, meta_path, max_n=10**10):
     '''
     Function that reads sequences from a fasta file and saves them as Sequence objects with metadata from "metadata.tsv".
 
@@ -135,6 +135,105 @@ def locate_primers(sequence, primerlist, comparison_matrix, max_degen=10):
     comparison_matrix : dict{ char : [] }
         Dictionary which dictates which nucleotides are considered equal.
     max_degen : int, optional
+        Number of degenerate nucleotides allowed when checking if a primer would bind. The default is 10 (log2(4**5)).
+
+    Returns
+    -------
+    hits_fwd : dict{ str : set() }
+        Dictionary with the binding sites for every forward primer in $primerlist.
+    hits_rev : dict{ str : set() }
+        Dictionary with the binding sites for every reverse primer in $primerlist.
+    '''
+    sequence_reverse = reverse_complement(sequence, rev=True)
+    num_degen = len(sequence)-sequence.count('a')-sequence.count('c')-sequence.count('g')-sequence.count('t')
+    
+    def find_hits(sequence, primers, num_degen, comparison_matrix, reverse=False, max_degen=10):
+        '''
+        Function that performs degenerate elastic string matching by doing k-mer based matching.
+
+        Parameters
+        ----------
+        sequence : Sequence
+            Sequence object for which to determine primer binding sites.
+        primers : list[ str ]
+            List with primers for which binding sites have to be determined.
+        num_degen : int
+            Number of degenerate nucleotides in the sequence. This guides the matching approach.
+        comparison_matrix : dict{ char : [] }
+            Dictionary which dictates which nucleotides are considered equal.
+        reverse : bool, optional
+            Boolean which should be set to true if the primers are based on the reverse complement of the sequence. The default is False.
+        max_degen : int
+            Number of degenerate nucleotides allowed in a primer binding site. The default is 10.
+
+        Returns
+        -------
+        hits : dict{ str : set() }
+            Dictionary with the binding sites for every primer in $primers.
+
+        '''
+        hits = {primer: set() for primer in primers}
+        equivalent_characters = {'a' : ['a','r','m','w','d','h','v','n'],
+                                 'c' : ['c','y','m','s','b','h','v','n'],
+                                 'g' : ['g','r','k','s','b','d','v','n'],
+                                 't' : ['t','y','k','w','b','d','h','n']}
+        
+        #Behaviour when there are NO degenerate nucleotides
+        if num_degen == 0:
+            for primer in primers:
+                cont = True
+                cur_occurrence = -1
+                while cont:
+                    try:
+                        cur_occurrence = sequence.index(primer, cur_occurrence+1)
+                        if not reverse:
+                            hits[primer].add(cur_occurrence)
+                        else:
+                            hits[primer].add(len(sequence) - cur_occurrence - len(primer))
+                    except:
+                        cont = False
+        else:
+            for primer in primers:
+                cur_char_index = 0
+                next_char_index = 0
+                while cur_char_index <= len(sequence) - len(primer):
+                    match = True
+                    for i in range(len(primer)):
+                        #Check if this should be the next comparison start
+                        if sequence[cur_char_index+i] in equivalent_characters[primer[i]]:
+                            next_char_index = cur_char_index + i
+                        #If character does not match, break for-loop
+                        if not comparison_matrix[(primer[i], sequence[cur_char_index + i])][0]:
+                            match = False
+                            break
+                    #If primer matches to subsequence then register match starting index
+                    if match and ( len(primer) - sequence[cur_char_index:cur_char_index+len(primer)].count('a') - sequence[cur_char_index:cur_char_index+len(primer)].count('c') - sequence[cur_char_index:cur_char_index+len(primer)].count('g') - sequence[cur_char_index:cur_char_index+len(primer)].count('t') <= max_degen ):
+                        if not reverse:
+                            hits[primer].add(cur_char_index)
+                        else:
+                            hits[primer].add(len(sequence) - cur_char_index + len(primer))
+                    cur_char_index = max(cur_char_index+1, cur_char_index+i, next_char_index)
+        return hits
+                        
+    hits_fwd = find_hits(sequence, primerlist['forward'], num_degen, comparison_matrix, reverse=False)
+    hits_rev = find_hits(sequence_reverse, primerlist['reverse'], num_degen, comparison_matrix, reverse=True)
+    
+    return hits_fwd, hits_rev    
+"""
+def locate_primers(sequence, primerlist, comparison_matrix, max_degen=10):
+    '''
+    Function that determines the primer binding sites of given primers in the given sequence by considering every exact binding location while
+    allowing for degenerate nucleotides (i.e. if the sequence contains an N, any nucleotide will bind here).
+
+    Parameters
+    ----------
+    sequence : Sequence
+        Sequence object for which to determine primer binding sites.
+    primerlist : dict{ 'forward':[], 'reverse':[] }
+        Dictionary containing a forward and reverse key along with primers (strings) for which binding sites have to be determined.
+    comparison_matrix : dict{ char : [] }
+        Dictionary which dictates which nucleotides are considered equal.
+    max_degen : int, optional
         Number of degenerate nucleotides in the sequence. This guides the k-mer based match finding method. 
         Note that this parameter is essentially redundant and can therefore be ignored. The default is 10.
 
@@ -210,7 +309,60 @@ def locate_primers(sequence, primerlist, comparison_matrix, max_degen=10):
     hits_rev = find_hits(sequence_reverse, primerlist['reverse'], max_degen, comparison_matrix, reverse=True)
     
     return hits_fwd, hits_rev
-                            
+"""
+             
+def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, max_degen=10):
+    '''
+    Function that locates the realized amplicons based on the amplicons and corresponding primers in $amplicons in $sequence.
+    Note that if the sequence has a stretch of $primer_length degenerate nucleotides, the results can potentially be uninterpretable.
+
+    Parameters
+    ----------
+    sequence : Sequence
+        Sequence object for which to determine primer binding sites.
+    amplicons : list[ [(int,int), dict] ]
+        List of amplicons in the form of a tuple (start, end), and a dictionary containing the keys forward and reverse which
+        contain for every amplicon the corresponding forward and reverse primers in a list as values.
+    comparison_matrix : dict{ char : [] }
+        Dictionary which dictates which nucleotides are considered equal.
+    primer_length : int, optional
+        Length of the primer sequence. Theoretically this could be omitted, but since AmpliVar generates primers of fixed length
+        it made sense to just include it as a parameter. The default is 25.
+    max_degen : int
+        Number of degenerate nucleotides in the sequence. This guides the matching approach. The default is 10 (log2(4**5)).
+
+    Returns
+    -------
+    binding_sites : dict{ (int,int) : (int, int) }
+        Dictionary with AmpliVar based amplicons as keys, and realized amplicons as values.
+
+    '''
+    binding_sites = {amplicon[0]: None for amplicon in amplicons}
+    #Iterate over amplicons
+    for amplicon in amplicons:
+        fwd_hits, rev_hits = locate_primers_v2(sequence, amplicon[1], comparison_matrix)
+        amplified = (0, 10**16, False)
+        
+        fwd_indices = set()
+        rev_indices = set()
+        for fwd in fwd_hits:
+            fwd_indices = fwd_indices.union(fwd_hits[fwd])
+        for rev in rev_hits:
+            rev_indices = rev_indices.union(rev_hits[rev])
+        fwd_indices = list(fwd_indices)
+        rev_indices = list(rev_indices)
+        #print(amplicon[0], fwd_indices, rev_indices)
+        
+        for fwd, rev in itertools.product(fwd_indices, rev_indices):
+            print(fwd, rev)
+            if rev - fwd >= 0 and rev - fwd  < amplified[1] - amplified[0] - primer_length:
+                amplified = (fwd, rev+primer_length, True)
+        if amplified[2]:
+            binding_sites[amplicon[0]] = amplified
+            
+    return binding_sites
+"""        
+DEPRECATED VERSION OF LOCATE AMPLICONS    
 def locate_amplicons(sequence, amplicons, comparison_matrix, max_degen=10, primer_length=25):
     '''
     Function that locates the realized amplicons based on the amplicons and corresponding primers in $amplicons in $sequence.
@@ -259,6 +411,7 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, max_degen=10, prime
             binding_sites[amplicon[0]] = amplified
             
     return binding_sites
+"""
 
 def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
     '''
