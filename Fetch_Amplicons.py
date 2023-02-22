@@ -177,42 +177,52 @@ def locate_primers(sequence, primerlist, comparison_matrix, max_degen=10):
                                  'c' : ['c','y','m','s','b','h','v','n'],
                                  'g' : ['g','r','k','s','b','d','v','n'],
                                  't' : ['t','y','k','w','b','d','h','n']}
+        sequence_length = len(sequence)
         
         #Behaviour when there are NO degenerate nucleotides
         if num_degen == 0:
             for primer in primers:
                 cont = True
                 cur_occurrence = -1
+                primer_length = len(primer)
                 while cont:
                     try:
                         cur_occurrence = sequence.index(primer, cur_occurrence+1)
                         if not reverse:
                             hits[primer].add(cur_occurrence)
                         else:
-                            hits[primer].add(len(sequence) - cur_occurrence - len(primer))
+                            hits[primer].add(sequence_length - cur_occurrence - primer_length)
                     except:
                         cont = False
+        #If there are degenerate nucleotides perform a simple version of Boyer-Moore
         else:
             for primer in primers:
                 cur_char_index = 0
-                next_char_index = 0
-                while cur_char_index <= len(sequence) - len(primer):
+                primer_length = len(primer)
+                while cur_char_index <= sequence_length - primer_length: #iterate over sequence to find occurrence of current primer
+                    stepsize = (0, False) #track where we should check for occurrence next
+                    cur_degen_chars = 0 #track number of degenerate characters
                     match = True
-                    for i in range(len(primer)):
-                        #Check if this should be the next comparison start
-                        if sequence[cur_char_index+i] in equivalent_characters[primer[i]]:
-                            next_char_index = cur_char_index + i
-                        #If character does not match, break for-loop
+                    for i in range(primer_length):
+                        if sequence[cur_char_index + i] not in ['a','c','g','t']:
+                            cur_degen_chars += 1
+                        #If current character in sequence is equal to first primer character then store it as next starting point
+                        if sequence[cur_char_index+i] in equivalent_characters[primer[0]] and not stepsize[1]:
+                            stepsize = (max(1, i), True)
+                        #If character does not match then break for-loop and start at next index
                         if not comparison_matrix[(primer[i], sequence[cur_char_index + i])][0]:
                             match = False
                             break
-                    #If primer matches to subsequence then register match starting index
-                    if match and ( len(primer) - sequence[cur_char_index:cur_char_index+len(primer)].count('a') - sequence[cur_char_index:cur_char_index+len(primer)].count('c') - sequence[cur_char_index:cur_char_index+len(primer)].count('g') - sequence[cur_char_index:cur_char_index+len(primer)].count('t') <= max_degen ):
+                    if match and cur_degen_chars <= max_degen:
                         if not reverse:
                             hits[primer].add(cur_char_index)
                         else:
-                            hits[primer].add(len(sequence) - cur_char_index + len(primer))
-                    cur_char_index = max(cur_char_index+1, cur_char_index+i, next_char_index)
+                            hits[primer].add(sequence_length - cur_char_index + primer_length)
+                    if stepsize[1]:
+                        cur_char_index += stepsize[0]
+                    else:
+                        cur_char_index += i + 1
+                        
         return hits
                         
     hits_fwd = find_hits(sequence, primerlist['forward'], num_degen, comparison_matrix, reverse=False)
@@ -340,7 +350,7 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
     binding_sites = {amplicon[0]: None for amplicon in amplicons}
     #Iterate over amplicons
     for amplicon in amplicons:
-        fwd_hits, rev_hits = locate_primers_v2(sequence, amplicon[1], comparison_matrix)
+        fwd_hits, rev_hits = locate_primers(sequence, amplicon[1], comparison_matrix)
         amplified = (0, 10**16, False)
         
         fwd_indices = set()
@@ -413,6 +423,7 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, max_degen=10, prime
     return binding_sites
 """
 
+
 def count_primerbindings_amplicons(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
     amplicons = read_logfile(logfile_path) #generate amplicons from logfile
     amplicons, primerlist = read_primerfile(primerfile_path, amplicons) #refine amplicons and determine corresponding primers
@@ -435,7 +446,6 @@ def count_primerbindings_amplicons(sequences_path, metadata_path, logfile_path, 
     except Exception as e:
         print('Metadata file does not exist')
         meta_works = False
-    num_genomes = len(metadata)
     
     primers_per_lineage = {lin: {} for lin in lineages}
     amplicons_per_lineage = {lin: {} for lin in lineages}
@@ -456,43 +466,66 @@ def count_primerbindings_amplicons(sequences_path, metadata_path, logfile_path, 
                 else:
                     cur_fwd, cur_rev = locate_primers(cur_sequence[1], primerlist, M, max_degen=max_degen)
                     cur_amplicons = locate_amplicons(cur_sequence[1], amplicons, M, primer_length=primer_length, max_degen=max_degen)
-                    #print(cur_amplicons)
-                    #Check which primers bind to current sequence
-                    #print(metadata)
-                    #print(primers_per_lineage)
-                    #print(metadata[cur_sequence[0]])
-                    #print(primers_per_lineage[metadata[cur_sequence[0]]])
                     if len(primers_per_lineage[metadata[cur_sequence[0]]]) == 0:
                         primers_per_lineage[metadata[cur_sequence[0]]]['forward'] = {primer: 0 for primer in cur_fwd}
                         primers_per_lineage[metadata[cur_sequence[0]]]['reverse'] = {primer: 0 for primer in cur_rev}
                     for primer in cur_fwd:
                         if len(cur_fwd[primer]) > 0:
                             primers_per_lineage[metadata[cur_sequence[0]]]['forward'][primer] += 1
-                            total_primer_bindings['forward'][primer] += 1/num_genomes
+                            total_primer_bindings['forward'][primer] += 1
                     for primer in cur_rev:
                         if len(cur_rev[primer]) > 0:
                             primers_per_lineage[metadata[cur_sequence[0]]]['reverse'][primer] += 1
-                            total_primer_bindings['reverse'][primer] += 1/num_genomes
+                            total_primer_bindings['reverse'][primer] += 1
                     #Check which amplicons are amplified in current sequence
                     if len(amplicons_per_lineage[metadata[cur_sequence[0]]]) == 0:
                         amplicons_per_lineage[metadata[cur_sequence[0]]] = {amplicon: 0 for amplicon in cur_amplicons}
                     for amplicon in cur_amplicons:
                         if cur_amplicons[amplicon]:
                             amplicons_per_lineage[metadata[cur_sequence[0]]][amplicon] += 1
-                            total_amplicon_bindings[amplicon] += 1/num_genomes
+                            total_amplicon_bindings[amplicon] += 1
                     total_per_lineage[metadata[cur_sequence[0]]] += 1
                     cur_sequence = [line.strip(), '']
                 done += 1
                 print(done)
             else:
                 cur_sequence[1] += line.strip().lower()
-    for lineage in lineages:
-        for primer in primers_per_lineage[lineage]['forward']:
-            primers_per_lineage[lineage]['forward'][primer] /= total_per_lineage[lineage]
-        for primer in primers_per_lineage[lineage]['reverse']:
-            primers_per_lineage[lineage]['reverse'][primer] /= total_per_lineage[lineage]
-        for amplicon in amplicons_per_lineage[lineage]:
-            amplicons_per_lineage[lineage][amplicon] /= total_per_lineage[lineage]
+        #Process final sequence since looping over lines ends before processing final sequence     
+        cur_fwd, cur_rev = locate_primers(cur_sequence[1], primerlist, M, max_degen=max_degen)
+        cur_amplicons = locate_amplicons(cur_sequence[1], amplicons, M, primer_length=primer_length, max_degen=max_degen)
+        if len(primers_per_lineage[metadata[cur_sequence[0]]]) == 0:
+            primers_per_lineage[metadata[cur_sequence[0]]]['forward'] = {primer: 0 for primer in cur_fwd}
+            primers_per_lineage[metadata[cur_sequence[0]]]['reverse'] = {primer: 0 for primer in cur_rev}
+        for primer in cur_fwd:
+            if len(cur_fwd[primer]) > 0:
+                primers_per_lineage[metadata[cur_sequence[0]]]['forward'][primer] += 1
+                total_primer_bindings['forward'][primer] += 1
+        for primer in cur_rev:
+            if len(cur_rev[primer]) > 0:
+                primers_per_lineage[metadata[cur_sequence[0]]]['reverse'][primer] += 1
+                total_primer_bindings['reverse'][primer] += 1
+        #Check which amplicons are amplified in current sequence
+        if len(amplicons_per_lineage[metadata[cur_sequence[0]]]) == 0:
+            amplicons_per_lineage[metadata[cur_sequence[0]]] = {amplicon: 0 for amplicon in cur_amplicons}
+        for amplicon in cur_amplicons:
+            if cur_amplicons[amplicon]:
+                amplicons_per_lineage[metadata[cur_sequence[0]]][amplicon] += 1
+                total_amplicon_bindings[amplicon] += 1
+        total_per_lineage[metadata[cur_sequence[0]]] += 1
+        cur_sequence = [line.strip(), '']
+        
+    """
+    #Post processing: counting primer bindings and amplifications for every lineage    
+    for lineage in primers_per_lineage:
+        if len(primers_per_lineage[lineage]) > 0:
+            for primer in primers_per_lineage[lineage]['forward']:
+                primers_per_lineage[lineage]['forward'][primer] /= total_per_lineage[lineage]
+            for primer in primers_per_lineage[lineage]['reverse']:
+                primers_per_lineage[lineage]['reverse'][primer] /= total_per_lineage[lineage]
+        if len(amplicons_per_lineage[lineage]) > 0:
+            for amplicon in amplicons_per_lineage[lineage]:
+                amplicons_per_lineage[lineage][amplicon] /= total_per_lineage[lineage]
+    """
     return primers_per_lineage, amplicons_per_lineage, total_per_lineage, total_primer_bindings, total_amplicon_bindings
                 
 
