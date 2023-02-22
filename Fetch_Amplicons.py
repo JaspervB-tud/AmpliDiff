@@ -556,7 +556,7 @@ def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerf
         DESCRIPTION.
 
     '''
-    sequences = generate_sequences(sequences_path, metadata_path, max_n=10) #read sequences
+    sequences = generate_sequences(sequences_path, metadata_path) #read sequences
     amplicons = read_logfile(logfile_path) #generate amplicons from logfile
     amplicons, primerlist = read_primerfile(primerfile_path, amplicons) #refine amplicons and determine corresponding primers
     M = generate_opportunistic_matrix() #generate matrix used to determine which nucleotides are identical
@@ -578,7 +578,7 @@ def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerf
     return fasta_list
 
 def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
-    sequences = generate_sequences(sequences_path, metadata_path, max_n=10) #read sequences
+    sequences = generate_sequences(sequences_path, metadata_path) #read sequences
     amplicons = read_logfile(logfile_path) #generate amplicons from logfile
     amplicons, primerlist = read_primerfile(primerfile_path, amplicons) #refine amplicons and determine corresponding primers
     M = generate_opportunistic_matrix() #generate matrix used to determine which nucleotides are identical
