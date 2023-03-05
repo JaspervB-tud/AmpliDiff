@@ -38,9 +38,9 @@ def generate_sequences(seq_path, meta_path, max_n=10**10):
     #Read metadata unless impossible in which case we assign every sequence its own "lineage"
     skip = -1
     num_processed = 0
-    try:
-        sequences = []
-        for meta in csv.reader(open(meta_path), delimiter='\t'):
+    sequences = []
+    for meta in csv.reader(open(meta_path), delimiter='\t'):
+        try:
             if skip == -1: #first line is always the header line
                 for cur_meta in range(len(meta)):
                     if 'lineage' in meta[cur_meta].lower():
@@ -51,16 +51,16 @@ def generate_sequences(seq_path, meta_path, max_n=10**10):
                 if meta[0] not in to_delete:
                     sequences.append(Sequence(sequences_temp[meta[0].replace(' ','')], meta[0], lineage=meta[skip]))
                     num_processed += 1
-    except: #unable to read metadata
-        '''
-        print('Unable to read metadata from file, making up lineages for every sequence')
-        sequences = []
-        i = 0
-        for identifier in sequences_temp:
-            sequences.append(Sequence(sequences_temp[identifier], identifier, lineage=str(i)))
-            i += 1
-        '''
-        print('id:', meta, 'not found, skipping')
+        except: #unable to read metadata
+            '''
+            print('Unable to read metadata from file, making up lineages for every sequence')
+            sequences = []
+            i = 0
+            for identifier in sequences_temp:
+                sequences.append(Sequence(sequences_temp[identifier], identifier, lineage=str(i)))
+                i += 1
+            '''
+            print('id:', meta, 'not found, skipping')
     print('Number of sequences processed:', num_processed)
     return sequences
 
