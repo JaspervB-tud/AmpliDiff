@@ -37,6 +37,7 @@ def generate_sequences(seq_path, meta_path, max_n=10**10):
             to_delete.append(sequence.id.split('|')[0]) #store sequences that should be removed due to too many 'n's or being too short
     #Read metadata unless impossible in which case we assign every sequence its own "lineage"
     skip = -1
+    num_processed = 0
     try:
         sequences = []
         for meta in csv.reader(open(meta_path), delimiter='\t'):
@@ -49,14 +50,18 @@ def generate_sequences(seq_path, meta_path, max_n=10**10):
                 #meta[0] contains id of the sequence
                 if meta[0] not in to_delete:
                     sequences.append(Sequence(sequences_temp[meta[0].replace(' ','')], meta[0], lineage=meta[skip]))
+                    num_processed += 1
     except: #unable to read metadata
+        '''
         print('Unable to read metadata from file, making up lineages for every sequence')
         sequences = []
         i = 0
         for identifier in sequences_temp:
             sequences.append(Sequence(sequences_temp[identifier], identifier, lineage=str(i)))
             i += 1
-            
+        '''
+        print('id:', meta, 'not found, skipping')
+    print('Number of sequences processed:', num_processed)
     return sequences
 
 def read_logfile(filename):
