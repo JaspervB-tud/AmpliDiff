@@ -60,7 +60,8 @@ def generate_sequences(seq_path, meta_path, max_n=10**10):
                 sequences.append(Sequence(sequences_temp[identifier], identifier, lineage=str(i)))
                 i += 1
             '''
-            print('id:', meta, 'not found, skipping')
+            #print('id:', meta, 'not found, skipping')
+            continue
     print('Number of sequences processed:', num_processed)
     return sequences
 
