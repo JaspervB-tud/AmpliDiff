@@ -65,7 +65,7 @@ def generate_sequences(seq_path, meta_path, max_n=10**10):
     print('Number of sequences processed:', num_processed)
     return sequences
 
-def read_logfile(filename):
+def read_logfile(filename, max_amplicons=1000):
     '''
     Function that reads the logfile of an amplicon finding run and returns the found amplicons.
 
@@ -73,6 +73,8 @@ def read_logfile(filename):
     ----------
     filename : str
         Absolute path to the log file.
+    max_amplicons : int, optional
+        Number of amplicons (starting with best) to include. The default is 1000
 
     Returns
     -------
@@ -87,6 +89,8 @@ def read_logfile(filename):
         for line in lines:
             if 'succesfully' in line:
                 amplicons.append( [(int(line.split(')')[0].split('(')[-1].split(',')[0]), int(line.split(')')[0].split('(')[-1].split(',')[1])), {'forward': [], 'reverse': []}] )
+                if len(amplicons) >= max_amplicons:
+                    break
     return amplicons
 
 def read_primerfile(filename, amplicons):
@@ -117,6 +121,8 @@ def read_primerfile(filename, amplicons):
         line_index = 0
         while line_index < len(lines):
             cur_amplicon = lines[line_index]
+            if int(cur_amplicon.split('_')[1]) > len(amplicons):
+                break
             if cur_amplicon.split('_')[-1][0] == 'F': #current line corresponds to forward primer
                 amplicons[int(cur_amplicon.split('_')[1]) - 1][1]['forward'].append(lines[line_index+1].strip()) #assign forward primer to corresponding amplicon
                 primerlist['forward'].append(lines[line_index+1].strip()) #add primer to full set of forward primers
@@ -535,7 +541,7 @@ def count_primerbindings_amplicons(sequences_path, metadata_path, logfile_path, 
     return primers_per_lineage, amplicons_per_lineage, total_per_lineage, total_primer_bindings, total_amplicon_bindings
                 
 
-def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
+def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, max_amplicons=1000, primer_length=25):
     '''
     Function that generates a fasta file which has entries for every amplicon for the amplicons in $logfile_path, for every sequence in $sequences_path.
     The intended use for this file is to use with the ART read simulator in amplicon mode.
@@ -552,6 +558,8 @@ def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerf
         Absolute path to the primers file of an AmpliVar run. For more info check read_primerfile
     max_degen : int, optional
         Number of degenerate nucleotides in the sequences. Note that this parameter is essentially redundant and can be ignored. The default is 10.
+    max_amplicons: int, optional
+        Number of amplicons to include. The default is 1000.
     primer_length : int, optional
         Length of the primer sequence. Theoretically this could be omitted, but since AmpliVar generates primers of fixed length
         it made sense to just include it as a parameter. The default is 25.
@@ -563,7 +571,7 @@ def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerf
 
     '''
     sequences = generate_sequences(sequences_path, metadata_path) #read sequences
-    amplicons = read_logfile(logfile_path) #generate amplicons from logfile
+    amplicons = read_logfile(logfile_path, max_amplicons=max_amplicons) #generate amplicons from logfile
     amplicons, primerlist = read_primerfile(primerfile_path, amplicons) #refine amplicons and determine corresponding primers
     M = generate_opportunistic_matrix() #generate matrix used to determine which nucleotides are identical
     
@@ -583,7 +591,35 @@ def generate_simulationfile(sequences_path, metadata_path, logfile_path, primerf
                 print('Amplicon', amplicon_index, 'not amplifiable in sequence', sequence.id)
     return fasta_list
 
-def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, primer_length=25):
+def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfile_path, max_degen=10, max_amplicons=1000, primer_length=25):
+    '''
+    Function that generates a fasta file which has entries for every amplicon for the amplicons in $logfile_path, for every sequence in $sequences_path.
+    The intended use for this file is to generate a Kallisto index using the "kallisto index" command. 
+
+    Parameters
+    ----------
+    sequences_path : str
+        Absolute path to the sequences fasta file.
+    metadata_path : str
+        Absolute path to the metadata file.
+    logfile_path : str
+        Absolute path to the log file of an AmpliVar run. For more info check read_logfile.
+    primerfile_path : str
+        Absolute path to the primers file of an AmpliVar run. For more info check read_primerfile
+    max_degen : int, optional
+        Number of degenerate nucleotides in the sequences. Note that this parameter is essentially redundant and can be ignored. The default is 10.
+    max_amplicons: int, optional
+        Number of amplicons to include. The default is 1000.
+    primer_length : int, optional
+        Length of the primer sequence. Theoretically this could be omitted, but since AmpliVar generates primers of fixed length
+        it made sense to just include it as a parameter. The default is 25.
+
+    Returns
+    -------
+    fasta_list : TYPE
+        DESCRIPTION.
+
+    '''
     sequences = generate_sequences(sequences_path, metadata_path) #read sequences
     amplicons = read_logfile(logfile_path) #generate amplicons from logfile
     amplicons, primerlist = read_primerfile(primerfile_path, amplicons) #refine amplicons and determine corresponding primers
@@ -612,6 +648,7 @@ def main():
     parser.add_argument('-p', '--primerfile_path', type=str, help='Primerfile location', required=True)
     parser.add_argument('-l', '--logfile_path', type=str, help='Logfile location', required=True)
     parser.add_argument('-o', '--output_path', type=str, help='Output location (folder)', required=True)
+    parser.add_argument('-n', '--num_amplicons', type=int, help='Maximum number of amplicons to consider')
     parser.add_argument('--art', action='store_true')
     parser.add_argument('--kallisto', action='store_true')
     
