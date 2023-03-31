@@ -1,3 +1,5 @@
+import argparse
+
 def extract_top_n_kallisto(input_file, output_loc, n):
     content = {}
     with open(input_file, 'r') as f:
@@ -39,5 +41,21 @@ def extract_top_n_ART(input_file, output_loc, n):
         f.write(s.rstrip())
     return content
                 
-content3 = extract_top_n_kallisto('/Users/jaspervanbemmelen/Documents/Wastewater/Kallisto_input.fasta', '/Users/jaspervanbemmelen/Documents/Wastewater/Kallisto_test.fasta', 5)
-content4 = extract_top_n_ART('/Users/jaspervanbemmelen/Documents/Wastewater/ART_input.fasta', '/Users/jaspervanbemmelen/Documents/Wastewater/ART_test.fasta', 5)
+def main():
+    parser = argparse.ArgumentParser(description='Use ART and Kallisto input files to generate input files using only the first n amplicons')
+    parser.add_argument('-n', '--num_amplicons', type=int, help='Consider the first n amplicons', default=0)
+    parser.add_argument('--art_input', type=str, help='ART_input file location', default='')
+    parser.add_argument('--art_output', type=str, help='Output file location for ART', default='')
+    parser.add_argument('--kallisto_input', type=str, help='Kallisto_input file location')
+    parser.add_argument('--kallito_output', type=str, help='Output file location for kallisto')
+    
+    args = parser.parse_args()
+    
+    if args.num_amplicons > 0:
+        if args.art_input != '' and args.art_output != '':
+            extract_top_n_ART(args.art_input, args.art_output, args.num_amplicons)
+        if args.kallisto_input != '' and args.kallisto_output != '':
+            extract_top_n_kallisto(args.kallisto_input, args.kallisto_output, args.num_amplicons)
+
+if __name__ == '__main__':
+    main()
