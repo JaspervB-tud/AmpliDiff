@@ -47,7 +47,7 @@ def main():
     parser.add_argument('--art_input', type=str, help='ART_input file location', default='')
     parser.add_argument('--art_output', type=str, help='Output file location for ART', default='')
     parser.add_argument('--kallisto_input', type=str, help='Kallisto_input file location')
-    parser.add_argument('--kallito_output', type=str, help='Output file location for kallisto')
+    parser.add_argument('--kallisto_output', type=str, help='Output file location for kallisto')
     
     args = parser.parse_args()
     
