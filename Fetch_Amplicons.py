@@ -663,7 +663,7 @@ def main():
         Kallisto_input = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
         with open(args.output_path + '/Kallisto_input.fasta', 'w') as f:
             for line in Kallisto_input:
-                f.write(line + '\n')
+                f.write(line)
 
 if __name__ == '__main__':
     main()
