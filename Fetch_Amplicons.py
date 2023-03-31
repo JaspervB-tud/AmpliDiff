@@ -336,7 +336,8 @@ def locate_primers(sequence, primerlist, comparison_matrix, max_degen=10):
 def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, max_degen=10):
     '''
     Function that locates the realized amplicons based on the amplicons and corresponding primers in $amplicons in $sequence.
-    Note that if the sequence has a stretch of $primer_length degenerate nucleotides, the results can potentially be uninterpretable.
+    Note that if the sequence has a stretch of $primer_length degenerate nucleotides, the results can potentially be uninterpretable if $max_degen
+    is not configured appropriately.
 
     Parameters
     ----------
@@ -378,7 +379,10 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
         for fwd, rev in itertools.product(fwd_indices, rev_indices):
             #print(fwd, rev)
             if rev - fwd >= 0 and rev - fwd  < amplified[1] - amplified[0] - primer_length:
-                amplified = (fwd, rev+primer_length, True)
+                #OLD: Amplicon including primers
+                #amplified = (fwd, rev+primer_length, True)
+                #NEW: Amplicon excluding primers -> reads and refs will not contain the primers
+                amplified = (fwd+primer_length-1, rev, True)
         if amplified[2]:
             binding_sites[amplicon[0]] = amplified
             
