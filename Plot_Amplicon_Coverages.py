@@ -113,11 +113,11 @@ def main():
             if args.coverage == '1.000':
                 logfile = (base_folder + 'coverage-' + args.coverage + '/amplicon_width-' + args.ampwidth +
                                                        '/primer_width-25/amplicon_threshold-1/misthresh' + args.ampwidth[:2] +
-                                                       '_searchwidth50_amps10_all_nseqs' + str(num_seqs) + '/logfile_' + str(seed))
+                                                       '_searchwidth50_amps10_all_nseqs' + str(num_seqs) + '/logfile_' + str(seed) + '.txt')
             else:
                 logfile = (base_folder + 'coverage-' + args.coverage + '/beta-' + args.beta + '/amplicon_width-' + args.ampwidth +
                                                        '/primer_width-25/amplicon_threshold-1/misthresh' + args.ampwidth[:2] +
-                                                       '_searchwidth50_amps10_all_nseqs' + str(num_seqs) + '/logfile_' + str(seed))
+                                                       '_searchwidth50_amps10_all_nseqs' + str(num_seqs) + '/logfile_' + str(seed) + '.txt')
             try:
                 positions_covered_cur += parse_logfile(logfile, num_positions)
                 actual_runs += 1
