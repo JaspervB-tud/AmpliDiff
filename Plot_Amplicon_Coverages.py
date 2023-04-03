@@ -124,6 +124,7 @@ def main():
             except Exception as e:
                 print(e)
                 continue
+        positions_covered_cur[positions_covered_cur > actual_runs] = actual_runs
         positions_covered_all += positions_covered_cur #add covered positions for current number of sequences to aggregated total
         total_runs += actual_runs
         
@@ -134,8 +135,7 @@ def main():
             plt.title('Coverage for amplicons of width 400 (' + str(actual_runs) + ' runs) while subsampling ' + str(num_seqs) + ' sequences', size=25)
             plt.xlabel('Nucleotide index', size=20)
             plt.ylabel('Relative coverage', size=20)
-            print(positions_covered_cur)
-            print('Plotting')
+            print('Plotting subsampling', num_seqs)
             plt.plot(positions_covered_cur/actual_runs, color='black', linewidth=3)
             for region in regions:
                 plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
@@ -152,6 +152,29 @@ def main():
                               str(num_seqs) + '.pdf') 
             plt.savefig(output_loc, figsize=[20,10], dpi=200, format='pdf')
             del fig, ax
+            
+    if total_runs > 0:
+        color_index = 0
+        fig = plt.figure(figsize=[20,10], dpi=200)
+        ax = plt.gca()
+        plt.title('Coverage for amplicons of width 400 (' + str(total_runs) + ' runs) aggregated', size=25)
+        plt.xlabel('Nucleotide index', size=20)
+        plt.ylabel('Relative coverage', size=20)
+        print('Plotting aggregated results')
+        plt.plot(positions_covered_all/total_runs, color='black', linewidth=3)
+        for region in regions:
+            plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+            plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.9), color='black', alpha=0.6, size=20, ha='center', rotation=90)
+            color_index += 1
+        plt.ylim([0, 1.2])
+        if args.coverage == '1.000':
+            output_loc = (args.output_folder + '/coverage-' + args.coverage + '_ampliconwidth-' + args.ampwidth + 
+                          '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-aggregated.pdf') 
+        else:
+            output_loc = (args.output_folder + '/coverage-' + args.coverage + '/beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
+                          '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-aggregated.pdf') 
+        plt.savefig(output_loc, figsize=[20,10], dpi=200, format='pdf')
+        del fig, ax
             
     
 if __name__ == '__main__':
