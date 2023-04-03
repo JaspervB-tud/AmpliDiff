@@ -130,6 +130,7 @@ def main():
         plt.title('Coverage for amplicons of width 400 (' + str(actual_runs) + ' runs) while subsampling ' + str(num_seqs) + ' sequences', size=25)
         plt.xlabel('Nucleotide index', size=20)
         plt.ylabel('Relative coverage', size=20)
+        print(positions_covered_cur)
         print('Plotting')
         plt.plot(positions_covered_cur/actual_runs, color='black', linewidth=3)
         for region in regions:
