@@ -3,6 +3,7 @@ import argparse
 from Class_Methods import generate_sequences
 from Sequence import *
 import numpy as np
+import Bio
 from Bio import pairwise2
 from pathlib import Path
 import matplotlib.pyplot as plt
