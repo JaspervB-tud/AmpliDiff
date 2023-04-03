@@ -121,7 +121,8 @@ def main():
             try:
                 positions_covered_cur += parse_logfile(logfile, num_positions)
                 actual_runs += 1
-            except:
+            except Exception as e:
+                print(e)
                 continue
         positions_covered_all += positions_covered_cur #add covered positions for current number of sequences to aggregated total
         total_runs += actual_runs
