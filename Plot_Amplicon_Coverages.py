@@ -86,11 +86,13 @@ def main():
     args = parser.parse_args()
     
     # Get sequences in order to align to reference genome to allow region annotation for plots
+    print('Reading sequences')
     sequences_folder = '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000'
     sequences = generate_sequences(sequences_folder, sequences_folder)
     num_positions = sequences[0].length
     
     # Get reference genome and determine annotations by aligning
+    print('Reading reference genome and determining annotations')
     ref_genome = Bio.SeqIO.read(open('/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/amplivar/NC_045512.2.fasta'), format='fasta')
     annotations = determine_annotations(sequences, ref_genome)
     regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'ORF6-7', 'N']
