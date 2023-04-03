@@ -90,6 +90,7 @@ def main():
     sequences_folder = '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasmijn/ref_sets_gisaid_2022_08_18/global_all_time_N0_L29000'
     sequences = generate_sequences(sequences_folder, sequences_folder)
     num_positions = sequences[0].length
+    print('Done reading sequences')
     
     # Get reference genome and determine annotations by aligning
     print('Reading reference genome and determining annotations')
@@ -97,6 +98,7 @@ def main():
     annotations = determine_annotations(sequences, ref_genome)
     regions = ['ORF1a', 'ORF1b', 'S1', 'S2', 'E', 'M', 'ORF6-7', 'N']
     colors = ['red', 'blue']
+    print('Done reading reference genome and determining annotations')
     
     # Folder containing subdirectories with logfiles
     base_folder = '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/downsampling/Soloplex/'
@@ -104,6 +106,7 @@ def main():
     total_runs = 0 #store the number of succesful runs
     # Iterate over number of sequences considered in downsampling runs
     for num_seqs in [1500, 2000, 2500]:
+        print('Working on downsampling with', num_seqs, 'sequences')
         positions_covered_cur = np.zeros((num_positions), dtype=np.int16)
         actual_runs = 0
         for seed in range(1,16):
@@ -127,7 +130,7 @@ def main():
         plt.title('Coverage for amplicons of width 400 (' + str(actual_runs) + ' runs) while subsampling ' + str(num_seqs) + ' sequences', size=25)
         plt.xlabel('Nucleotide index', size=20)
         plt.ylabel('Relative coverage', size=20)
-        
+        print('Plotting')
         plt.plot(positions_covered_cur/actual_runs, color='black', linewidth=3)
         for region in regions:
             plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
