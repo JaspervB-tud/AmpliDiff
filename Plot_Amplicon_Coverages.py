@@ -78,7 +78,7 @@ def determine_annotations(sequences, ref_genome):
 
 def main():
     parser = argparse.ArgumentParser(description='Plot amplicon coverage for given amplicon width coverage and beta value')
-    parser.add_argument('-w', '--ampwidth', type=int, required=True)
+    parser.add_argument('-w', '--ampwidth', type=str, required=True)
     parser.add_argument('-c', '--coverage', type=str, required=True)
     parser.add_argument('-b', '--beta', type=str, required=True)
     parser.add_argument('-o', '--output_folder', type=str, required=True)
