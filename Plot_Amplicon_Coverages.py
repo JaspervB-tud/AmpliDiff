@@ -19,6 +19,63 @@ def parse_logfile(location, num_positions):
                 positions_covered[amplicon[0]:amplicon[1]] += 1
     return positions_covered
 
+#################################### HELPER FUNCTIONS ###################################################
+def determine_annotations(sequences, ref_genome):
+    alignments = pairwise2.align.globalxx(sequences[0].sequence_raw.upper(), str(ref_genome.seq))
+    ref_sequence = Sequence(alignments[0].seqB.lower(), 'NC_045512.2')
+    ref_sequence.align_to_trim()
+    sequences[0].align_to_trim()
+    
+    #Annotations are based on annotations for reference genome "NC_045512.2"
+    annotations = {}
+    annotations2 = {}
+    ORF1a = [266, 13483]
+    ORF1b = [13483, 21555]
+    spike_1 = [21599, 23618]
+    spike_2 = [23618, 25381]
+    E = [26245, 26472]
+    M = [26523, 27191]
+    ORF6 = [27202, 27384]
+    ORF7a = [27439, 27756]
+    ORF7b = [27756, 27884]
+    N = [28274, 29553]
+    
+    #ORF1a
+    annotations['ORF1a'] = [np.where(ref_sequence.aligned_to_trim == ORF1a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1a[1])[0][0]]
+    annotations2['ORF1a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][1])[0][0]]
+    #ORF1b
+    annotations['ORF1b'] = [np.where(ref_sequence.aligned_to_trim == ORF1b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1b[1])[0][0]]
+    annotations2['ORF1b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][1])[0][0]]
+    #S1
+    annotations['S1'] = [np.where(ref_sequence.aligned_to_trim == spike_1[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_1[1])[0][0]]
+    annotations2['S1'] = [np.where(sequences[0].aligned_to_trim == annotations['S1'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S1'][1])[0][0]]
+    #S2
+    annotations['S2'] = [np.where(ref_sequence.aligned_to_trim == spike_2[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_2[1])[0][0]]
+    annotations2['S2'] = [np.where(sequences[0].aligned_to_trim == annotations['S2'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S2'][1])[0][0]]
+    #E
+    annotations['E'] = [np.where(ref_sequence.aligned_to_trim == E[0])[0][0], np.where(ref_sequence.aligned_to_trim == E[1])[0][0]]
+    annotations2['E'] = [np.where(sequences[0].aligned_to_trim == annotations['E'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['E'][1])[0][0]]
+    #M
+    annotations['M'] = [np.where(ref_sequence.aligned_to_trim == M[0])[0][0], np.where(ref_sequence.aligned_to_trim == M[1])[0][0]]
+    annotations2['M'] = [np.where(sequences[0].aligned_to_trim == annotations['M'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['M'][1])[0][0]]
+    #ORF6
+    annotations['ORF6'] = [np.where(ref_sequence.aligned_to_trim == ORF6[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF6[1])[0][0]]
+    annotations2['ORF6'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF6'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF6'][1])[0][0]]
+    #ORF7a
+    annotations['ORF7a'] = [np.where(ref_sequence.aligned_to_trim == ORF7a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF7a[1])[0][0]]
+    annotations2['ORF7a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF7a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF7a'][1])[0][0]]
+    #ORF7b
+    annotations['ORF7b'] = [np.where(ref_sequence.aligned_to_trim == ORF7b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF7b[1])[0][0]]
+    annotations2['ORF7b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF7b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF7b'][1])[0][0]]
+    #ORF6 + 7
+    annotations2['ORF6-7'] = [annotations2['ORF6'][0], annotations2['ORF7b'][1]]
+    #N
+    annotations['N'] = [np.where(ref_sequence.aligned_to_trim == N[0])[0][0], np.where(ref_sequence.aligned_to_trim == N[1])[0][0]]
+    annotations2['N'] = [np.where(sequences[0].aligned_to_trim == annotations['N'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['N'][1])[0][0]]
+    
+    return annotations2
+#####################################################################################################
+
 def main():
     parser = argparse.ArgumentParser(description='Plot amplicon coverage for given amplicon width coverage and beta value')
     parser.add_argument('-w', '--ampwidth', type=int, required=True)
@@ -90,60 +147,5 @@ def main():
 if __name__ == '__main__':
     main()
     
-#################################### HELPER FUNCTIONS ###################################################
-def determine_annotations(sequences, ref_genome):
-    alignments = pairwise2.align.globalxx(sequences[0].sequence_raw.upper(), str(ref_genome.seq))
-    ref_sequence = Sequence(alignments[0].seqB.lower(), 'NC_045512.2')
-    ref_sequence.align_to_trim()
-    sequences[0].align_to_trim()
-    
-    #Annotations are based on annotations for reference genome "NC_045512.2"
-    annotations = {}
-    annotations2 = {}
-    ORF1a = [266, 13483]
-    ORF1b = [13483, 21555]
-    spike_1 = [21599, 23618]
-    spike_2 = [23618, 25381]
-    E = [26245, 26472]
-    M = [26523, 27191]
-    ORF6 = [27202, 27384]
-    ORF7a = [27439, 27756]
-    ORF7b = [27756, 27884]
-    N = [28274, 29553]
-    
-    #ORF1a
-    annotations['ORF1a'] = [np.where(ref_sequence.aligned_to_trim == ORF1a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1a[1])[0][0]]
-    annotations2['ORF1a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1a'][1])[0][0]]
-    #ORF1b
-    annotations['ORF1b'] = [np.where(ref_sequence.aligned_to_trim == ORF1b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF1b[1])[0][0]]
-    annotations2['ORF1b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF1b'][1])[0][0]]
-    #S1
-    annotations['S1'] = [np.where(ref_sequence.aligned_to_trim == spike_1[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_1[1])[0][0]]
-    annotations2['S1'] = [np.where(sequences[0].aligned_to_trim == annotations['S1'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S1'][1])[0][0]]
-    #S2
-    annotations['S2'] = [np.where(ref_sequence.aligned_to_trim == spike_2[0])[0][0], np.where(ref_sequence.aligned_to_trim == spike_2[1])[0][0]]
-    annotations2['S2'] = [np.where(sequences[0].aligned_to_trim == annotations['S2'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['S2'][1])[0][0]]
-    #E
-    annotations['E'] = [np.where(ref_sequence.aligned_to_trim == E[0])[0][0], np.where(ref_sequence.aligned_to_trim == E[1])[0][0]]
-    annotations2['E'] = [np.where(sequences[0].aligned_to_trim == annotations['E'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['E'][1])[0][0]]
-    #M
-    annotations['M'] = [np.where(ref_sequence.aligned_to_trim == M[0])[0][0], np.where(ref_sequence.aligned_to_trim == M[1])[0][0]]
-    annotations2['M'] = [np.where(sequences[0].aligned_to_trim == annotations['M'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['M'][1])[0][0]]
-    #ORF6
-    annotations['ORF6'] = [np.where(ref_sequence.aligned_to_trim == ORF6[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF6[1])[0][0]]
-    annotations2['ORF6'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF6'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF6'][1])[0][0]]
-    #ORF7a
-    annotations['ORF7a'] = [np.where(ref_sequence.aligned_to_trim == ORF7a[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF7a[1])[0][0]]
-    annotations2['ORF7a'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF7a'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF7a'][1])[0][0]]
-    #ORF7b
-    annotations['ORF7b'] = [np.where(ref_sequence.aligned_to_trim == ORF7b[0])[0][0], np.where(ref_sequence.aligned_to_trim == ORF7b[1])[0][0]]
-    annotations2['ORF7b'] = [np.where(sequences[0].aligned_to_trim == annotations['ORF7b'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['ORF7b'][1])[0][0]]
-    #ORF6 + 7
-    annotations2['ORF6-7'] = [annotations2['ORF6'][0], annotations2['ORF7b'][1]]
-    #N
-    annotations['N'] = [np.where(ref_sequence.aligned_to_trim == N[0])[0][0], np.where(ref_sequence.aligned_to_trim == N[1])[0][0]]
-    annotations2['N'] = [np.where(sequences[0].aligned_to_trim == annotations['N'][0])[0][0], np.where(sequences[0].aligned_to_trim == annotations['N'][1])[0][0]]
-    
-    return annotations2
-#####################################################################################################
+
     
