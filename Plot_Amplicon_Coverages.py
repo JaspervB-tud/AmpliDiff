@@ -187,7 +187,7 @@ def main():
     print('Plotting comparative results')
     for num_seqs in [(1500, 'orange'), (2000, 'blue'), (2500, 'green')]:
         plt.plot(positions_covered[num_seqs[0]][0]/positions_covered[num_seqs[0]][1], color=num_seqs[1], linewidth=3, label=str(num_seqs[0]))
-    plt.legend(size=20)
+    plt.legend(fontsize=20)
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
         plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.9), color='black', alpha=0.6, size=20, ha='center', rotation=90)
