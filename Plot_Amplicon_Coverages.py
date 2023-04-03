@@ -149,7 +149,7 @@ def main():
                               '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-' + 
                               str(num_seqs) + '.pdf') 
             else:
-                output_loc = (args.output_folder + '/coverage-' + args.coverage + '/beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
+                output_loc = (args.output_folder + '/coverage-' + args.coverage + '_beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
                               '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-' + 
                               str(num_seqs) + '.pdf') 
             plt.savefig(output_loc, figsize=[20,10], dpi=200, format='pdf')
@@ -173,7 +173,7 @@ def main():
             output_loc = (args.output_folder + '/coverage-' + args.coverage + '_ampliconwidth-' + args.ampwidth + 
                           '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-aggregated.pdf') 
         else:
-            output_loc = (args.output_folder + '/coverage-' + args.coverage + '/beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
+            output_loc = (args.output_folder + '/coverage-' + args.coverage + '_beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
                           '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-aggregated.pdf') 
         plt.savefig(output_loc, figsize=[20,10], dpi=200, format='pdf')
         del fig, ax
@@ -197,7 +197,7 @@ def main():
         output_loc = (args.output_folder + '/coverage-' + args.coverage + '_ampliconwidth-' + args.ampwidth + 
                       '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-compared.pdf') 
     else:
-        output_loc = (args.output_folder + '/coverage-' + args.coverage + '/beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
+        output_loc = (args.output_folder + '/coverage-' + args.coverage + '_beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
                       '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-compared.pdf') 
     plt.savefig(output_loc, figsize=[20,10], dpi=200, format='pdf')
     del fig, ax
