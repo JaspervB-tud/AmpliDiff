@@ -103,6 +103,7 @@ def main():
     # Folder containing subdirectories with logfiles
     base_folder = '/tudelft.net/staff-umbrella/SARSCoV2Wastewater/jasper/source_code/final_scripts/fast_output/Global/downsampling/Soloplex/'
     positions_covered_all = np.zeros((num_positions), dtype=np.int16) #store how often each position is covered in every run
+    positions_covered = {}
     total_runs = 0 #store the number of succesful runs
     # Iterate over number of sequences considered in downsampling runs
     for num_seqs in [1500, 2000, 2500]:
@@ -125,6 +126,7 @@ def main():
                 print(e)
                 continue
         positions_covered_cur[positions_covered_cur > actual_runs] = actual_runs
+        positions_covered[num_seqs] = (positions_covered_cur, actual_runs) #store both the coverage and actual runs for comparative plot
         positions_covered_all += positions_covered_cur #add covered positions for current number of sequences to aggregated total
         total_runs += actual_runs
         
@@ -175,6 +177,31 @@ def main():
                           '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-aggregated.pdf') 
         plt.savefig(output_loc, figsize=[20,10], dpi=200, format='pdf')
         del fig, ax
+        
+    color_index = 0
+    fig = plt.figure(figsize=[20,10], dpi=200)
+    ax = plt.gca()
+    plt.title('Coverage for amplicons of width 400 while subsampling 1500 (' + str(positions_covered[1500][1]) + '), 2000 (' + str(positions_covered[2000][1]) + ') and 2500 (' + str(positions_covered[2500][1]) + ') sequences', size=25)
+    plt.xlabel('Nucleotide index', size=20)
+    plt.ylabel('Relative coverage', size=20)
+    print('Plotting comparative results')
+    for num_seqs in [(1500, 'orange'), (2000, 'blue'), (2500, 'green')]:
+        plt.plot(positions_covered[num_seqs[0]][0]/positions_covered[num_seqs[0]][1], color=num_seqs[1], linewidth=3, label=str(num_seqs[0]))
+    plt.legend(size=20)
+    for region in regions:
+        plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.9), color='black', alpha=0.6, size=20, ha='center', rotation=90)
+        color_index += 1
+    plt.ylim([0, 1.2])
+    if args.coverage == '1.000':
+        output_loc = (args.output_folder + '/coverage-' + args.coverage + '_ampliconwidth-' + args.ampwidth + 
+                      '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-compared.pdf') 
+    else:
+        output_loc = (args.output_folder + '/coverage-' + args.coverage + '/beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
+                      '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-compared.pdf') 
+    plt.savefig(output_loc, figsize=[20,10], dpi=200, format='pdf')
+    del fig, ax
+    
             
     
 if __name__ == '__main__':
