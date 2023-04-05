@@ -103,51 +103,22 @@ def main():
                     
     #Store lineages that are both in reference set and simulation set
     intersected_lineages = list(simset_lineages.intersection(refset_lineages))
-    
-    #Calculate difference between estimated and real abundances, and other related statistics
-    MSE = 0
-    MAE = 0
-    for lineage in all_lineages:
-        if lineage not in simset_lineages:
-            errors[lineage] = estimated_abundances[lineage]
-        elif lineage not in refset_lineages:
-            errors[lineage] = -real_abundances[lineage]
-        else:
-            errors[lineage] = estimated_abundances[lineage] - real_abundances[lineage]
-        super_lineage = lineage.split('.')
-        if len(super_lineage) > 1:
-            super_lineage = super_lineage[0] + '.' + super_lineage[1]
-        else:
-            super_lineage = super_lineage[0]
-        super_lineages.add(super_lineage)
-        if super_lineage not in super_errors:
-            super_errors[super_lineage] = 0
-        super_errors[super_lineage] += errors[lineage]
-        MSE += (errors[lineage]**2)/len(all_lineages)
-        MAE += abs(errors[lineage])/len(all_lineages)
-    MSE_super = 0
-    MAE_super = 0
-    for lineage in super_lineages:
-        MSE_super += (super_errors[lineage]**2)/len(super_lineages)
-        MAE_super += abs(super_errors[lineage])/len(super_lineages)
-        
+    #Calculate errors and error statistics
+    errors, super_errors, MSE, MSE_super, MAE, MAE_super = calculate_errors(all_lineages, super_lineages, estimated_abundances, real_abundances)
+    """
     with open(args.output_folder + '/estimation_errors.csv', 'w') as f:
         for lineage in all_lineages:
             f.write(lineage + ';' + str(errors[lineage]) + '\n')
     with open(args.output_folder + '/estimation_errors_super.csv', 'w') as f:
         for lineage in super_lineages:
             f.write(lineage + ';' + str(super_errors[lineage]) + '\n')
-            
-    print('MSE:', MSE)
-    print('MAE:', MAE)
-    print('MSE (super)', MSE_super)
-    print('MAE (super)', MAE_super)
+    """
     
-    E, SE, MSE, MSE_super, MAE, MAE_super = calculate_errors(all_lineages, super_lineages, estimated_abundances, real_abundances)
     print('MSE (new)', MSE)
     print('MAE (new)', MAE)
     print('MSE (super) (new)', MSE_super)
     print('MAE (super) (new)', MAE_super)
+    print(super_errors)
     
 if __name__ == '__main__':
     main()
