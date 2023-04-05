@@ -57,8 +57,6 @@ def main():
         else:
             errors[lineage] = estimated_abundances[lineage] - real_abundances[lineage]
         MSE += (errors[lineage]**2)/len(all_lineages)
-    for lineage in intersected_lineages:
-        print(lineage, errors[lineage])
     print('MSE:', MSE)
         
 if __name__ == '__main__':
