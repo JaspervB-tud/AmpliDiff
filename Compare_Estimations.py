@@ -18,13 +18,20 @@ def main():
     #Store lineages occurring in both simulation data (i.e. the sequences) and in the reference data (based on estimates)
     lineage_mapping = {} #just an index based map of the lineages (e.g. lineage X -> 0)
     all_lineages = set()
-    simset_lineages = set([sequence.lineage for sequence in sequences])
+    simset_lineages = set()
     refset_lineages = set()
+    #Determine actual abundances
+    for sequence in sequences:
+        all_lineages.add(sequence.lineage)
+        simset_lineages.add(sequence.lineage)
+        if sequence.lineage not in real_abundances:
+            real_abundances[sequence.lineage] = 0
+        real_abundances[sequence.lineage] += 1/len(sequences)
     #Read estimated abundances
     with open(args.abundances_path, 'r') as f:
         for line in f:
             line = line.split('\t')
             print(line)
-    
+    print(real_abundances)
 if __name__ == '__main__':
     main()
