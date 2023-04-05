@@ -10,11 +10,12 @@ def determine_superlineages(lineages):
             super_lineages[lineage] = lineage
     return super_lineages
 
-def calculate_errors(lineages, estimated_abundances, real_abundances):
+def calculate_errors(lineages, super_lineages, estimated_abundances, real_abundances):
     MSE = 0
+    MAE = 0
     MSE_super = 0
+    MAE_super = 0
     errors = {}
-    super_lineages = set()
     super_errors = {}
     
     for lineage in lineages:
@@ -30,7 +31,6 @@ def calculate_errors(lineages, estimated_abundances, real_abundances):
             super_lineage = super_lineage[0] + '.' + super_lineage[1]
         else:
             super_lineage = super_lineage[0]
-        super_lineages.add(super_lineage)
             
         if super_lineage in super_errors:
             super_errors[super_lineage] += errors[lineage]
@@ -75,6 +75,11 @@ def main():
     for sequence in sequences:
         all_lineages.add(sequence.lineage)
         simset_lineages.add(sequence.lineage)
+        super_lineage = sequence.lineage.split('.')
+        if len(super_lineage) > 1:
+            super_lineages.add(super_lineage[0] + '.' + super_lineage[1])
+        else:
+            super_lineages.add(super_lineage[0])
         if sequence.lineage not in real_abundances:
             real_abundances[sequence.lineage] = 0
         real_abundances[sequence.lineage] += 100/len(sequences) #this is the percentage
@@ -86,6 +91,11 @@ def main():
                 line = line.split('\t')
                 all_lineages.add(line[0].strip())
                 refset_lineages.add(line[0].strip())
+                super_lineage = line[0].strip().split('.')
+                if len(super_lineage) > 1:
+                    super_lineages.add(super_lineage[0] + '.' + super_lineage[1])
+                else:
+                    super_lineages.add(super_lineage[0])
                 if line[0].strip() not in estimated_abundances:
                     estimated_abundances[line[0].strip()] = float(line[-1].strip())
                     
@@ -131,7 +141,7 @@ def main():
     print('MSE (super)', MSE_super)
     print('MAE (super)', MAE_super)
     
-    E, SE, MSE, MSE_super = calculate_errors(all_lineages, estimated_abundances, real_abundances)
+    E, SE, MSE, MSE_super = calculate_errors(all_lineages, super_lineages, estimated_abundances, real_abundances)
     print('MSE (new)', MSE)
     print('MSE (super) (new)', MSE_super)
     
