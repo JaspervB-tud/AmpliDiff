@@ -8,6 +8,7 @@ def main():
     parser.add_argument('-s', '--sequences_path', type=str, help='Sequences used for simulation file location', required=True)
     parser.add_argument('-m', '--metadata_path', type=str, help='Metadata for sequences used in simulation file location', required=True)
     parser.add_argument('-a', '--abundances_path', type=str, help='TSV file containing the estimated abundances', required=True)
+    parser.add_argument('-o', '--output_folder', type=str, help='Path to the folder where output will be saved', default='.')
     
     args = parser.parse_args()
     sequences = generate_sequences(args.sequences_path, args.metadata_path)
@@ -32,7 +33,7 @@ def main():
         simset_lineages.add(sequence.lineage)
         if sequence.lineage not in real_abundances:
             real_abundances[sequence.lineage] = 0
-        real_abundances[sequence.lineage] += 100/len(sequences) #this is already the percentage
+        real_abundances[sequence.lineage] += 100/len(sequences) #this is the percentage
         
     #Read estimated abundances
     with open(args.abundances_path, 'r') as f:
@@ -56,6 +57,8 @@ def main():
             errors[lineage] = -real_abundances[lineage]
         else:
             errors[lineage] = estimated_abundances[lineage] - real_abundances[lineage]
+        super_lineage = lineage.split('.')
+        print(super_lineage)
         MSE += (errors[lineage]**2)/len(all_lineages)
     print('MSE:', MSE)
         
