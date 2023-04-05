@@ -24,6 +24,7 @@ def main():
     #Store lineages occurring in simulation data (i.e. the sequences) or in the reference data (based on estimates)
     lineage_mapping = {} #just an index based map of the lineages (e.g. lineage X -> 0)
     all_lineages = set()
+    super_lineages = set()
     simset_lineages = set()
     refset_lineages = set()
     
@@ -58,9 +59,18 @@ def main():
         else:
             errors[lineage] = estimated_abundances[lineage] - real_abundances[lineage]
         super_lineage = lineage.split('.')
-        print(super_lineage)
+        if len(super_lineage) > 1:
+            super_lineage = super_lineage[0] + '.' + super_lineage[1]
+        super_lineages.add(super_lineage)
+        if super_lineage not in super_errors:
+            super_errors[super_lineage]
+        super_errors[super_lineage] += errors[lineage]
         MSE += (errors[lineage]**2)/len(all_lineages)
+    MSE_super = 0
+    for lineage in super_lineages:
+        MSE_super += (super_errors[lineage]**2)/len(super_lineages)
     print('MSE:', MSE)
+    print('MSE (super)', MSE_super)
         
 if __name__ == '__main__':
     main()
