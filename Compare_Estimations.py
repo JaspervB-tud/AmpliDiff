@@ -71,6 +71,7 @@ def main():
     MSE_super = 0
     for lineage in super_lineages:
         MSE_super += (super_errors[lineage]**2)/len(super_lineages)
+    print(super_lineages)
     print('MSE:', MSE)
     print('MSE (super)', MSE_super)
         
