@@ -12,8 +12,9 @@ def determine_superlineages(lineages):
 
 def calculate_errors(lineages, estimated_abundances, real_abundances):
     MSE = 0
-    MAE = 0
+    MSE_super = 0
     errors = {}
+    super_lineages = set()
     super_errors = {}
     
     for lineage in lineages:
@@ -29,13 +30,19 @@ def calculate_errors(lineages, estimated_abundances, real_abundances):
             super_lineage = super_lineage[0] + '.' + super_lineage[1]
         else:
             super_lineage = super_lineage[0]
+        super_lineages.add(super_lineage)
             
         if super_lineage in super_errors:
             super_errors[super_lineage] += errors[lineage]
         else:
             super_errors[super_lineage] = errors[lineage]
     
-    return errors, super_errors
+    for lineage in lineages:
+        MSE += (errors[lineage]**2)/len(lineages)
+    for super_lineage in super_lineages:
+        MSE_super += (super_errors[super_lineage]**2)/len(super_lineages)
+    
+    return errors, super_errors, MSE, MSE_super
             
         
 
@@ -124,7 +131,9 @@ def main():
     print('MSE (super)', MSE_super)
     print('MAE (super)', MAE_super)
     
-    E, SE = calculate_errors(all_lineages, estimated_abundances, real_abundances)
+    E, SE, MSE, MSE_super = calculate_errors(all_lineages, estimated_abundances, real_abundances)
+    print('MSE (new)', MSE)
+    print('MSE (super) (new)', MSE_super)
     
 if __name__ == '__main__':
     main()
