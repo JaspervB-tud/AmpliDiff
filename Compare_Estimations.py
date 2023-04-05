@@ -78,6 +78,7 @@ def main():
     print('MSE:', MSE)
     print('MAE:', MAE)
     print('MSE (super)', MSE_super)
+    print('MAE (super)', MAE_super)
         
 if __name__ == '__main__':
     main()
