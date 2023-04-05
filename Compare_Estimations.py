@@ -1,7 +1,39 @@
 from Fetch_Amplicons import generate_sequences
 import argparse
 
+def determine_superlineages(lineages):
+    super_lineages = {}
+    for lineage in lineages:
+        if len(lineage.split('.')) > 1:
+            super_lineages[lineage] = lineage.split('.')[0] + '.' + lineage.split('.')[1]
+        else:
+            super_lineages[lineage] = lineage
+    return super_lineages
 
+def calculate_errors(lineages, estimated_abundances, real_abundances):
+    MSE = 0
+    MAE = 0
+    errors = {}
+    super_errors = {}
+    
+    for lineage in lineages:
+        if lineage not in estimated_abundances:
+            errors[lineage] = -real_abundances[lineage]
+        elif lineage not in real_abundances:
+            errors[lineage] = estimated_abundances[lineage]
+        else:
+            errors[lineage] = estimated_abundances[lineage] - real_abundances[lineage]
+        
+        super_lineage = lineage.split('.')
+        if len(super_lineage) > 1:
+            super_lineage = super_lineage[0] + '.' + super_lineage[1]
+        else:
+            super_lineage = super_lineage[0]
+        super_errors[super_lineage] += errors[lineage]
+    
+    return errors, super_errors
+            
+        
 
 def main():
     parser = argparse.ArgumentParser(description='Generates .txt files with estimation outcome comparisons with real abundances')
@@ -82,10 +114,13 @@ def main():
     with open(args.output_folder + '/estimation_errors_super.csv', 'w') as f:
         for lineage in super_lineages:
             f.write(lineage + ';' + str(super_errors[lineage]) + '\n')
+            
     print('MSE:', MSE)
     print('MAE:', MAE)
     print('MSE (super)', MSE_super)
     print('MAE (super)', MAE_super)
-        
+    
+    E, SE = calculate_errors(all_lineages, estimated_abundances, real_abundances)
+    
 if __name__ == '__main__':
     main()
