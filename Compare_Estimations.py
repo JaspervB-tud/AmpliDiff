@@ -63,7 +63,7 @@ def main():
             super_lineage = super_lineage[0] + '.' + super_lineage[1]
         super_lineages.add(super_lineage)
         if super_lineage not in super_errors:
-            super_errors[super_lineage]
+            super_errors[super_lineage] = 0
         super_errors[super_lineage] += errors[lineage]
         MSE += (errors[lineage]**2)/len(all_lineages)
     MSE_super = 0
