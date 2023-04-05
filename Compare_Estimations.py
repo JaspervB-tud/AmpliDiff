@@ -51,6 +51,7 @@ def main():
     
     #Calculate difference between estimated and real abundances, and other related statistics
     MSE = 0
+    MAE = 0
     for lineage in all_lineages:
         if lineage not in simset_lineages:
             errors[lineage] = estimated_abundances[lineage]
@@ -68,11 +69,14 @@ def main():
             super_errors[super_lineage] = 0
         super_errors[super_lineage] += errors[lineage]
         MSE += (errors[lineage]**2)/len(all_lineages)
+        MAE += abs(errors[lineage])/len(all_lineages)
     MSE_super = 0
+    MAE_super = 0
     for lineage in super_lineages:
         MSE_super += (super_errors[lineage]**2)/len(super_lineages)
-    print(super_lineages)
+        MAE_super += abs(super_errors[lineage])/len(super_lineages)
     print('MSE:', MSE)
+    print('MAE:', MAE)
     print('MSE (super)', MSE_super)
         
 if __name__ == '__main__':
