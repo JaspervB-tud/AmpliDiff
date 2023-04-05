@@ -12,10 +12,11 @@ def main():
     args = parser.parse_args()
     sequences = generate_sequences(args.sequences_path, args.metadata_path)
     
-    #Store real and estimated abundances
+    #Store real and estimated abundances, and errors
     real_abundances = {}
     estimated_abundances = {}
-    #Store lineages occurring in both simulation data (i.e. the sequences) and in the reference data (based on estimates)
+    errors = {}
+    #Store lineages occurring in simulation data (i.e. the sequences) or in the reference data (based on estimates)
     lineage_mapping = {} #just an index based map of the lineages (e.g. lineage X -> 0)
     all_lineages = set()
     simset_lineages = set()
@@ -32,9 +33,20 @@ def main():
         for line in f:
             if not '#' in line:
                 line = line.split('\t')
+                all_lineages.add(line[0].strip())
                 if line[0].strip() not in estimated_abundances:
                     estimated_abundances[line[0].strip()] = float(line[-1].strip())
-    print(estimated_abundances)
-    print(real_abundances)
+    #Store lineages that are both in reference set and simulation set
+    intersected_lineages = list(simset_lineages.intersection(refset_lineages))
+    #Calculate difference between estimated and real abundances
+    for lineage in all_lineages:
+        if lineage not in simset_lineages:
+            errors[lineage] = estimated_abundances[lineage]
+        elif lineage not in refset_lineages:
+            errors[lineage] = -real_abundances[lineage]
+        else:
+            errors[lineage] = estimated_abundances[lineage] - real_abundances[lineage]
+    print(errors)
+        
 if __name__ == '__main__':
     main()
