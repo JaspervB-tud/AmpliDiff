@@ -30,9 +30,10 @@ def main():
     #Read estimated abundances
     with open(args.abundances_path, 'r') as f:
         for line in f:
-            line = line.split('\t')
-            if line[0].strip() not in estimated_abundances:
-                estimated_abundances[line[0].strip()] = float(line[-1].strip())
+            if not '#' in line:
+                line = line.split('\t')
+                if line[0].strip() not in estimated_abundances:
+                    estimated_abundances[line[0].strip()] = float(line[-1].strip())
     print(estimated_abundances)
     print(real_abundances)
 if __name__ == '__main__':
