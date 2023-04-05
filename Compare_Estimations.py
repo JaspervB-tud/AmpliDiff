@@ -29,7 +29,11 @@ def calculate_errors(lineages, estimated_abundances, real_abundances):
             super_lineage = super_lineage[0] + '.' + super_lineage[1]
         else:
             super_lineage = super_lineage[0]
-        super_errors[super_lineage] += errors[lineage]
+            
+        if super_lineage in super_errors:
+            super_errors[super_lineage] += errors[lineage]
+        else:
+            super_errors[super_lineage] = errors[lineage]
     
     return errors, super_errors
             
