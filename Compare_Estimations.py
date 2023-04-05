@@ -61,6 +61,8 @@ def main():
         super_lineage = lineage.split('.')
         if len(super_lineage) > 1:
             super_lineage = super_lineage[0] + '.' + super_lineage[1]
+        else:
+            super_lineage = super_lineage[0]
         super_lineages.add(super_lineage)
         if super_lineage not in super_errors:
             super_errors[super_lineage] = 0
