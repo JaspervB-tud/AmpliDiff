@@ -46,7 +46,9 @@ def main():
                     
     #Store lineages that are both in reference set and simulation set
     intersected_lineages = list(simset_lineages.intersection(refset_lineages))
-    #Calculate difference between estimated and real abundances
+    
+    #Calculate difference between estimated and real abundances, and other related statistics
+    MSE = 0
     for lineage in all_lineages:
         if lineage not in simset_lineages:
             errors[lineage] = estimated_abundances[lineage]
@@ -54,8 +56,10 @@ def main():
             errors[lineage] = -real_abundances[lineage]
         else:
             errors[lineage] = estimated_abundances[lineage] - real_abundances[lineage]
+        MSE += (errors[lineage]**2)/len(all_lineages)
     for lineage in intersected_lineages:
         print(lineage, errors[lineage])
+    print('MSE:', MSE)
         
 if __name__ == '__main__':
     main()
