@@ -4,7 +4,7 @@ import argparse
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Generates plots comparing estimation outcomes with real abundances')
+    parser = argparse.ArgumentParser(description='Generates .txt files with estimation outcome comparisons with real abundances')
     parser.add_argument('-s', '--sequences_path', type=str, help='Sequences used for simulation file location', required=True)
     parser.add_argument('-m', '--metadata_path', type=str, help='Metadata for sequences used in simulation file location', required=True)
     parser.add_argument('-a', '--abundances_path', type=str, help='TSV file containing the estimated abundances', required=True)
@@ -75,6 +75,13 @@ def main():
     for lineage in super_lineages:
         MSE_super += (super_errors[lineage]**2)/len(super_lineages)
         MAE_super += abs(super_errors[lineage])/len(super_lineages)
+        
+    with open(args.output_folder + '/estimation_errors.csv', 'w') as f:
+        for lineage in all_lineages:
+            f.write(lineage + ';' + str(errors[lineage]) + '\n')
+    with open(args.output_folder + '/estimation_errors_super.csv', 'w') as f:
+        for lineage in super_lineages:
+            f.write(lineage + ';' + str(super_errors[lineage]) + '\n')
     print('MSE:', MSE)
     print('MAE:', MAE)
     print('MSE (super)', MSE_super)
