@@ -39,10 +39,12 @@ def calculate_errors(lineages, super_lineages, estimated_abundances, real_abunda
     
     for lineage in lineages:
         MSE += (errors[lineage]**2)/len(lineages)
+        MAE += abs(errors[lineage])/len(lineages)
     for super_lineage in super_lineages:
         MSE_super += (super_errors[super_lineage]**2)/len(super_lineages)
+        MAE_super += abs(super_errors[super_lineage])/len(super_lineages)
     
-    return errors, super_errors, MSE, MSE_super
+    return errors, super_errors, MSE, MSE_super, MAE, MAE_super
             
         
 
@@ -141,9 +143,11 @@ def main():
     print('MSE (super)', MSE_super)
     print('MAE (super)', MAE_super)
     
-    E, SE, MSE, MSE_super = calculate_errors(all_lineages, super_lineages, estimated_abundances, real_abundances)
+    E, SE, MSE, MSE_super, MAE, MAE_super = calculate_errors(all_lineages, super_lineages, estimated_abundances, real_abundances)
     print('MSE (new)', MSE)
+    print('MAE (new)', MAE)
     print('MSE (super) (new)', MSE_super)
+    print('MAE (super) (new)', MAE_super)
     
 if __name__ == '__main__':
     main()
