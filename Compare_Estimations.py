@@ -40,6 +40,7 @@ def main():
             if not '#' in line:
                 line = line.split('\t')
                 all_lineages.add(line[0].strip())
+                refset_lineages.add(line[0].strip())
                 if line[0].strip() not in estimated_abundances:
                     estimated_abundances[line[0].strip()] = float(line[-1].strip())
                     
@@ -53,7 +54,6 @@ def main():
             errors[lineage] = -real_abundances[lineage]
         else:
             errors[lineage] = estimated_abundances[lineage] - real_abundances[lineage]
-    
     for lineage in intersected_lineages:
         print(lineage, errors[lineage])
         
