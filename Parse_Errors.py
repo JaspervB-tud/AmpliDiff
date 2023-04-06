@@ -57,16 +57,16 @@ def main():
     
     with open(args.output + '/MSE.tsv', 'w') as f:
         for mse in MSE:
-            f.write(mse + '\n')
+            f.write(str(mse) + '\n')
     with open(args.output + '/MAE.tsv', 'w') as f:
         for mae in MAE:
-            f.write(mae + '\n')
+            f.write(str(mae) + '\n')
     with open(args.output + '/MSE_super.tsv', 'w') as f:
         for mse_super in MSE_super:
-            f.write(mse_super + '\n')
+            f.write(str(mse_super) + '\n')
     with open(args.output + '/MAE_super.tsv', 'w') as f:
         for mae_super in MAE_super:
-            f.write(mae_super + '\n')
+            f.write(str(mae_super) + '\n')
         
     
 if __name__ == '__main__':
