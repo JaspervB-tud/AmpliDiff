@@ -1,5 +1,6 @@
 from Fetch_Amplicons import generate_sequences
 import argparse
+import numpy as np
 
 def read_errors(error_file):
     errors = {}
@@ -10,10 +11,35 @@ def read_errors(error_file):
                 errors[cur_line[0].strip()] = cur_line[1].strip()
     return errors
 
+def calculate_statistics(errors):
+    MSE = np.zeros((len(errors)))
+    MAE = np.zeros((len(errors)))
+    
+    means = {}
+    stds = {}
+    
+    for error in errors:
+        for lineage in error:
+            if lineage not in means:
+                means[lineage] = [error[lineage]]
+            else:
+                means[lineage].append(error[lineage])
+    i = 0
+    for error in errors:
+        for lineage in error:
+            MSE[i] += (error[lineage]**2)/len(error)
+            MAE[i] += abs(error[lineage])/len(error)
+            cur_errors = np.array(error[lineage])
+            stds[lineage] = np.std(cur_errors, ddof=1)
+            means[lineage] = np.mean(cur_errors)
+    return means, stds, MSE, MAE
+        
+
 def main():
     parser = argparse.ArgumentParser(description='Generates plots based on error files in input folder')
-    parser.add_argument('-i', '--input', type=str, help='Folder containing the seed folders with error files')
-    parser.add_argument('-o', '--output', type=str, help='Folder where output should be stored')
+    parser.add_argument('-i', '--input', type=str, help='Folder containing the seed folders with error files', required=True)
+    parser.add_argument('-o', '--output', type=str, help='Folder where output should be stored', required=True)
+    parser.add_argument('--intersect', type=str, help='File containing the lineages that appear in both ref and sim set')
     
     args = parser.parse_args()
     
@@ -28,6 +54,12 @@ def main():
     print(errors)
     print('Super errors')
     print(super_errors)
+    
+    mu, sigma, MSE, MAE = calculate_statistics(errors)
+    print(mu)
+    print(sigma)
+    print(MSE)
+    print(MAE)
     
 if __name__ == '__main__':
     main()
