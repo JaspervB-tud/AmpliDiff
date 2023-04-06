@@ -8,7 +8,7 @@ def read_errors(error_file):
         for line in f:
             if ';' in line:
                 cur_line = line.split(';')
-                errors[cur_line[0].strip()] = cur_line[1].strip()
+                errors[cur_line[0].strip()] = float(cur_line[1].strip())
     return errors
 
 def calculate_statistics(errors):
