@@ -105,14 +105,14 @@ def main():
     intersected_lineages = list(simset_lineages.intersection(refset_lineages))
     #Calculate errors and error statistics
     errors, super_errors, MSE, MSE_super, MAE, MAE_super = calculate_errors(all_lineages, super_lineages, estimated_abundances, real_abundances)
-    """
+
     with open(args.output_folder + '/estimation_errors.csv', 'w') as f:
         for lineage in all_lineages:
             f.write(lineage + ';' + str(errors[lineage]) + '\n')
     with open(args.output_folder + '/estimation_errors_super.csv', 'w') as f:
         for lineage in super_lineages:
             f.write(lineage + ';' + str(super_errors[lineage]) + '\n')
-    """
+
     
     print('MSE (new)', MSE)
     print('MAE (new)', MAE)
