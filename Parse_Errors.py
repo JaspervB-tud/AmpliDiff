@@ -29,11 +29,14 @@ def calculate_statistics(errors):
     i = 0
     for error in errors:
         for lineage in error:
-            MSE[i] += (error[lineage]**2)/len(error)
-            MAE[i] += abs(error[lineage])/len(error)
-            cur_errors = np.array(means[lineage])
-            stds[lineage] = np.std(cur_errors, ddof=1)
-            means[lineage] = np.mean(cur_errors)
+            try:
+                MSE[i] += (error[lineage]**2)/len(error)
+                MAE[i] += abs(error[lineage])/len(error)
+                cur_errors = np.array(means[lineage])
+                stds[lineage] = np.std(cur_errors, ddof=1)
+                means[lineage] = np.mean(cur_errors)
+            except Exception as e:
+                print(cur_errors)
         i += 1
     return means, stds, MSE, MAE
         
