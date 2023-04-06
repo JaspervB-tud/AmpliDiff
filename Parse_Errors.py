@@ -20,10 +20,11 @@ def calculate_statistics(errors):
     
     for error in errors:
         for lineage in error:
-            if lineage not in means:
-                means[lineage] = [error[lineage]]
-            else:
-                means[lineage].append(error[lineage])
+            if len(lineage) > 0:
+                if lineage not in means:
+                    means[lineage] = [error[lineage]]
+                else:
+                    means[lineage].append(error[lineage])
     i = 0
     for error in errors:
         for lineage in error:
