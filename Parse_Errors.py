@@ -53,16 +53,7 @@ def main():
         cur_super_error = read_errors(args.input + '/Seed_' + str(seed) + '/results/estimation_errors_super.csv')
         errors.append(cur_error)
         super_errors.append(cur_super_error)
-    print('Errors')
-    print(errors)
-    print('Super errors')
-    print(super_errors)
-    
     mu, sigma, MSE, MAE = calculate_statistics(errors)
-    print(mu)
-    print(sigma)
-    print(MSE)
-    print(MAE)
     
 if __name__ == '__main__':
     main()
