@@ -36,7 +36,9 @@ def calculate_statistics(errors):
                 stds[lineage] = np.std(cur_errors, ddof=1)
                 means[lineage] = np.mean(cur_errors)
             except Exception as e:
+                print('ERROR')
                 print(cur_errors)
+                print('END ERROR')
         i += 1
     return means, stds, MSE, MAE
         
