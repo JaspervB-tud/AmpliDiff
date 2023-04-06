@@ -25,14 +25,13 @@ def calculate_statistics(errors):
                     means[lineage] = [error[lineage]]
                 else:
                     means[lineage].append(error[lineage])
-    print(means)
     i = 0
     for error in errors:
         for lineage in error:
             MSE[i] += (error[lineage]**2)/len(error)
             MAE[i] += abs(error[lineage])/len(error)
             cur_errors = np.array(means[lineage])
-            stds[lineage] = np.std(cur_errors, ddof=1)
+            #stds[lineage] = np.std(cur_errors, ddof=1)
             means[lineage] = np.mean(cur_errors)
         i += 1
     return means, stds, MSE, MAE
@@ -54,6 +53,21 @@ def main():
         errors.append(cur_error)
         super_errors.append(cur_super_error)
     mu, sigma, MSE, MAE = calculate_statistics(errors)
+    mu, sigma, MSE_super, MAE_super = calculate_statistics(super_errors)
+    
+    with open(args.output + '/MSE.tsv', 'w') as f:
+        for mse in MSE:
+            f.write(mse + '\n')
+    with open(args.output + '/MAE.tsv', 'w') as f:
+        for mae in MAE:
+            f.write(mae + '\n')
+    with open(args.output + '/MSE_super.tsv', 'w') as f:
+        for mse_super in MSE_super:
+            f.write(mse_super + '\n')
+    with open(args.output + '/MAE_super.tsv', 'w') as f:
+        for mae_super in MAE_super:
+            f.write(mae_super + '\n')
+        
     
 if __name__ == '__main__':
     main()
