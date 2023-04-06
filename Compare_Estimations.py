@@ -112,6 +112,9 @@ def main():
     with open(args.output_folder + '/estimation_errors_super.csv', 'w') as f:
         for lineage in super_lineages:
             f.write(lineage + ';' + str(super_errors[lineage]) + '\n')
+    with open(args.output_folder + '/intersected_lineages.txt', 'w') as f:
+        for lineage in intersected_lineages:
+            f.write(lineage + '\n')
 
     
     print('MSE (new)', MSE)
