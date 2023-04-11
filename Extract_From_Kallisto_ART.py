@@ -20,7 +20,7 @@ def extract_top_n_kallisto(input_file, amplicon_index_file, output_loc, n):
             else:
                 cur_amplicons = line.split('A'*200)
                 for i in range(min(n, len(cur_amplicons))): #iterate over amplicons
-                    if amplicon_indices[cur_sequence] <= n: #check if current amplicon should be included -> this may imply that some sequence get no amplicons
+                    if amplicon_indices[cur_sequence.strip()] <= n: #check if current amplicon should be included -> this may imply that some sequence get no amplicons
                         content[cur_sequence] += cur_amplicons[i].strip() + 'A'*200
                 content[cur_sequence] = content[cur_sequence][:-200]
     s = ''
