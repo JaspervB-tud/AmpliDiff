@@ -31,7 +31,10 @@ def calculate_statistics(errors):
             MSE[i] += (error[lineage]**2)/len(error)
             MAE[i] += abs(error[lineage])/len(error)
             cur_errors = np.array(means[lineage])
-            #stds[lineage] = np.std(cur_errors, ddof=1)
+            try:
+                stds[lineage] = np.std(cur_errors, ddof=1)
+            except:
+                stds[lineage] = 0
             means[lineage] = np.mean(cur_errors)
         i += 1
     return means, stds, MSE, MAE

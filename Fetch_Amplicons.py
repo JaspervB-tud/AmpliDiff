@@ -630,17 +630,21 @@ def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfil
     M = generate_opportunistic_matrix() #generate matrix used to determine which nucleotides are identical
     
     fasta_list = []
+    amplicon_index_dict = {} #stores which amplicons have actually been retrieved
     for sequence in sequences[:]:
         realized_amplicons = locate_amplicons(sequence.sequence_raw, amplicons, M)
         amplicon_index = 0
+        cur_amplicon_indices = [] #store indices for this sequence
         s = ''
         fasta_list.append('>' + sequence.id + '\n')
         for amplicon in realized_amplicons:
             amplicon_index += 1
             if realized_amplicons[amplicon]:
                 s += sequence.sequence_raw[realized_amplicons[amplicon][0]:realized_amplicons[amplicon][1]] +'A'*200
+                cur_amplicon_indices.append(amplicon_index)
         fasta_list.append(s[:-200] + '\n')
-    return fasta_list
+        amplicon_index_dict[sequence.id] = cur_amplicon_indices
+    return fasta_list, amplicon_index_list
         
     
     
@@ -664,10 +668,16 @@ def main():
             for line in ART_input:
                 f.write(line + '\n')
     if args.kallisto:
-        Kallisto_input = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
+        Kallisto_input, amplicon_index_dict = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
         with open(args.output_path + '/Kallisto_input.fasta', 'w') as f:
             for line in Kallisto_input:
                 f.write(line)
+        with open(args.output_path + '/amplicon_indices.csv', 'w') as f:
+            for seq in amplicon_index_dict:
+                cur_str = '>' + seq
+                for index in amplicon_index_dict[seq]:
+                    cur_str += ';' + str(index)
+                f.write(cur_str + '\n')
 
 if __name__ == '__main__':
     main()

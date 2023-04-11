@@ -136,7 +136,7 @@ def main():
             ax = plt.gca()
             plt.title('Coverage for amplicons of width 400 (' + str(actual_runs) + ' runs) while subsampling ' + str(num_seqs) + ' sequences', size=25)
             plt.xlabel('Nucleotide index', size=20)
-            plt.ylabel('Relative coverage', size=20)
+            plt.ylabel('Relative occurrence', size=20)
             print('Plotting subsampling', num_seqs)
             plt.plot(positions_covered_cur/actual_runs, color='black', linewidth=3)
             for region in regions:
@@ -161,7 +161,7 @@ def main():
         ax = plt.gca()
         plt.title('Coverage for amplicons of width 400 (' + str(total_runs) + ' runs) aggregated', size=25)
         plt.xlabel('Nucleotide index', size=20)
-        plt.ylabel('Relative coverage', size=20)
+        plt.ylabel('Relative occurrence', size=20)
         print('Plotting aggregated results')
         plt.plot(positions_covered_all/total_runs, color='black', linewidth=3)
         for region in regions:
@@ -173,7 +173,7 @@ def main():
             output_loc = (args.output_folder + '/coverage-' + args.coverage + '_ampliconwidth-' + args.ampwidth + 
                           '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-aggregated.pdf') 
         else:
-            output_loc = (args.output_folder + '/coverage-' + args.coverage + '_beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
+            output_loc = (args.output_folder + '/coverage-' + args.coverage + 'beta-' + args.beta + '_ampliconwidth-' + args.ampwidth + 
                           '_primerwidth-25_ampliconthreshold-1_misthresh-' + args.ampwidth[:2] + '_searchwidth-50_amps-10_nseqs-aggregated.pdf') 
         plt.savefig(output_loc, figsize=[20,10], dpi=200, format='pdf')
         del fig, ax
@@ -183,7 +183,7 @@ def main():
     ax = plt.gca()
     plt.title('Coverage for amplicons of width 400 while subsampling 1500 (' + str(positions_covered[1500][1]) + '), 2000 (' + str(positions_covered[2000][1]) + ') and 2500 (' + str(positions_covered[2500][1]) + ') sequences', size=25)
     plt.xlabel('Nucleotide index', size=20)
-    plt.ylabel('Relative coverage', size=20)
+    plt.ylabel('Relative occurrence', size=20)
     print('Plotting comparative results')
     for num_seqs in [(1500, 'orange'), (2000, 'blue'), (2500, 'green')]:
         plt.plot(positions_covered[num_seqs[0]][0]/positions_covered[num_seqs[0]][1], color=num_seqs[1], linewidth=3, label=str(num_seqs[0]))
