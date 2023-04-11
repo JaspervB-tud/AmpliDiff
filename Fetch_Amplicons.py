@@ -661,13 +661,15 @@ def main():
     parser.add_argument('--kallisto', action='store_true')
     
     args = parser.parse_args()
-    
     if args.art:
+        print('Starting with generating ART input file')
         ART_input = generate_simulationfile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
         with open(args.output_path + '/ART_input.fasta', 'w') as f:
             for line in ART_input:
                 f.write(line + '\n')
+        print('Done with generating ART input file')
     if args.kallisto:
+        print('Starting with generating Kallisto input file')
         Kallisto_input, amplicon_index_dict = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
         with open(args.output_path + '/Kallisto_input.fasta', 'w') as f:
             for line in Kallisto_input:
@@ -678,6 +680,7 @@ def main():
                 for index in amplicon_index_dict[seq]:
                     cur_str += ';' + str(index)
                 f.write(cur_str + '\n')
+        print('Done with generating Kallisto input file')
 
 if __name__ == '__main__':
     main()
