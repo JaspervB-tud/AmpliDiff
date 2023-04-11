@@ -644,7 +644,7 @@ def generate_kallistofile(sequences_path, metadata_path, logfile_path, primerfil
                 cur_amplicon_indices.append(amplicon_index)
         fasta_list.append(s[:-200] + '\n')
         amplicon_index_dict[sequence.id] = cur_amplicon_indices
-    return fasta_list, amplicon_index_list
+    return fasta_list, amplicon_index_dict
         
     
     
