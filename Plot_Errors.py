@@ -71,9 +71,9 @@ def main():
     set_box_color(bp_left, 'red')
     set_box_color(bp_right, 'blue')
     
-    plt.xticks(range(0, len(lineages)), lineages)
+    plt.xticks(range(0, len(lineages)*2, 2), lineages)
     plt.xlim(-2, len(lineages)*2)
-    plt.ylim(0,100)
+    plt.ylim(-50,50)
     plt.tight_layout()
     plt.savefig('boxcompare.png')
 
