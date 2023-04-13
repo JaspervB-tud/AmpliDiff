@@ -2,6 +2,25 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
+def setBoxColors(bp):
+    plt.setp(bp['boxes'][0], color='blue')
+    plt.setp(bp['caps'][0], color='blue')
+    plt.setp(bp['caps'][1], color='blue')
+    plt.setp(bp['whiskers'][0], color='blue')
+    plt.setp(bp['whiskers'][1], color='blue')
+    plt.setp(bp['fliers'][0], color='blue')
+    plt.setp(bp['fliers'][1], color='blue')
+    plt.setp(bp['medians'][0], color='blue')
+
+    plt.setp(bp['boxes'][1], color='red')
+    plt.setp(bp['caps'][2], color='red')
+    plt.setp(bp['caps'][3], color='red')
+    plt.setp(bp['whiskers'][2], color='red')
+    plt.setp(bp['whiskers'][3], color='red')
+    plt.setp(bp['fliers'][2], color='red')
+    plt.setp(bp['fliers'][3], color='red')
+    plt.setp(bp['medians'][1], color='red')
+
 def main():
     parser = argparse.ArgumentParser(description='Generates plots based on error files in input folder')
     parser.add_argument('-a', '--amplicon_input', type=str, help='Folder containing the seed folders with error files for amplicon based', required=True)
@@ -54,6 +73,17 @@ def main():
     print('AMP errors')
     print(errors_amp)
     
+    fig = plt.figure()
+    ax = plt.axes()
+    plt.hold(True)
+    for i in range(len(lineages)):
+        bp = plt.boxplot([errors_wgs[lineages[i]], errors_amp[lineages[i]]], positions=[1+3*i, 2+3*i], widths=0.5)
+        plt.setBoxColors(bp)
+    plt.xlim(0, 3*len(lineages))
+    plt.ylim(0, 100)
+    ax.set_xticklabels(lineages)
+    ax.set_xticks([1.5*(i+1) for i in range(len(lineages))])
+    plt.savefig('boxcompare.png')
 
 if __name__ == '__main__':
     main()
