@@ -119,7 +119,7 @@ def main():
     plt.tight_layout()
     
     plt.grid(color='0.8')
-    plt.axvline(x=0, color='black', alpha=0.9)
+    plt.axvline(x=0, color='black', alpha=0.75, linewidth=0.5)
     plt.gca().spines['top'].set_visible(False)
     plt.gca().spines['right'].set_visible(False)
     
