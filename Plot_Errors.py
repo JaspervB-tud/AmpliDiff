@@ -57,10 +57,24 @@ def main():
                     if line[0] in lineages:
                         errors_super_wgs[line[0]][seed-1] = float(line[1])
                     
+    print('Lineages')
     print(lineages)
+    print('*'*200)
+    
+    print('WGS errors')
     print(errors_wgs)
+    print('*'*200)
+    
+    print('WGS super errors')
+    print(errors_super_wgs)
+    print('*'*200)
+    
+    print('AMP errors')
     print(errors_amp)
-                
+    print('*'*200)
+    
+    print('AMP super errors')
+    print(errors_super_amp)
     
 
 if __name__ == '__main__':
