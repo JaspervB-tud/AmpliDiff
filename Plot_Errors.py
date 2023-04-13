@@ -40,8 +40,7 @@ def main():
                 line = line.strip()
                 if line != '':
                     line = line.split(';')
-                    if line[0] in lineages:
-                        errors_super_amp[line[0]][seed-1] = float(line[1])
+                    errors_super_amp[line[0]][seed-1] = float(line[1])
         with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors.csv', 'r') as f:
             for line in f:
                 line = line.strip()
@@ -54,8 +53,7 @@ def main():
                 line = line.strip()
                 if line != '':
                     line = line.split(';')
-                    if line[0] in lineages:
-                        errors_super_wgs[line[0]][seed-1] = float(line[1])
+                    errors_super_wgs[line[0]][seed-1] = float(line[1])
                     
     print('Lineages')
     print(lineages)
