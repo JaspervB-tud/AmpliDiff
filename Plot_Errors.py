@@ -35,12 +35,6 @@ def main():
                     line = line.split(';')
                     if line[0] in lineages:
                         errors_amp[line[0]][seed-1] = float(line[1])
-        with open(args.amplicon_input + '/Seed_' + str(seed) + '/results/estimation_errors_super.csv', 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line != '':
-                    line = line.split(';')
-                    errors_super_amp[line[0]][seed-1] = float(line[1])
         with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors.csv', 'r') as f:
             for line in f:
                 line = line.strip()
@@ -48,12 +42,6 @@ def main():
                     line = line.split(';')
                     if line[0] in lineages:
                         errors_wgs[line[0]][seed-1] = float(line[1])
-        with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors_super.csv', 'r') as f:
-            for line in f:
-                line = line.strip()
-                if line != '':
-                    line = line.split(';')
-                    errors_super_wgs[line[0]][seed-1] = float(line[1])
                     
     print('Lineages')
     print(lineages)
@@ -63,16 +51,8 @@ def main():
     print(errors_wgs)
     print('*'*200)
     
-    print('WGS super errors')
-    print(errors_super_wgs)
-    print('*'*200)
-    
     print('AMP errors')
     print(errors_amp)
-    print('*'*200)
-    
-    print('AMP super errors')
-    print(errors_super_amp)
     
 
 if __name__ == '__main__':
