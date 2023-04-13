@@ -112,7 +112,7 @@ def main():
     plt.ylim(-max_error-2.5, max_error+2.5)
     plt.tight_layout()
     
-    plt.grid(axis='y', color='1.2')
+    plt.grid(axis='y', color='0.8')
     
     plt.savefig('boxcompare_lineage.png')
     
@@ -137,7 +137,7 @@ def main():
     plt.ylim(-max_error-2.5, max_error+2.5)
     plt.tight_layout()
     
-    plt.grid(axis='y', color='1.2')
+    plt.grid(axis='y', color='0.8')
     
     plt.savefig('boxcompare_superlineage.png')
 
