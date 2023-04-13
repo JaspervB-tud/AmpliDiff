@@ -24,6 +24,8 @@ def main():
     errors_amp = {}
     errors_super_amp = {}
     
+    max_error = 0
+    
     #Initialize error dicts and fill lineages list with lineages that are both in refset and simset
     with open(args.intersect, 'r') as f:
         for line in f:
@@ -41,6 +43,7 @@ def main():
                     line = line.split(';')
                     if line[0] in lineages:
                         errors_amp[line[0]][seed-1] = float(line[1])
+                        max_error = max(max_error, abs(float(line[1])))
         with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors.csv', 'r') as f:
             for line in f:
                 line = line.strip()
@@ -48,6 +51,7 @@ def main():
                     line = line.split(';')
                     if line[0] in lineages:
                         errors_wgs[line[0]][seed-1] = float(line[1])
+                        max_error = max(max_error, abs(float(line[1])))
                     
     print('Lineages')
     print(lineages)
@@ -71,9 +75,13 @@ def main():
     set_box_color(bp_left, 'red')
     set_box_color(bp_right, 'blue')
     
-    plt.xticks(range(0, len(lineages)*2, 2), lineages)
+    plt.plot([], color='red', label='WGS')
+    plt.plot([], color='blue', label='AMP')
+    plt.legend()
+    
+    plt.xticks(range(0, len(lineages)*2, 2), lineages, rotation=90)
     plt.xlim(-2, len(lineages)*2)
-    plt.ylim(-30,30)
+    plt.ylim(-max_error-5, max_error+5)
     plt.tight_layout()
     plt.savefig('boxcompare.png')
 
