@@ -75,6 +75,8 @@ def main():
                     if line[0] not in super_lineages:
                         super_lineages.append(line[0])
                         errors_super_wgs[line[0]] = np.zeros((args.num_seeds))
+                    if line[0] not in errors_super_wgs:
+                        errors_super_wgs[line[0]] = np.zeros((args.num_seeds))
                     errors_super_wgs[line[0]][seed-1] = float(line[1])
                     max_super_error = max(max_super_error, abs(float(line[1])))
                     
