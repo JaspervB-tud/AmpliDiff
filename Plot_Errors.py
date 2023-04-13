@@ -40,6 +40,7 @@ def main():
                     super_lineages.append(line.split('.')[0] + '.' + line.split('.')[1])
                 else:
                     super_lineages.append(line)
+    print(super_lineages)
                 
     for seed in range(1,args.num_seeds+1):
         #Find "normal" errors
