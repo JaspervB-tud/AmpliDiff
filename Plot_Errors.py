@@ -123,8 +123,8 @@ def main():
     data_amp = [list(errors_super_amp[lineage]) for lineage in super_lineages]
     data_wgs = [list(errors_super_wgs[lineage]) for lineage in super_lineages]
     
-    bp_left = plt.boxplot(data_wgs, positions=np.array(range(len(data_amp)))*2.0-0.4, sym='', widths=0.6)
-    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*2.0+0.4, sym='', widths=0.6)
+    bp_left = plt.boxplot(data_wgs, positions=np.array(range(len(data_amp)))*2.0-0.4, sym='', widths=0.6, vert=False)
+    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*2.0+0.4, sym='', widths=0.6, vert=False)
     set_box_color(bp_left, 'red')
     set_box_color(bp_right, 'blue')
     
