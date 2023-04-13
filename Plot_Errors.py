@@ -132,9 +132,9 @@ def main():
     plt.plot([], color='blue', label='AMP')
     plt.legend()
     
-    plt.xticks(range(0, len(super_lineages)*2, 2), super_lineages, rotation=90)
-    plt.xlim(-2, len(super_lineages)*2)
-    plt.ylim(-max_error-2.5, max_error+2.5)
+    plt.yticks(range(0, len(super_lineages)*2, 2), super_lineages, rotation=90)
+    plt.ylim(-2, len(super_lineages)*2)
+    plt.xlim(-max_error-2.5, max_error+2.5)
     plt.tight_layout()
     
     plt.grid(axis='y', color='0.8')
