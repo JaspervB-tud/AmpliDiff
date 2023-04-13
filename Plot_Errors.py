@@ -132,14 +132,14 @@ def main():
     plt.plot([], color='blue', label='AMP')
     plt.legend()
     
-    plt.yticks(range(0, len(super_lineages)*2, 2), super_lineages)
+    plt.yticks(range(0, len(super_lineages)*3, 3), super_lineages)
     plt.ylim(-2, len(super_lineages)*2)
-    plt.xlim(-max_error-2.5, max_error+2.5)
+    plt.xlim(-max_error-1, max_error+1)
     plt.tight_layout()
     
     plt.grid(axis='x', color='0.8')
     
-    plt.savefig('boxcompare_superlineage.png')
+    plt.savefig('boxcompare_superlineage.png', dpi=400)
 
 if __name__ == '__main__':
     main()
