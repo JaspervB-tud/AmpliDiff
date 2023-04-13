@@ -14,7 +14,9 @@ def main():
     
     lineages = []
     errors_wgs = {}
+    errors_super_wgs = {}
     errors_amp = {}
+    errors_super_amp = {}
     
     #Initialize error dicts and fill lineages list with lineages that are both in refset and simset
     with open(args.intersect, 'r') as f:
@@ -33,6 +35,13 @@ def main():
                     line = line.split(';')
                     if line[0] in lineages:
                         errors_amp[line[0]][seed-1] = float(line[1])
+        with open(args.amplicon_input + '/Seed_' + str(seed) + '/results/estimation_errors_super.csv', 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line != '':
+                    line = line.split(';')
+                    if line[0] in lineages:
+                        errors_super_amp[line[0]][seed-1] = float(line[1])
         with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors.csv', 'r') as f:
             for line in f:
                 line = line.strip()
@@ -40,6 +49,13 @@ def main():
                     line = line.split(';')
                     if line[0] in lineages:
                         errors_wgs[line[0]][seed-1] = float(line[1])
+        with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors_super.csv', 'r') as f:
+            for line in f:
+                line = line.strip()
+                if line != '':
+                    line = line.split(';')
+                    if line[0] in lineages:
+                        errors_super_wgs[line[0]][seed-1] = float(line[1])
                     
     print(lineages)
     print(errors_wgs)
