@@ -113,12 +113,12 @@ def main():
     plt.plot([], color='blue', label='AMP')
     plt.legend()
     
-    plt.xticks(range(0, len(lineages)*3, 3), lineages, rotation=90)
-    plt.xlim(-3, len(lineages)*3)
-    plt.ylim(-max_error-1, max_error+1)
+    plt.yticks(range(0, len(lineages)*3, 3), lineages, rotation=90)
+    plt.ylim(-3, len(lineages)*3)
+    plt.xlim(-max_error-1, max_error+1)
     plt.tight_layout()
     
-    plt.grid(axis='y', color='0.8')
+    plt.grid(axis='x', color='0.8')
     
     plt.savefig('boxcompare_lineage.png')
     
