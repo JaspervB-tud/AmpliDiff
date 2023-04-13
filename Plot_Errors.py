@@ -73,7 +73,7 @@ def main():
     
     plt.xticks(range(0, len(lineages)*2, 2), lineages)
     plt.xlim(-2, len(lineages)*2)
-    plt.ylim(-50,50)
+    plt.ylim(-30,30)
     plt.tight_layout()
     plt.savefig('boxcompare.png')
 
