@@ -119,6 +119,9 @@ def main():
     plt.tight_layout()
     
     plt.grid(color='0.8')
+    plt.grid(axis='x', color='1')
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['right'].set_visible(False)
     
     plt.savefig('boxcompare_lineage.png', dpi=400)
     
@@ -144,6 +147,8 @@ def main():
     plt.tight_layout()
     
     plt.grid(axis='x', color='0.8')
+    plt.gca().spines['top'].set_visible(False)
+    plt.gca().spines['right'].set_visible(False)
     
     plt.savefig('boxcompare_superlineage.png', dpi=400)
 
