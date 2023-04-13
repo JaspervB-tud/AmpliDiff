@@ -104,8 +104,8 @@ def main():
     data_amp = [list(errors_amp[lineage]) for lineage in lineages]
     data_wgs = [list(errors_wgs[lineage]) for lineage in lineages]
     
-    bp_left = plt.boxplot(data_wgs, positions=np.array(range(len(data_amp)))*2.0-0.4, sym='', widths=0.6)
-    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*2.0+0.4, sym='', widths=0.6)
+    bp_left = plt.boxplot(data_wgs, positions=np.array(range(len(data_amp)))*3.0-0.4, sym='', widths=0.6, vert=False)
+    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*3.0+0.4, sym='', widths=0.6, vert=False)
     set_box_color(bp_left, 'red')
     set_box_color(bp_right, 'blue')
     
@@ -113,9 +113,9 @@ def main():
     plt.plot([], color='blue', label='AMP')
     plt.legend()
     
-    plt.xticks(range(0, len(lineages)*2, 2), lineages, rotation=90)
-    plt.xlim(-2, len(lineages)*2)
-    plt.ylim(-max_error-2.5, max_error+2.5)
+    plt.xticks(range(0, len(lineages)*3, 3), lineages, rotation=90)
+    plt.xlim(-3, len(lineages)*3)
+    plt.ylim(-max_error-1, max_error+1)
     plt.tight_layout()
     
     plt.grid(axis='y', color='0.8')
@@ -129,8 +129,8 @@ def main():
     data_amp = [list(errors_super_amp[lineage]) for lineage in super_lineages]
     data_wgs = [list(errors_super_wgs[lineage]) for lineage in super_lineages]
     
-    bp_left = plt.boxplot(data_wgs, positions=np.array(range(len(data_amp)))*3.0-0.4, sym='', widths=1.2, vert=False)
-    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*3.0+0.4, sym='', widths=1.2, vert=False)
+    bp_left = plt.boxplot(data_wgs, positions=np.array(range(len(data_amp)))*3.0-0.4, sym='', widths=0.6, vert=False)
+    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*3.0+0.4, sym='', widths=0.6, vert=False)
     set_box_color(bp_left, 'red')
     set_box_color(bp_right, 'blue')
     
