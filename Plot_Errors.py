@@ -2,24 +2,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
-def setBoxColors(bp):
-    plt.setp(bp['boxes'][0], color='blue')
-    plt.setp(bp['caps'][0], color='blue')
-    plt.setp(bp['caps'][1], color='blue')
-    plt.setp(bp['whiskers'][0], color='blue')
-    plt.setp(bp['whiskers'][1], color='blue')
-    plt.setp(bp['fliers'][0], color='blue')
-    plt.setp(bp['fliers'][1], color='blue')
-    plt.setp(bp['medians'][0], color='blue')
-
-    plt.setp(bp['boxes'][1], color='red')
-    plt.setp(bp['caps'][2], color='red')
-    plt.setp(bp['caps'][3], color='red')
-    plt.setp(bp['whiskers'][2], color='red')
-    plt.setp(bp['whiskers'][3], color='red')
-    plt.setp(bp['fliers'][2], color='red')
-    plt.setp(bp['fliers'][3], color='red')
-    plt.setp(bp['medians'][1], color='red')
+def set_box_color(bp, color):
+    plt.setp(bp['boxes'], color=color)
+    plt.setp(bp['whiskers'], color=color)
+    plt.setp(bp['caps'], color=color)
+    plt.setp(bp['medians'], color=color)
 
 def main():
     parser = argparse.ArgumentParser(description='Generates plots based on error files in input folder')
@@ -75,14 +62,19 @@ def main():
     
     fig = plt.figure()
     ax = plt.axes()
-    plt.hold(True)
-    for i in range(len(lineages)):
-        bp = plt.boxplot([errors_wgs[lineages[i]], errors_amp[lineages[i]]], positions=[1+3*i, 2+3*i], widths=0.5)
-        plt.setBoxColors(bp)
-    plt.xlim(0, 3*len(lineages))
-    plt.ylim(0, 100)
-    ax.set_xticklabels(lineages)
-    ax.set_xticks([1.5*(i+1) for i in range(len(lineages))])
+    
+    data_amp = [list(errors_amp[lineage]) for lineage in lineages]
+    data_wgs = [list(errors_wgs[lineage]) for lineage in lineages]
+    
+    bp_left = plt.boxplot(data_wgs, potitions=np.array(range(len(data_amp)))*2.0-0.4, sym='', widths=0.6)
+    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*2.0+0.4, sym='', widths=0.6)
+    set_box_color(bp_left, 'red')
+    set_box_color(bp_right, 'blue')
+    
+    plt.xticks(range(0, len(lineages)), lineages)
+    plt.xlim(-2, len(lineages)*2)
+    plt.ylim(0,100)
+    plt.tight_layout()
     plt.savefig('boxcompare.png')
 
 if __name__ == '__main__':
