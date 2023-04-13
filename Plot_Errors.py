@@ -146,7 +146,8 @@ def main():
     plt.xlim(-max_super_error-1, max_super_error+1)
     plt.tight_layout()
     
-    plt.grid(axis='x', color='0.8')
+    plt.grid(color='0.8')
+    plt.axvline(x=0, color='black', alpha=0.75, linewidth=0.5)
     plt.gca().spines['top'].set_visible(False)
     plt.gca().spines['right'].set_visible(False)
     
