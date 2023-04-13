@@ -81,8 +81,11 @@ def main():
     
     plt.xticks(range(0, len(lineages)*2, 2), lineages, rotation=90)
     plt.xlim(-2, len(lineages)*2)
-    plt.ylim(-max_error-5, max_error+5)
+    plt.ylim(-max_error-2.5, max_error+2.5)
     plt.tight_layout()
+    
+    plt.grid(axis='y', color='0.95')
+    
     plt.savefig('boxcompare.png')
 
 if __name__ == '__main__':
