@@ -118,7 +118,7 @@ def main():
     plt.xlim(-max_error-1, max_error+1)
     plt.tight_layout()
     
-    plt.grid(axis='x', color='0.8')
+    plt.grid(color='0.8')
     
     plt.savefig('boxcompare_lineage.png', dpi=400)
     
