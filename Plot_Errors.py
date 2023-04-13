@@ -119,7 +119,7 @@ def main():
     plt.tight_layout()
     
     plt.grid(color='0.8')
-    plt.grid(axis='x', color='1')
+    plt.plot(0*np.array(range(len(data_amp))), np.array(range(-3, len(super_lineages)*3, len(data_amp))), color='black')
     plt.gca().spines['top'].set_visible(False)
     plt.gca().spines['right'].set_visible(False)
     
