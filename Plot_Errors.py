@@ -37,13 +37,15 @@ def main():
                 errors_wgs[line] = np.zeros((args.num_seeds))
                 errors_amp[line] = np.zeros((args.num_seeds))
                 if len(line.split('.')) > 1:
-                    super_lineages.append(line.split('.')[0] + '.' + line.split('.')[1])
-                    errors_super_wgs[line.split('.')[0] + '.' + line.split('.')[1]] = np.zeros((args.num_seeds))
-                    errors_super_amp[line.split('.')[0] + '.' + line.split('.')[1]] = np.zeros((args.num_seeds))
+                    if line.split('.')[0] + '.' + line.split('.')[1] not in super_lineages:
+                        super_lineages.append(line.split('.')[0] + '.' + line.split('.')[1])
+                        errors_super_wgs[line.split('.')[0] + '.' + line.split('.')[1]] = np.zeros((args.num_seeds))
+                        errors_super_amp[line.split('.')[0] + '.' + line.split('.')[1]] = np.zeros((args.num_seeds))
                 else:
-                    super_lineages.append(line)
-                    errors_super_wgs[line] = np.zeros((args.num_seeds))
-                    errors_super_amp[line] = np.zeros((args.num_seeds))
+                    if line not in super_lineages:
+                        super_lineages.append(line)
+                        errors_super_wgs[line] = np.zeros((args.num_seeds))
+                        errors_super_amp[line] = np.zeros((args.num_seeds))
                     
     print(super_lineages)
                 
