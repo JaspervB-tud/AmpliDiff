@@ -36,6 +36,10 @@ def main():
                 lineages.append(line)
                 errors_wgs[line] = np.zeros((args.num_seeds))
                 errors_amp[line] = np.zeros((args.num_seeds))
+                if len(line.split('.')) > 1:
+                    super_lineages.append(line.split('.')[0] + '.' + line.split('.')[1])
+                else:
+                    super_lineages.append(line)
                 
     for seed in range(1,args.num_seeds+1):
         #Find "normal" errors
@@ -62,23 +66,17 @@ def main():
                 line = line.strip()
                 if line != '':
                     line = line.split(';')
-                    if line[0] not in super_lineages:
-                        super_lineages.append(line[0])
-                        errors_super_amp[line[0]] = np.zeros((args.num_seeds))
-                    errors_super_amp[line[0]][seed-1] = float(line[1])
-                    max_super_error = max(max_super_error, abs(float(line[1])))
+                    if line[0] in super_lineages:
+                        errors_super_amp[line[0]][seed-1] = float(line[1])
+                        max_super_error = max(max_super_error, abs(float(line[1])))
         with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors_super.csv', 'r') as f:
             for line in f:
                 line = line.strip()
                 if line != '':
                     line = line.split(';')
-                    if line[0] not in super_lineages:
-                        super_lineages.append(line[0])
-                        errors_super_wgs[line[0]] = np.zeros((args.num_seeds))
-                    if line[0] not in errors_super_wgs:
-                        errors_super_wgs[line[0]] = np.zeros((args.num_seeds))
-                    errors_super_wgs[line[0]][seed-1] = float(line[1])
-                    max_super_error = max(max_super_error, abs(float(line[1])))
+                    if line[0] in super_lineages:
+                        errors_super_wgs[line[0]][seed-1] = float(line[1])
+                        max_super_error = max(max_super_error, abs(float(line[1])))
                     
     print('Lineages')
     print(lineages)
@@ -123,8 +121,8 @@ def main():
     data_amp = [list(errors_super_amp[lineage]) for lineage in super_lineages]
     data_wgs = [list(errors_super_wgs[lineage]) for lineage in super_lineages]
     
-    bp_left = plt.boxplot(data_wgs, positions=np.array(range(len(data_amp)))*2.0-0.4, sym='', widths=1.2, vert=False)
-    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*2.0+0.4, sym='', widths=1.2, vert=False)
+    bp_left = plt.boxplot(data_wgs, positions=np.array(range(len(data_amp)))*3.0-0.4, sym='', widths=1.2, vert=False)
+    bp_right = plt.boxplot(data_amp, positions=np.array(range(len(data_wgs)))*3.0+0.4, sym='', widths=1.2, vert=False)
     set_box_color(bp_left, 'red')
     set_box_color(bp_right, 'blue')
     
@@ -133,7 +131,7 @@ def main():
     plt.legend()
     
     plt.yticks(range(0, len(super_lineages)*3, 3), super_lineages)
-    plt.ylim(-2, len(super_lineages)*2)
+    plt.ylim(-3, len(super_lineages)*3)
     plt.xlim(-max_error-1, max_error+1)
     plt.tight_layout()
     
