@@ -22,8 +22,8 @@ def main():
             line = line.strip()
             if line != '':
                 lineages.append(line)
-                errors_wgs[line] = []
-                errors_amp[line] = []
+                errors_wgs[line] = np.zeros((args.num_seeds))
+                errors_amp[line] = np.zeros((args.num_seeds))
                 
     for seed in range(1,args.num_seeds+1):
         with open(args.amplicon_input + '/Seed_' + str(seed) + '/results/estimation_errors.csv', 'r') as f:
@@ -31,13 +31,13 @@ def main():
                 line = line.strip()
                 if line != '':
                     line = line.split(';')
-                    errors_amp[line[0]] = float(line[1])
+                    errors_amp[line[0]][seed-1] = float(line[1])
         with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors.csv', 'r') as f:
             for line in f:
                 line = line.strip()
                 if line != '':
                     line = line.split(';')
-                    errors_wgs[line[0]] = float(line[1])
+                    errors_wgs[line[0]][seed-1] = float(line[1])
                     
     print(lineages)
     print(errors_wgs)
