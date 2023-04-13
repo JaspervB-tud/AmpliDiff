@@ -138,7 +138,7 @@ def main():
     
     plt.yticks(range(0, len(super_lineages)*3, 3), super_lineages)
     plt.ylim(-3, len(super_lineages)*3)
-    plt.xlim(-max_error-1, max_error+1)
+    plt.xlim(-max_super_error-1, max_super_error+1)
     plt.tight_layout()
     
     plt.grid(axis='x', color='0.8')
