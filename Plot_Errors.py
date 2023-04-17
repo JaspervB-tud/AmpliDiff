@@ -34,7 +34,7 @@ def main():
                     errors_wgs[line] = np.zeros((args.num_seeds))
                     errors_amp[line] = np.zeros((args.num_seeds))
                     
-        lineages.sort()
+        lineages.sort(reverse=True)
                     
         for seed in range(1, args.num_seeds+1):
             #WGS
@@ -80,6 +80,8 @@ def main():
         plt.axvline(x=0, color='black', alpha=0.75, linewidth=0.5)
         plt.gca().spines['top'].set_visible(False)
         plt.gca().spines['right'].set_visible(False)
+        
+        ax.axis["left"].major_ticklabels.set_ha("left")
         
         plt.savefig(args.output + '/estimation_errors_plot_depth=' + str(depth) + '.png', dpi=400)
 
