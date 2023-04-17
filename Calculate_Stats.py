@@ -56,7 +56,7 @@ def main():
             for coverage in coverages:
                 for amplicon_width in amplicon_widths:
                     for amplicon in num_amplicons:
-                        cur_line += 'mean=' + str(MSE[(coverage, amplicon_width, amplicons, depth)]) + ', std=' + str(MSE[(coverage, amplicon_width, amplicons, depth)]) + ';'
+                        cur_line += 'mean=' + str(MSE[(coverage, amplicon_width, amplicons, depth)][0]) + ', std=' + str(MSE[(coverage, amplicon_width, amplicons, depth)][1]) + ';'
             f.write(cur_line[:-1] + '\n')
 
 if __name__ == '__main__':
