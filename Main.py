@@ -432,7 +432,7 @@ def run_plot_amplicons(args):
         cur_amplicon = amplicons[i]
         cur_coverage = coverages[i]
         #Amplicons
-        cur_line, = plt.plot([cur_amplicon[0], cur_amplicon[1]], [cur_coverage, cur_coverage], label='Amplicon ' + str(i+1), linewidth=3)
+        cur_line, = plt.plot([cur_amplicon[0], cur_amplicon[1]], [cur_coverage, cur_coverage], label='Amplicon ' + str(i+1), linewidth=4)
         plt.plot([cur_amplicon[0]]*2, [0, cur_coverage], color=cur_line.get_color(), linestyle='--', alpha=0.5)
         plt.plot([cur_amplicon[1]]*2, [0, cur_coverage], color=cur_line.get_color(), linestyle='--', alpha=0.5)
         plt.plot([cur_amplicon[0], cur_amplicon[1]], [0,0], color=cur_line.get_color(), linewidth=3, alpha=0.8)
@@ -441,19 +441,19 @@ def run_plot_amplicons(args):
     color_index = 0
     for region in regions:
         plt.axvspan(annotations[region][0], annotations[region][1], color=colors[color_index % 2], alpha=0.2)
-        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.8), color='black', alpha=0.6, size=8, ha='center', rotation=90)
+        plt.annotate(region, ((annotations[region][0] + annotations[region][1])/2, 0.8), color='black', alpha=0.6, size=10, ha='center', rotation=90)
         color_index += 1
     #Plot differences
-    plt.plot([d/total_differences for d in differences], color='black', alpha=0.3, linewidth=0.5)
+    plt.plot([d/total_differences for d in differences], color='black', alpha=0.3, linewidth=1)
     #Figure makeup
-    plt.xlabel('Nucleotide index', size=5)
-    plt.ylabel('Relative number of sequence pairs differentiated', size=5)
+    plt.xlabel('Nucleotide index', size=15)
+    plt.ylabel('Relative number of sequence pairs differentiated', size=15)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     if args.coverage >= 1:
-        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%%')
+        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%', size=20)
     else:
-        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%%, beta=' + str(args.beta))
+        plt.title('Chosen amplicons width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%, beta=' + str(args.beta), size=20)
     plt.ylim([0, 1])
     plt.draw()
     plt.savefig(args.output + '/amplicons_' + str(args.seed) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
@@ -464,20 +464,20 @@ def run_plot_amplicons(args):
     #Plot amplicon coverages
     for i in range(len(amplicons)):
         plt.plot([i+1, i+1], [0, sum(coverages[:i+1])], linewidth=2, color='black', alpha=0.6)
-    plt.plot(range(1, len(amplicons)+1), [sum(coverages[:i+1]) for i in range(len(amplicons))], 'ro', markersize=3)
+    plt.plot(range(1, len(amplicons)+1), [sum(coverages[:i+1]) for i in range(len(amplicons))], 'ro', markersize=5)
     plt.plot(range(len(amplicons)+1), [sum(coverages)]*(len(amplicons)+1), color='red', linewidth=1.5, alpha=0.4)
-    plt.annotate('{0:.4f}'.format(sum(coverages)), (len(amplicons), sum(coverages)+0.05), color='black', ha='center')
+    plt.annotate('{0:.4f}'.format(sum(coverages)), (len(amplicons), sum(coverages)+0.05), color='black', ha='center', size=10)
     plt.ylim([0, 1])
     plt.xlim([0, len(amplicons) + 1])
-    plt.xticks(range(1, len(amplicons)+1), [str(amplicon) for amplicon in amplicons], rotation=45)
-    plt.xlabel('Amplicon', size=8)
-    plt.ylabel('Cumulative relative number of sequence pairs differentiated', size=8)
+    plt.xticks(range(1, len(amplicons)+1), [str(amplicon) for amplicon in amplicons], rotation=45, size=10)
+    plt.xlabel('Amplicon', size=15)
+    plt.ylabel('Cumulative relative number of sequence pairs differentiated', size=15)
     ax.spines['right'].set_visible(False)
     ax.spines['top'].set_visible(False)
     if args.coverage >= 1:
-        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) +'%%')
+        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) +'%', size=20)
     else:
-        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%%, beta=' + str(args.beta))
+        plt.title('Cumulative amplicon coverage, width=' + str(args.amplicon_width) + ', coverage=' + str(args.coverage*100) + '%, beta=' + str(args.beta), size=20)
     plt.savefig(args.output + '/amplicons_cumulative_' + str(args.seed) + '.pdf', figsize=[20,10], dpi=200, format='pdf')
 
 def run_comparison(args):
