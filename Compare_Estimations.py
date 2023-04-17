@@ -113,12 +113,15 @@ def main():
     max_depth = 0 #maximum "length" of a lineage (e.g. B.1.1.117 has depth 4)
     
     #Determine simulated abundances
+    TOT = 0
     for sequence in sequences:
         if sequence.lineage not in real_abundances:
             real_abundances[sequence.lineage] = 0
         real_abundances[sequence.lineage] += 100/len(sequences) #percentage of sequences per lineage
+        TOT += 100/len(sequences)
         simulated_lineages.add(sequence.lineage)
         max_depth = max(max_depth, len(aliases[sequence.lineage].split('.')))
+    print('total real:', TOT)
     #Determine estimated abundances
     TOT = 0
     with open(args.abundances_path, 'r') as f:
