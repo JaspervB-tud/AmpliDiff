@@ -52,11 +52,20 @@ def main():
     with open(args.output + '/MSE_stats.csv', 'w') as f:
         f.write(header[:-1] + '\n')
         for depth in depths:
-            cur_line = '' + depth
+            cur_line = '' + depth + ';'
             for coverage in coverages:
                 for amplicon_width in amplicon_widths:
                     for amplicon in num_amplicons:
                         cur_line += 'mean=' + str(MSE[(coverage, amplicon_width, amplicons, depth)][0]) + ', std=' + str(MSE[(coverage, amplicon_width, amplicons, depth)][1]) + ';'
+            f.write(cur_line[:-1] + '\n')
+    with open(args.output + '/MAE_stats.csv', 'w') as f:
+        f.write(header[:-1] + '\n')
+        for depth in depths:
+            cur_line = '' + depth + ';'
+            for coverage in coverages:
+                for amplicon_width in amplicon_widths:
+                    for amplicon in num_amplicons:
+                        cur_line += 'mean=' + str(MAE[(coverage, amplicon_width, amplicons, depth)][0]) + ', std=' + str(MAE[(coverage, amplicon_width, amplicons, depth)][1]) + ';'
             f.write(cur_line[:-1] + '\n')
 
 if __name__ == '__main__':
