@@ -27,7 +27,6 @@ def main():
     parser = argparse.ArgumentParser(description='Generates output based on error files in input folder')
     parser.add_argument('-i', '--input', type=str, help='Folder containing the seed folders with error files', required=True)
     parser.add_argument('-o', '--output', type=str, help='Folder where output should be stored', required=True)
-    parser.add_argument('--intersect', type=str, help='File containing the lineages that appear in both ref and sim set')
     
     args = parser.parse_args()
     
