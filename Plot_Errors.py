@@ -18,12 +18,13 @@ def main():
     args = parser.parse_args()
     
     max_depth=13 #this is hard-coded, change when needed
-    max_error = 0 #max error used to position figure
     
     for depth in range(1, max_depth+1):
         lineages = []
         errors_wgs = {}
         errors_amp = {}
+        
+        max_error = 0 #Used to determine xlims
         
         #Determine both intersection of lineages, and all lineages to decide which to use
         with open(args.amplicon_input + '/Seed_1/results/intersected_lineages_depth=' + str(depth) + '.csv', 'r') as f:
