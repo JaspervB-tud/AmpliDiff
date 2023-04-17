@@ -120,13 +120,16 @@ def main():
         simulated_lineages.add(sequence.lineage)
         max_depth = max(max_depth, len(aliases[sequence.lineage].split('.')))
     #Determine estimated abundances
+    TOT = 0
     with open(args.abundances_path, 'r') as f:
         for line in f:
             if not '#' in line:
                 line = line.split('\t')
                 estimated_abundances[line[0].strip()] = float(line[-1].strip())
+                TOT += float(line[-1].strip())
                 estimated_lineages.add(line[0].strip())
                 max_depth = max(max_depth, len(aliases[line[0].strip()].split('.')))
+    print('total estimated:', TOT)
     
     #Iterate over different depths, calculate errors and store them
     for depth in range(1, max_depth+1):
