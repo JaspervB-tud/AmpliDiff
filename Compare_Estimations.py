@@ -36,6 +36,11 @@ def calculate_errors(estimated_abundances, real_abundances, aliases, depth=1000)
         else:
             errors[current_lineage] += estimated_abundances[lineage] - real_abundances[lineage]
             intersected_lineages.add(current_lineage)
+            
+    S = 0
+    for lineage in errors:
+        S += errors[lineage]
+    print(S)
     
     return errors, intersected_lineages
 
