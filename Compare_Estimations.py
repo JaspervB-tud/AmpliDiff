@@ -16,6 +16,7 @@ def extract_lineages(PANGO_lineages_file):
 
 def calculate_errors(estimated_abundances, real_abundances, aliases, depth=1000):
     errors = {}
+    intersected_lineages = set()
     
     for lineage in estimated_abundances:
         current_lineage = '.'.join(aliases[lineage].split('.')[:depth])
@@ -25,6 +26,7 @@ def calculate_errors(estimated_abundances, real_abundances, aliases, depth=1000)
             errors[current_lineage] += estimated_abundances[lineage]
         else:
             errors[current_lineage] += estimated_abundances[lineage] - real_abundances[lineage]
+            intersected_lineages.add(current_lineage)
     for lineage in real_abundances:
         current_lineage = '.'.join(aliases[lineage].split('.')[:depth])
         if current_lineage not in errors:
@@ -33,9 +35,11 @@ def calculate_errors(estimated_abundances, real_abundances, aliases, depth=1000)
             errors[current_lineage]  += -real_abundances[lineage]
         else:
             errors[current_lineage] += estimated_abundances[lineage] - real_abundances[lineage]
+            intersected_lineages.add(current_lineage)
     
-    return errors
+    return errors, intersected_lineages
 
+"""
 def determine_superlineages(lineages):
     super_lineages = {}
     for lineage in lineages:
@@ -81,7 +85,7 @@ def calculate_errors(lineages, super_lineages, estimated_abundances, real_abunda
     
     return errors, super_errors, MSE, MSE_super, MAE, MAE_super
             
-        
+"""   
 
 def main():
     parser = argparse.ArgumentParser(description='Generates .txt files with estimation outcome comparisons with real abundances')
@@ -100,7 +104,6 @@ def main():
     
     simulated_lineages = set() #all lineages in the simulated dataset
     estimated_lineages = set() #all lineages in the reference set
-    intersect_lineages = set() #lineages that are both in simulated and reference set
     
     max_depth = 0 #maximum "length" of a lineage (e.g. B.1.1.117 has depth 4)
     
@@ -119,19 +122,23 @@ def main():
                 estimated_abundances[line[0].strip()] = float(line[-1].strip())
                 estimated_lineages.add(line[0].strip())
                 max_depth = max(max_depth, len(aliases[line[0].strip()].split('.')))
-    #Determine lineages occurring in both simulation and ref set
-    intersect_lineages = simulated_lineages.intersection(estimated_lineages)
     
     #Iterate over different depths, calculate errors and store them
     for depth in range(1, max_depth+1):
-        errors = calculate_errors(estimated_abundances, real_abundances, aliases, depth=depth)
-        
+        errors, cur_intersected_lineages = calculate_errors(estimated_abundances, real_abundances, aliases, depth=depth)
+        print('Current depth:', depth)
+        print('MSE')
+        #Store estimation errors at current depth
+        with open(args.output_folder + '/estimation_errors_depth=' + str(depth) + '.csv', 'w') as f:
+            for lineage in errors:
+                f.write(lineage + ';' + str(errors[lineage]) + '\n')
+        #Store lineages in ref and sim set at current depth
+        with open(args.output_folder + '/intersected_lineages_depth=' + str(depth) + '.csv', 'w') as f:
+            for lineage in cur_intersected_lineages:
+                f.write(lineage + '\n')
     
     
-    
-    
-    
-    
+    """
     #Store real and estimated abundances, and errors
     real_abundances = {} #at lineage level
     real_super_abundances = {} #at super lineage level
@@ -196,6 +203,6 @@ def main():
     print('MSE (super) (new)', MSE_super)
     print('MAE (super) (new)', MAE_super)
     print(super_errors)
-    
+    """
 if __name__ == '__main__':
     main()
