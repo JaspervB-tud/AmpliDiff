@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import stats
+import argparse
 
 def main():
     parser = argparse.ArgumentParser(description='Generate summary statistics for all simulation results')
