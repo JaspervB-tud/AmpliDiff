@@ -22,8 +22,8 @@ def main():
             for amplicons in num_amplicons:
                 cur_path = args.input + '/Amplicon_' + amplicon_width + '/Coverage_' + coverage
                 if coverage != '1.000':
-                    cur_path += '/beta_0.05/'
-                cur_path += 'Simulation_' + amplicons
+                    cur_path += '/beta_0.05'
+                cur_path += '/Simulation_' + amplicons
                 for depth in depths:
                     #Calculate MAE stats
                     cur_values = []
