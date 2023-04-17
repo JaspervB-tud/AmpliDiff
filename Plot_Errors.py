@@ -81,8 +81,6 @@ def main():
         plt.gca().spines['top'].set_visible(False)
         plt.gca().spines['right'].set_visible(False)
         
-        ax.axis["left"].major_ticklabels.set_ha("left")
-        
         plt.savefig(args.output + '/estimation_errors_plot_depth=' + str(depth) + '.png', dpi=400)
 
 if __name__ == '__main__':
