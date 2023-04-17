@@ -25,16 +25,16 @@ def calculate_errors(estimated_abundances, real_abundances, aliases, depth=1000)
         if lineage not in real_abundances:
             errors[current_lineage] += estimated_abundances[lineage]
         else:
-            errors[current_lineage] += estimated_abundances[lineage] - real_abundances[lineage]
+            errors[current_lineage] += (estimated_abundances[lineage] - real_abundances[lineage])
             intersected_lineages.add(current_lineage)
     for lineage in real_abundances:
         current_lineage = '.'.join(aliases[lineage].split('.')[:depth])
         if current_lineage not in errors:
             errors[current_lineage] = 0
         if lineage not in estimated_abundances:
-            errors[current_lineage]  += -real_abundances[lineage]
+            errors[current_lineage]  -= real_abundances[lineage]
         else:
-            errors[current_lineage] += estimated_abundances[lineage] - real_abundances[lineage]
+            errors[current_lineage] += (estimated_abundances[lineage] - real_abundances[lineage])
             intersected_lineages.add(current_lineage)
             
     S = 0
