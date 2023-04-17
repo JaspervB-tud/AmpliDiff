@@ -34,6 +34,8 @@ def main():
                     errors_wgs[line] = np.zeros((args.num_seeds))
                     errors_amp[line] = np.zeros((args.num_seeds))
                     
+        lineages.sort()
+                    
         for seed in range(1, args.num_seeds+1):
             #WGS
             with open(args.wgs_input + '/Seed_' + str(seed) + '/results/estimation_errors_depth=' + str(depth) + '.csv', 'r') as f:
