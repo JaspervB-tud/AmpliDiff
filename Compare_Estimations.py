@@ -126,8 +126,14 @@ def main():
     #Iterate over different depths, calculate errors and store them
     for depth in range(1, max_depth+1):
         errors, cur_intersected_lineages = calculate_errors(estimated_abundances, real_abundances, aliases, depth=depth)
+        MSE = 0
+        MAE = 0
         print('Current depth:', depth)
-        print('MSE')
+        for lineage in errors:
+            MSE += (errors[lineage]**2) / len(list(errors.keys()))
+            MAE += abs(errors[lineage]) / len(list(errors.keys()))
+        print('MSE', MSE)
+        print('MAE', MAE)
         #Store estimation errors at current depth
         with open(args.output_folder + '/estimation_errors_depth=' + str(depth) + '.csv', 'w') as f:
             for lineage in errors:
