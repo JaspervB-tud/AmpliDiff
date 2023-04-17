@@ -55,7 +55,7 @@ def main():
             cur_line = '' + depth + ';'
             for amplicon_width in amplicon_widths:
                 for coverage in coverages:
-                    for amplicon in num_amplicons:
+                    for amplicons in num_amplicons:
                         cur_line += 'mean=' + str(MSE[(coverage, amplicon_width, amplicons, depth)][0]) + ', std=' + str(MSE[(coverage, amplicon_width, amplicons, depth)][1]) + ';'
             f.write(cur_line[:-1] + '\n')
     with open(args.output + '/MAE_stats.csv', 'w') as f:
@@ -64,7 +64,7 @@ def main():
             cur_line = '' + depth + ';'
             for amplicon_width in amplicon_widths:
                 for coverage in coverages:
-                    for amplicon in num_amplicons:
+                    for amplicons in num_amplicons:
                         cur_line += 'mean=' + str(MAE[(coverage, amplicon_width, amplicons, depth)][0]) + ', std=' + str(MAE[(coverage, amplicon_width, amplicons, depth)][1]) + ';'
             f.write(cur_line[:-1] + '\n')
 
