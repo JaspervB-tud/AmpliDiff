@@ -16,6 +16,7 @@ def extract_lineages(PANGO_lineages_file):
 
 def calculate_errors(estimated_abundances, real_abundances, aliases, depth=1000):
     errors = {}
+    lineages = set()
     intersected_lineages = set()
     
     for lineage in estimated_abundances:
@@ -23,13 +24,14 @@ def calculate_errors(estimated_abundances, real_abundances, aliases, depth=1000)
         if current_lineage not in errors:
             errors[current_lineage] = 0
         errors[current_lineage] += estimated_abundances[lineage]
-        if lineage in real_abundances:
-            intersected_lineages.add(current_lineage)
+        lineages.append(current_lineage)
     for lineage in real_abundances:
         current_lineage = '.'.join(aliases[lineage].split('.')[:depth])
         if current_lineage not in errors:
             errors[current_lineage] = 0
-        errors[current_lineage] -= real_abundances[lineage]            
+        errors[current_lineage] -= real_abundances[lineage]  
+        if current_lineage in lineages:
+            intersected_lineages.add(current_lineage)
     return errors, intersected_lineages
 
 def main():
