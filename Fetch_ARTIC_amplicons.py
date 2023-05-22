@@ -655,7 +655,7 @@ def main():
     parser = argparse.ArgumentParser(description='Generate input for ART and Kallisto')
     parser.add_argument('-s', '--sequences_path', type=str, help='Sequences file location', required=True)
     parser.add_argument('-m', '--metadata_path', type=str, help='Metadata file location', required=True)
-    parser.add_argument('b', '--bedfile_path', type=str, help='Bedfile location', required=True)
+    parser.add_argument('-b', '--bedfile_path', type=str, help='Bedfile location', required=True)
     parser.add_argument('-o', '--output_path', type=str, help='Output location (folder)', required=True)
     parser.add_argument('-n', '--num_amplicons', type=int, help='Maximum number of amplicons to consider')
     parser.add_argument('--art', action='store_true')
