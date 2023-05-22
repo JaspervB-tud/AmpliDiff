@@ -390,7 +390,7 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
                 total_binding += 1
         if amplified[2]:
             binding_sites[amplicon[0]] = amplified
-    print('Total amplicons amplifiable in sequence', sequence.id, ':', total_binding)
+    print('Total amplicons amplifiable:', total_binding)
     return binding_sites
 """        
 DEPRECATED VERSION OF LOCATE AMPLICONS    
@@ -587,6 +587,7 @@ def generate_simulationfile(sequences_path, metadata_path, bedfile_path, max_deg
     fasta_list = []
     S = set()
     for sequence in sequences[:]:
+        print(sequence.id)
         S.add(sequence.lineage)
         realized_amplicons = locate_amplicons(sequence.sequence_raw, amplicons, M)
         amplicon_index = 0
