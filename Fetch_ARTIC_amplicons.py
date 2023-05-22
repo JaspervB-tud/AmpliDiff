@@ -655,8 +655,7 @@ def main():
     parser = argparse.ArgumentParser(description='Generate input for ART and Kallisto')
     parser.add_argument('-s', '--sequences_path', type=str, help='Sequences file location', required=True)
     parser.add_argument('-m', '--metadata_path', type=str, help='Metadata file location', required=True)
-    parser.add_argument('-p', '--primerfile_path', type=str, help='Primerfile location', required=True)
-    parser.add_argument('-l', '--logfile_path', type=str, help='Logfile location', required=True)
+    parser.add_argument('b', '--bedfile_path', type=str, help='Bedfile location', required=True)
     parser.add_argument('-o', '--output_path', type=str, help='Output location (folder)', required=True)
     parser.add_argument('-n', '--num_amplicons', type=int, help='Maximum number of amplicons to consider')
     parser.add_argument('--art', action='store_true')
@@ -665,14 +664,14 @@ def main():
     args = parser.parse_args()
     if args.art:
         print('Starting with generating ART input file')
-        ART_input = generate_simulationfile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
+        ART_input = generate_simulationfile(args.sequences_path, args.metadata_path, args.bedfile_path)
         with open(args.output_path + '/ART_input_ARTIC.fasta', 'w') as f:
             for line in ART_input:
                 f.write(line + '\n')
         print('Done with generating ART input file')
     if args.kallisto:
         print('Starting with generating Kallisto input file')
-        Kallisto_input, amplicon_index_dict = generate_kallistofile(args.sequences_path, args.metadata_path, args.logfile_path, args.primerfile_path)
+        Kallisto_input, amplicon_index_dict = generate_kallistofile(args.sequences_path, args.metadata_path, args.bedfile_path)
         with open(args.output_path + '/Kallisto_input_ARTIC.fasta', 'w') as f:
             for line in Kallisto_input:
                 f.write(line)
