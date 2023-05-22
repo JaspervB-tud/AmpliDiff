@@ -365,6 +365,7 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
 
     '''
     binding_sites = {amplicon: None for amplicon in amplicons}
+    total_binding = 0
     #Iterate over amplicons
     for amplicon in amplicons:
         fwd_hits, rev_hits = locate_primers(sequence, amplicons[amplicon], comparison_matrix)
@@ -387,9 +388,10 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
                 #amplified = (fwd, rev+primer_length, True)
                 #NEW: Amplicon excluding primers -> reads and refs will not contain the primers
                 amplified = (fwd+primer_length-1, rev, True)
+                total_binding += 1
         if amplified[2]:
             binding_sites[amplicon[0]] = amplified
-            
+    print('Total amplicons amplifiable:', total_binding)
     return binding_sites
 """        
 DEPRECATED VERSION OF LOCATE AMPLICONS    
