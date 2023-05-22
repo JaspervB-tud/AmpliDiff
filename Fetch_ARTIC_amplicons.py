@@ -380,7 +380,6 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
         fwd_indices = list(fwd_indices)
         rev_indices = list(rev_indices)
         #print(amplicon[0], fwd_indices, rev_indices)
-        
         for fwd, rev in itertools.product(fwd_indices, rev_indices):
             #print(fwd, rev)
             if rev - fwd >= 0 and rev - fwd  < amplified[1] - amplified[0] - primer_length:
@@ -391,7 +390,7 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
                 total_binding += 1
         if amplified[2]:
             binding_sites[amplicon[0]] = amplified
-    print('Total amplicons amplifiable:', total_binding)
+    print('Total amplicons amplifiable in sequence', sequence.id, ':', total_binding)
     return binding_sites
 """        
 DEPRECATED VERSION OF LOCATE AMPLICONS    
@@ -582,6 +581,7 @@ def generate_simulationfile(sequences_path, metadata_path, bedfile_path, max_deg
     '''
     sequences = generate_sequences(sequences_path, metadata_path) #read sequences
     amplicons = read_bedfile(bedfile_path) #generate amplicons from logfile
+    print(amplicons)
     M = generate_opportunistic_matrix() #generate matrix used to determine which nucleotides are identical
     
     fasta_list = []
