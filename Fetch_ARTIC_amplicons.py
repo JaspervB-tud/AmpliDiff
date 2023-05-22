@@ -364,7 +364,7 @@ def locate_amplicons(sequence, amplicons, comparison_matrix, primer_length=25, m
         Dictionary with AmpliVar based amplicons as keys, and realized amplicons as values.
 
     '''
-    binding_sites = {amplicon[0]: None for amplicon in amplicons}
+    binding_sites = {amplicon: None for amplicon in amplicons}
     #Iterate over amplicons
     for amplicon in amplicons:
         fwd_hits, rev_hits = locate_primers(sequence, amplicons[amplicon], comparison_matrix)
@@ -596,6 +596,7 @@ def generate_simulationfile(sequences_path, metadata_path, bedfile_path, max_deg
                 #print(amplicon, realized_amplicons[amplicon][1] - realized_amplicons[amplicon][0])
             else:
                 print('Amplicon', amplicon_index, 'not amplifiable in sequence', sequence.id)
+                print(realized_amplicons[amplicon])
     return fasta_list
 
 def generate_kallistofile(sequences_path, metadata_path, bedfile_path, max_degen=10, max_amplicons=1000, primer_length=25):
