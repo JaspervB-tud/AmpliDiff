@@ -596,9 +596,10 @@ def generate_simulationfile(sequences_path, metadata_path, bedfile_path, max_deg
                 fasta_list.append('>' + sequence.lineage + '_' + sequence.id + '_A' + str(amplicon_index))
                 fasta_list.append(sequence.sequence_raw[realized_amplicons[amplicon][0]:realized_amplicons[amplicon][1]])
                 #print(amplicon, realized_amplicons[amplicon][1] - realized_amplicons[amplicon][0])
+            """
             else:
                 print('Amplicon', amplicon_index, 'not amplifiable in sequence', sequence.id)
-                print(realized_amplicons[amplicon])
+            """
     return fasta_list
 
 def generate_kallistofile(sequences_path, metadata_path, bedfile_path, max_degen=10, max_amplicons=1000, primer_length=25):
