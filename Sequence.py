@@ -18,7 +18,7 @@ class Sequence:
             else:
                 self.lineage_num = len(Sequence.lineage_to_number)
                 Sequence.lineage_to_number[lineage] = len(Sequence.lineage_to_number)
-        self.aligned_to_trim = np.zeros((1))
+        self.aligned_to_trim = np.zeros((1)) #initialize aligned to trim array
         
     def __eq__(self, other):
         try:
@@ -43,7 +43,7 @@ class Sequence:
 
         Returns
         -------
-        np.array[int]
+        np.array
             np.array with indices representing the index of a character in the original sequence, and the element is equal to the corresponding element in the raw sequence.
 
         '''
@@ -80,8 +80,6 @@ class Sequence:
             index such that there are exactly $min_non_align non-alignment characters before it.
 
         '''
-        #lb = self.aligned_to_trim.index(min_non_align) <- old
         lb = np.where(self.aligned_to_trim == min_non_align)[0][0]
-        #ub = self.aligned_to_trim.index(self.length_raw - min_non_align) <- old
         ub = np.where(self.aligned_to_trim == (self.length_raw - min_non_align))[0][0]
         return lb, ub

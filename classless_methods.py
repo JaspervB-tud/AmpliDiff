@@ -1,21 +1,47 @@
 import itertools
 
+########################### Standalone functions ###########################
 def equivalent_characters(c):
+    '''
+    Function that returns a set of non-degenerate nucleotides that are equivalent to the (possibly degenerate) input nucleotide.
+
+    Parameters
+    ----------
+    c : char
+        Nucleotide according to IUPAC notation for which equivalent "base" nucleotides will be returned.
+
+    Returns
+    -------
+    equiv : set
+        Set of characters equivalent to input character according to IUPAC notation.
+
+    '''
     if c == '-':
         return set(['-'])
     else:
-        res = set()
+        equiv = set()
         if c in ['a','r','m','w','d','h','v','n']:
-            res.add('a')
+            equiv.add('a')
         if c in ['c','y','m','s','b','h','v','n']:
-            res.add('c')
+            equiv.add('c')
         if c in ['g','r','k','s','b','d','v','n']:
-            res.add('g')
+            equiv.add('g')
         if c in ['t','y','k','w','b','d','h','n']:
-            res.add('t')
-        return res
+            equiv.add('t')
+        return equiv
 
-def generate_opportunistic_matrix():
+def generate_comparison_matrix():
+    '''
+    Function that constructs a dictionary with pairs of IUPAC nucleotide characters as keys, and a tuple of
+    with booleans (first element is True if characters share at least one non-degenerate nucleotide, and
+    second element is True if either character is a misalignment character) as keys.
+
+    Returns
+    -------
+    res : dict[ (char,char) ] -> (bool, bool)
+        Dictionary with character tuples as keys, and boolean tuples as values.
+
+    '''
     chars = ['a','c','t','g','u','r','y','k','m','s','w','b','d','h','v','n','-']
     char_comp = {
                 'a' : ['a','r','m','w','d','h','v'],
@@ -35,60 +61,25 @@ def generate_opportunistic_matrix():
                 'v' : ['a','c','g','r','y','k','m','s','w','b','d','h','v'],
                 '-' : ['-']
         }
-    res = {}
+    comparison_matrix = {}
     for c1 in chars:
         for c2 in chars:
             if c1 == '-' or c2 == '-':
                 if c1 == c2:
-                    res[(c1,c2)] = (True,True)
+                    comparison_matrix[(c1,c2)] = (True,True)
                 else:
-                    res[(c1,c2)] = (False,True)
+                    comparison_matrix[(c1,c2)] = (False,True)
             elif c1 == 'n' or c2 == 'n':
-                res[(c1,c2)] = (True,False)
+                comparison_matrix[(c1,c2)] = (True,False)
             elif c1 in char_comp[c2] and c2 in char_comp[c1]:
-                res[(c1,c2)] = (True,False)
+                comparison_matrix[(c1,c2)] = (True,False)
             else:
-                res[(c1,c2)] = (False,False)
-    return res
-
-def generate_comparison_table():
-    chars = ['a','c','t','g','u','r','y','k','m','s','w','b','d','h','v','n','-']
-    char_comp = {
-                'a' : ['a','r','m','w','d','h','v'],
-                'c' : ['c','y','m','s','b','h','v'],
-                't' : ['t','y','k','w','b','d','h'],
-                'g' : ['g','r','k','s','b','d','v'],
-                'u' : ['u','y','k','w','b','d','h'],
-                'r' : ['a','g','r','k','m','s','w','b','d','h','v'],
-                'y' : ['c','t','u','y','k','m','s','w','b','d','h','v'],
-                'k' : ['g','t','u','r','y','k','s','w','b','d','h','v'],
-                'm' : ['a','c','r','y','m','s','w','b','d','h','v'],
-                's' : ['c','g','y','k','m','s','b','d','h','v'],
-                'w' : ['a','t','u','r','y','k','m','w','b','d','h','v'],
-                'b' : ['c','g','t','u','r','y','k','m','s','w','b','d','h','v'],
-                'd' : ['a','g','t','u','r','y','k','m','s','w','b','d','h','v'],
-                'h' : ['a','c','t','u','r','y','k','m','s','w','b','d','h','v'],
-                'v' : ['a','c','g','r','y','k','m','s','w','b','d','h','v'],
-                '-' : ['-']
-        }
-    res = {}
-    for c1 in chars:
-        for c2 in chars:
-            if c1 == c2:
-                res[(c1,c2)] = True
-            elif c1 == 'n' and c2 != '-':
-                res[(c1,c2)] = True
-            elif c2 == 'n' and c2 != '-':
-                res[(c1,c2)] = True
-            elif c1 in char_comp[c2] and c2 in char_comp[c1]:
-                res[(c1,c2)] = True
-            else:
-                res[(c1,c2)] = False
-    return res
+                comparison_matrix[(c1,c2)] = (False,False)
+    return comparison_matrix
 
 def reverse_complement(sequence, rev=True):
     '''
-    Function that returns the reverse complement of the given sequence
+    Function that returns the (reverse) complement of the given sequence.
 
     Parameters
     ----------
@@ -99,11 +90,11 @@ def reverse_complement(sequence, rev=True):
 
     Returns
     -------
-    str
-        Reverse complement of the input sequence.
+    rev_comp : str
+        (Reverse) complement of the input sequence.
 
     '''
-    #Define the complement of every possible nucleotide
+    #Define the complement of every possible IUPAC nucleotide
     translate = {
             'a' : 't',
             't' : 'a',
@@ -123,17 +114,61 @@ def reverse_complement(sequence, rev=True):
             'n' : 'n',
             '-' : '-'
         }
-    res = ''
+    rev_comp = ''
     for i in range(len(sequence)):
-        res += translate[sequence[i]]
+        rev_comp += translate[sequence[i]]
     if rev:
-        return res[::-1]
+        return rev_comp[::-1]
     else:
-        return res
+        return rev_comp
+
+def disambiguate(sequence):
+    '''
+    Function that disambiguates the given sequence by generating all its non-degenerate representations.
+
+    Parameters
+    ----------
+    sequence : str
+        String representation of the sequence to disambiguate.
+
+    Returns
+    -------
+    repr : [str]
+        List containing the non-degenerate sequences represented by the input sequence.
+
+    '''
+    translation = {'a' : ['a'],
+                   'c' : ['c'],
+                   'g' : ['g'],
+                   't' : ['t'],                           
+                   'b' : ['c','g','t'],
+                   'd' : ['a','g','t'],
+                   'h' : ['a','c','t'],
+                   'k' : ['g','t'],
+                   'm' : ['a','c'],
+                   'n' : ['a','c','g','t'],
+                   'r' : ['a','g'],
+                   's' : ['g','c'],
+                   'v' : ['a','c','g'],
+                   'w' : ['a','t'],
+                   'y' : ['c','t']}
+    
+    repr = translation[sequence[0]].copy()
+    for char in sequence[1:]:
+        for subsequence_index in range(len(repr)):
+            new_subsequences = []
+            for new_char in translation[char]:
+                new_subsequences.append(repr[subsequence_index] + new_char)
+            repr[subsequence_index] = new_subsequences
+        repr = list(itertools.chain(*repr))
+    return repr
+
+########################### Calculation functions for sequence properties ###########################
 
 def calculate_degeneracy(sequence):
     '''
-    Function that returns the degeneracy of a sequence of nucleotides
+    Function that returns the degeneracy of a sequence of nucleotides which is defined as the
+    cardinality of the set of all possible non-degenerate representations of the sequence.
 
     Parameters
     ----------
@@ -142,23 +177,23 @@ def calculate_degeneracy(sequence):
 
     Returns
     -------
-    res : int
+    degen : int
         Degeneracy of the input sequence.
 
     '''
-    res = 1
+    degen = 1
     for char in sequence:
         if char in ['y', 'r', 's', 'w', 'm', 'k']:
-            res = res*2
+            degen = degen*2
         elif char in ['b', 'd', 'h', 'v']:
-            res = res*3
+            degen = degen*3
         elif char == 'n':
-            res = res*4
-    return res
+            degen = degen*4
+    return degen
 
 def calculate_GC(sequence):
     '''
-    Function that calculates the GC-content of a sequence
+    Function that calculates the GC-content of a (possibly degenerate) sequence.
 
     Parameters
     ----------
@@ -171,15 +206,15 @@ def calculate_GC(sequence):
         GC-content of input sequence.
 
     '''
-    res = len(sequence)
+    gc = len(sequence)
     for char in sequence:
-        if char in ['a','t','w','-']:
-            res -= 1
-    return res / len(sequence)
+        if char in ['a','t','w','-']: #assumption is that any character that can represent a G or C counts here
+            gc -= 1
+    return gc / len(sequence)
 
 def calculate_end_stats(sequence, comparison_matrix):
     '''
-    Function that determines the number of a/t (c/g) characters in the last 3 (5) characters of the input sequence
+    Function that determines the number of a/t (c/g) characters in the last 3 (5) characters of the 3'-end of the input sequence.
 
     Parameters
     ----------
@@ -190,26 +225,27 @@ def calculate_end_stats(sequence, comparison_matrix):
 
     Returns
     -------
-    res : (int, int, bool)
-        Triplet where the first element is the number of a/t chars in final 3, second element the number of c/g in final 5 and last element is true when last character is c/g.
+    stats : (int, int, bool)
+        Triplet where the first element is the number of a/t chars in final 3, 
+        second element the number of c/g in final 5 and last element is true when last character is c/g.
 
     '''
-    res = [0, 0, False]
+    stats = [0, 0, False]
     for i in range(1, 4):
         if comparison_matrix[(sequence[-i], 'a')][0] or comparison_matrix[(sequence[-i], 't')][0]:
-            res[0] += 1
+            stats[0] += 1
         elif comparison_matrix[(sequence[-i], 'c')][0] or comparison_matrix[(sequence[-i], 'g')][0]:
-            res[1] += 1
+            stats[1] += 1
             if i == 1:
-                res[2] = True
+                stats[2] = True
     for i in range(4, 6):
         if comparison_matrix[(sequence[-i], 'c')][0] or comparison_matrix[(sequence[-i], 'g')][0]:
-            res[1] += 1
-    return res
+            stats[1] += 1
+    return stats
 
 def calculate_longest_monorun(sequence, comparison_matrix):
     '''
-    Function that calculates the longest run of a single character in the given sequence
+    Function that calculates the longest run of a single character in the given sequence.
 
     Parameters
     ----------
@@ -235,7 +271,7 @@ def calculate_longest_monorun(sequence, comparison_matrix):
 
 def calculate_longest_duorun(sequence, comparison_matrix):
     '''
-    Function that calculates the longest run of a pair of characters in the given sequence
+    Function that calculates the longest run of a pair of characters in the given sequence.
 
     Parameters
     ----------
@@ -263,65 +299,3 @@ def calculate_longest_duorun(sequence, comparison_matrix):
             current_duo = (sequence[index-1], sequence[index])
             index += 1
     return max(stats)
-
-def calculate_hairpin_formation(sequence):
-    last_nucleotides_reverse = reverse_complement(sequence[-6:], rev=True)
-    binding_locations = []
-    res = (0, 0)
-    for c in range(len(sequence)-5):
-        if sequence[c] == last_nucleotides_reverse[0]:
-            binding_locations.append(c)
-    for binding_location in binding_locations:
-        max_overlap = min(6, len(sequence) - binding_location - 1)
-        cur_overlap = 0
-        for i in range(max_overlap):
-            if sequence[binding_location + i] == last_nucleotides_reverse[i]:
-                cur_overlap += 1
-        if cur_overlap > res[0]:
-            res = (cur_overlap, binding_location)
-    print(sequence)
-    print(sequence[res[1]:res[1] + min(6, len(sequence) - res[1] - 1)])
-    print(last_nucleotides_reverse[:min(6, len(sequence) - res[1] - 1)])
-    print(res[0])
-    
-            
-def disambiguate(sequence):
-    '''
-    Function that disambiguates the given sequence by generating a string for every degenerate combination
-
-    Parameters
-    ----------
-    sequence : str
-        String representation of the sequence to disambiguate.
-
-    Returns
-    -------
-    res : [str]
-        List containing the non-degenerate sequences represented by the input sequence.
-
-    '''
-    translation = {'a' : ['a'],
-                   'c' : ['c'],
-                   'g' : ['g'],
-                   't' : ['t'],                           
-                   'b' : ['c','g','t'],
-                   'd' : ['a','g','t'],
-                   'h' : ['a','c','t'],
-                   'k' : ['g','t'],
-                   'm' : ['a','c'],
-                   'n' : ['a','c','g','t'],
-                   'r' : ['a','g'],
-                   's' : ['g','c'],
-                   'v' : ['a','c','g'],
-                   'w' : ['a','t'],
-                   'y' : ['c','t']}
-    
-    res = translation[sequence[0]].copy()
-    for char in sequence[1:]:
-        for subsequence_index in range(len(res)):
-            new_subsequences = []
-            for new_char in translation[char]:
-                new_subsequences.append(res[subsequence_index] + new_char)
-            res[subsequence_index] = new_subsequences
-        res = list(itertools.chain(*res))
-    return res

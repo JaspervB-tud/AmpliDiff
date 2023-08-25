@@ -1,0 +1,10 @@
+gc_lb;0.4
+gc_ub;0.6
+melting_lb;55
+melting_ub;75
+end_at_threshold;2
+end_gc_threshold;3
+monorun_threshold;3
+duorun_threshold;3
+mfe_threshold;-5
+self_complementarity_threshold;10

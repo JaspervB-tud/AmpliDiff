@@ -1,33 +1,31 @@
 import numpy as np
 import copy
 import itertools
-import time
 import multiprocessing as mp
 from math import ceil
-from Generic_Methods import generate_opportunistic_matrix, calculate_degeneracy, disambiguate, reverse_complement
+from classless_methods import generate_comparison_matrix, calculate_degeneracy, disambiguate, reverse_complement
 from Primer import *
 
 class PrimerIndex():
-    def __init__(self):
-        self.primer2index = {'forward' : {}, 'reverse' : {}} #contains primer sequences as keys and corresponding primer index as value
-        self.index2primer = {'forward' : np.empty((0)), 'reverse' : np.empty((0))} #contains Primer objects in an array
-        self.conflict_matrix = None
-        
-        self.thresholds = {
+    thresholds = {
             'gc_lb'                             : 0.4,
             'gc_ub'                             : 0.6,
-            'melting_lb'                        : 55,
-            'melting_ub'                        : 75,
+            'melting_lb'                        : 55.,
+            'melting_ub'                        : 75.,
             'end_at_threshold'                  : 2,
             'end_gc_threshold'                  : 3,
             'monorun_threshold'                 : 3,
             'duorun_threshold'                  : 3,
-            'mfe_threshold'                     : -5,
+            'mfe_threshold'                     : -5.,
             'self_complementarity_threshold'    : 10
             }
-        self.comparison_matrix = generate_opportunistic_matrix()
+    def __init__(self):
+        self.primer2index = {'forward' : {}, 'reverse' : {}} #contains primer sequences as keys and corresponding primer index as value
+        self.index2primer = {'forward' : np.empty((0)), 'reverse' : np.empty((0))} #contains Primer objects in an array
+        self.conflict_matrix = None
+        self.comparison_matrix = generate_comparison_matrix()
         
-    #This does not work currently
+    #This does not work as intended currently
     def __eq__(self, other):
         try:
             for orientation in self.set:
@@ -44,7 +42,6 @@ class PrimerIndex():
         except:
             return False
         
-    #Remove new if confirmed to work
     def add_primer(self, sequence, orientation):
         '''
         Function that adds a new primer to the primer index
@@ -132,10 +129,11 @@ class PrimerIndex():
             print( 'Finally contains %d %s primers' % (len(self.primer2index[orientation]), orientation) )
             print( 'Removed %d primers occurring both as forward and reverse' % (len(common_kmers)) )
    
-    def set_thresholds(self, thresholds):
+    @staticmethod
+    def set_thresholds(thresholds):
         '''
         Function that sets the primer property thresholds to the given values. Note that this does not check for
-        existing primers in the index whether they satisfy the new thresholds.
+        existing primers in the index whether they satisfy the new thresholds and thus should be set beforehand.
 
         Parameters
         ----------
@@ -149,7 +147,7 @@ class PrimerIndex():
         '''
         for prop in thresholds:
             try:
-                self.thresholds[prop] = thresholds[prop]
+                PrimerIndex.thresholds[prop] = thresholds[prop]
             except:
                 continue
 
@@ -338,7 +336,6 @@ class PrimerIndex():
         '''
         primer_index = PrimerIndex()
         i = 0
-        st = time.time()
         if type(sequences) == list: #If multiple sequences supplied
             for sequence in sequences:
                 for cur_index in range(sequence.length_raw - width + 1):
@@ -362,7 +359,6 @@ class PrimerIndex():
                     for reverse_primer in disambiguate(current_rev_primer):
                         primer_index.add_sequence(sequences, cur_index, reverse_primer, 'reverse')
             i += 1
-        print('Time elapsed processing %d sequences: %fs' % (i,(time.time() - st)))
         return primer_index
     
     @staticmethod

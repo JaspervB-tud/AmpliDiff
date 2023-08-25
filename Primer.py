@@ -1,4 +1,4 @@
-from Generic_Methods import reverse_complement, calculate_degeneracy, calculate_GC, calculate_end_stats, calculate_longest_monorun, calculate_longest_duorun
+from classless_methods import reverse_complement, calculate_degeneracy, calculate_GC, calculate_end_stats, calculate_longest_monorun, calculate_longest_duorun
 from Bio.SeqUtils import MeltingTemp as mt
 import RNA
 
