@@ -314,7 +314,7 @@ class PrimerIndex():
         return self.conflict_matrix[orientation][pair]
 
     @staticmethod
-    def generate_index(sequences, width, comparison_matrix):
+    def generate_index(sequences, width, comparison_matrix, max_degeneracy=4**5):
         '''
         Static function that generates a primer index for the given sequences using a primer width of $width. For the
         multiprocessing variant see generate_index_mp
@@ -327,6 +327,8 @@ class PrimerIndex():
             Width of the primers to include in this index.
         comparison_matrix : dict[ (char,char) ]
             Dictionary that determines which characters should be considered equal.
+        max_degeneracy : int, optional
+            Maximum allowed degeneracy of a k-mer for processing it.
 
         Returns
         -------
@@ -340,33 +342,33 @@ class PrimerIndex():
             for sequence in sequences:
                 for cur_index in range(sequence.length_raw - width + 1):
                     current_fwd_primer = sequence.sequence_raw[cur_index : cur_index + width]
-                    if calculate_degeneracy(current_fwd_primer) <= 4**5:
+                    if calculate_degeneracy(current_fwd_primer) <= max_degeneracy:
                         for forward_primer in disambiguate(current_fwd_primer):
                             primer_index.add_sequence(sequence, cur_index, forward_primer, 'forward')
                     current_rev_primer = reverse_complement(current_fwd_primer)
-                    if calculate_degeneracy(current_rev_primer) <= 4**5:
+                    if calculate_degeneracy(current_rev_primer) <= max_degeneracy:
                         for reverse_primer in disambiguate(current_rev_primer):
                             primer_index.add_sequence(sequence, cur_index, reverse_primer, 'reverse')
                 i += 1
         else: #If a singular sequence is supplied
             for cur_index in range(sequences.length_raw - width + 1):
                 current_fwd_primer = sequences.sequence_raw[cur_index : cur_index + width]
-                if calculate_degeneracy(current_fwd_primer) <= 4**5:
+                if calculate_degeneracy(current_fwd_primer) <= max_degeneracy:
                     for forward_primer in disambiguate(current_fwd_primer):
                         primer_index.add_sequence(sequences, cur_index, forward_primer, 'forward')
                 current_rev_primer = reverse_complement(current_fwd_primer)
-                if calculate_degeneracy(current_rev_primer) <= 4**5:
+                if calculate_degeneracy(current_rev_primer) <= max_degeneracy:
                     for reverse_primer in disambiguate(current_rev_primer):
                         primer_index.add_sequence(sequences, cur_index, reverse_primer, 'reverse')
             i += 1
         return primer_index
     
     @staticmethod
-    def generate_index_mp(sequences, width, comparison_matrix, processors=1):
+    def generate_index_mp(sequences, width, comparison_matrix, max_degeneracy=4**5, processors=1):
         if processors > 1:
             sequences_partitioned = [ sequences[i:i+(ceil(len(sequences)/processors))] for i in range(0, len(sequences), ceil(len(sequences)/processors))]
             with mp.Pool(processors) as pool:
-                indices = pool.starmap(PrimerIndex.generate_index, zip(sequences_partitioned, itertools.repeat(width), itertools.repeat(comparison_matrix)))
+                indices = pool.starmap(PrimerIndex.generate_index, zip(sequences_partitioned, itertools.repeat(width), itertools.repeat(comparison_matrix), itertools.repeat(max_degeneracy)))
             master_index = indices[0]
             for index in indices[1:]:
                 master_index.merge_indices(index)

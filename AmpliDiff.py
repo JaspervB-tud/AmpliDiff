@@ -22,6 +22,7 @@ def main():
     parser.add_argument('-sw', '--search_width', type=int, default=50, help='Search window for finding primers, default is 50')
     parser.add_argument('-cov', '--coverage', type=float, default=1.0, help='Minimal required amplifiability, default is 100')
     parser.add_argument('-b', '--beta', type=float, default=0.05, help='Trade-off parameter between primer pairs and differentiability, default is 0.05')
+    parser.add_argument('--max_primer_degeneracy', type=int, default=4**5, help='Maximum allowed degeneracy for disambiguating primer candidates, default is 1024')
     parser.add_argument('--gc_lb', type=float, default=0.4, help='Minimum required GC content in primers, default is 0.4')
     parser.add_argument('--gc_ub', type=float, default=0.6, help='Maximum allowed GC content in primers, default is 0.6')
     parser.add_argument('--melting_lb', type=float, default=55., help='Minimum required primer melting temperature in degrees Celsius, default is 55')
@@ -129,7 +130,7 @@ def main():
         thresholds['self_complementarity_threshold'] = args.self_complementarity_threshold
     PrimerIndex.PrimerIndex.set_thresholds(thresholds)
     print('Generating primer index')
-    primer_index = PrimerIndex.PrimerIndex.generate_index_mp(sequences, args.primer_width, comparison_matrix, processors=args.cores)
+    primer_index = PrimerIndex.PrimerIndex.generate_index_mp(sequences, args.primer_width, comparison_matrix, max_degeneracy=args.max_primer_degeneracy, processors=args.cores)
     primer_index.remove_redundant()
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent generating primer index and filtering for feasible primers: ' + str(time.time() - st) + '\n')
