@@ -54,6 +54,7 @@ AmpliDiff then has the following list of optional parameters:
 -c                     : Number of cores to use in multiprocessing mode. Default is 1 (no multiprocessing).
 -sd                    : Random seed to use when selecting subset of input sequences (only if -n is provided and smaller than actual number of sequences). Default is 0.
 ```
+
 If both a primer threshold file and primer property thresholds are given through the CLI, AmpliDiff will prioritize threshold given through the CLI.
 
 AmpliDiff will output the following four files:
