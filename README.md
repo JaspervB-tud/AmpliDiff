@@ -16,6 +16,7 @@ As of now, AmpliDiff uses [Gurobi](https://www.gurobi.com) to solve the primer f
 
 ### Usage
 AmpliDiff requires the user to provide an Multiple Sequence Alignment in the form of a fasta file, and a metadata file in TSV format which has a header line containing a header with "lineage" that contains the lineages/strains/species of an entry. The first column should always be a sequence identifier which is used to assign classes to genomes in the MSA fasta file. Note that sequence IDs in the metadata should not contain "|" characters and should correspond exactly to the IDs in the fasta file.
+
 AmpliDiff then has the following list of optional parameters:
 ```
 -o                     : Path to folder where output will be stored. Default is current folder.
