@@ -9,7 +9,47 @@ All dependencies can be found in the dependencies.txt files in the corresponding
 AmpliDiff can simply be installed by cloning this repo, and building the amplicon_generation.pyx Cython file using the following commands:
 ```
 git clone git@github.com:JaspervB-tud/AmpliDiff.git
-cd AmpliDiff
+cd AmpliDiff/AmpliDiff
 python setup.py build_ext --inplace
 ```
 As of now, AmpliDiff uses [Gurobi](https://www.gurobi.com) to solve the primer feasibility and minimization problems.
+
+### Usage
+AmpliDiff requires the user to provide an Multiple Sequence Alignment in the form of a fasta file, and a metadata file in TSV format which has a header line containing a header with "lineage" that contains the lineages/strains/species of an entry. The first column should always be a sequence identifier which is used to assign classes to genomes in the MSA fasta file. Note that sequence IDs in the metadata should not contain "|" characters and should correspond exactly to the IDs in the fasta file.
+AmpliDiff then has the following list of optional parameters:
+```
+-o                     : Path to folder where output will be stored. Default is current folder.
+--primer_thresholds  : Path to the primer thresholds file. Default is ./primer_thresholds.csv
+##Amplicon parameters
+-aw                    : Amplicon width. Default is 200.
+-mm                    : Number of allowed mismatches during amplicon differentiation. Default is 0.
+-mt                    : Number of allowed misalignment characters in an amplicon. Default is 20.
+--min_non_align        : Minimum number of nucleotides before the first amplicon and after the final amplicon, recommended to set equal to the search width (-sw). Default is 0.
+##Primer parameters
+-pw                    : Primer size. Default is 25.
+-sw                    : Search window flanking an amplicon. Default is 50.
+-cov                   : Minimal required amplifiability. Default is 1 (100%).
+-b                     : Trade-off parameter between primer pairs and differentiability. Default is 0.05.
+--max_primer_degeneracy: Maximimum allowed degeneracy for disambiguating primer candidates. Default is 1024.
+--gc_lb                : Minimum required GC-content in primers. Default is 0.4 (40%).
+--gc_ub                : Maximum allowed GC-content in primers. Default is 0.6 (60%).
+--melting_lb           : Minimum required primer melting temperature in degrees Celsius. Default is 55.
+--melting_ub           : Maximum allowed primer melting temperature in degrees Celsius. Default is 75.
+--max_temperature_difference : Maximal difference between minimum and maximum primer melting temperatures of selected primers. Default is 5.
+--end_at_threshold     : Maximum allowed A/T nucleotides in final 3 nucleotides (3'-end). Default is 2.
+--end_gc_threshold     : Maximum allowed G/C nucleotides in final 5 nucleotides (5'-end). Default is 3.
+--monorun_threshold    : Maximum allowed length of a single nucleotide run. Default is 3.
+--duorun_threshold     : Maximum allowed length of a double nucleotide run. Default is 3.
+--mfe_threshold        : Minimum required MFE for determining hairpin formation risk. Default is -5.
+--self_complementarity_threshold : Maximum primer-primer complementarity in worst alignment between primers. Default is 10.
+##Greedy algorithm parameters
+-amps                  : Number of amplicons to find. Default is 10.
+##Sequence parameters
+-n                     : Number of sequences to include. Default is -1 (all input sequences).
+--min_characters       : Minimum number of characters in a sequence. Default is -1 (no minimum).
+--max_degeneracy       : Maximum degeneracy of a sequence. Default is -1 (no maximum).
+--max_n                : Maximum number of N characters in a sequence. Default is -1 (no maximum).
+##System parameters
+-c                     : Number of cores to use in multiprocessing mode. Default is 1 (no multiprocessing).
+-sd                    : Random seed to use when selecting subset of input sequences (only if -n is provided and smaller than actual number of sequences). Default is 0.
+```
