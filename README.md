@@ -19,7 +19,7 @@ AmpliDiff requires the user to provide an Multiple Sequence Alignment in the for
 AmpliDiff then has the following list of optional parameters:
 ```
 -o                     : Path to folder where output will be stored. Default is current folder.
---primer_thresholds  : Path to the primer thresholds file. Default is ./primer_thresholds.csv
+--primer_thresholds  : Path to the primer thresholds file. Default is ./primer_thresholds.csv.
 ##Amplicon parameters
 -aw                    : Amplicon width. Default is 200.
 -mm                    : Number of allowed mismatches during amplicon differentiation. Default is 0.
@@ -53,3 +53,10 @@ AmpliDiff then has the following list of optional parameters:
 -c                     : Number of cores to use in multiprocessing mode. Default is 1 (no multiprocessing).
 -sd                    : Random seed to use when selecting subset of input sequences (only if -n is provided and smaller than actual number of sequences). Default is 0.
 ```
+
+AmpliDiff will output the following four files:
+- logfile_X.txt : this file contains information from the greedy amplicon selection step of AmpliDiff (e.g. accepted and rejected amplicons)
+- primers_X.fasta : this file contains all the selected primers in fasta format. Names are of the form AMPLICON_N_FY in case of a forward primer, or AMPLICON_N_RY in case of a reverse primer
+- runtimes_X.txt : this file contains information on the runtimes of AmpliDiff steps, as well as an ordered list of the selected amplicons and corresponding primers
+- sequences_included_X.txt : this file contains the identifiers of sequences that were considered
+Here X denotes the seed that was used (even when using all genomes), N the rank of an amplicon (when it was selected, 1 for first), and Y an index for the primer (e.g. AMPLICON_2_F3 referes to the third forward primer for amplicon 2).
