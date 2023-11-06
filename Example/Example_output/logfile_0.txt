@@ -1,0 +1,499 @@
+Total to cover based on amplicon feasibility: 276 with 24 sequences and 29343 amplicons.
+Checking amplicon: (22872, 23072)
+Amplicon (22872, 23072) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22873, 23073)
+Amplicon (22873, 23073) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22874, 23074)
+Amplicon (22874, 23074) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22875, 23075)
+Amplicon (22875, 23075) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22876, 23076)
+Amplicon (22876, 23076) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22877, 23077)
+Amplicon (22877, 23077) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22878, 23078)
+Amplicon (22878, 23078) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22879, 23079)
+Amplicon (22879, 23079) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22880, 23080)
+Amplicon (22880, 23080) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22881, 23081)
+Amplicon (22881, 23081) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22882, 23082)
+Amplicon (22882, 23082) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22883, 23083)
+Amplicon (22883, 23083) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22884, 23084)
+Amplicon (22884, 23084) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22885, 23085)
+Amplicon (22885, 23085) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22886, 23086)
+Amplicon (22886, 23086) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22887, 23087)
+Amplicon (22887, 23087) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22888, 23088)
+Amplicon (22888, 23088) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22889, 23089)
+Amplicon (22889, 23089) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22890, 23090)
+Amplicon (22890, 23090) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22891, 23091)
+Amplicon (22891, 23091) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22892, 23092)
+Amplicon (22892, 23092) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22893, 23093)
+Amplicon (22893, 23093) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22894, 23094)
+Amplicon (22894, 23094) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22895, 23095)
+Amplicon (22895, 23095) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22896, 23096)
+Amplicon (22896, 23096) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22897, 23097)
+Amplicon (22897, 23097) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22898, 23098)
+Amplicon (22898, 23098) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22899, 23099)
+Amplicon (22899, 23099) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22900, 23100)
+Amplicon (22900, 23100) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22901, 23101)
+Amplicon (22901, 23101) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22902, 23102)
+Amplicon (22902, 23102) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22903, 23103)
+Amplicon (22903, 23103) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (22904, 23104)
+Amplicon (22904, 23104) succesfully added, new sequence pairs covered: 265(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
+Checking amplicon: (21646, 21846)
+Amplicon (21646, 21846) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21647, 21847)
+Amplicon (21647, 21847) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21648, 21848)
+Amplicon (21648, 21848) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21649, 21849)
+Amplicon (21649, 21849) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21650, 21850)
+Amplicon (21650, 21850) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21651, 21851)
+Amplicon (21651, 21851) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21652, 21852)
+Amplicon (21652, 21852) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21653, 21853)
+Amplicon (21653, 21853) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21654, 21854)
+Amplicon (21654, 21854) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21655, 21855)
+Amplicon (21655, 21855) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21656, 21856)
+Amplicon (21656, 21856) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21657, 21857)
+Amplicon (21657, 21857) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21601, 21801)
+Amplicon (21601, 21801) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21602, 21802)
+Amplicon (21602, 21802) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21603, 21803)
+Amplicon (21603, 21803) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21604, 21804)
+Amplicon (21604, 21804) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21605, 21805)
+Amplicon (21605, 21805) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21606, 21806)
+Amplicon (21606, 21806) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21607, 21807)
+Amplicon (21607, 21807) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21608, 21808)
+Amplicon (21608, 21808) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21609, 21809)
+Amplicon (21609, 21809) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21610, 21810)
+Amplicon (21610, 21810) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21611, 21811)
+Amplicon (21611, 21811) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21612, 21812)
+Amplicon (21612, 21812) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21613, 21813)
+Amplicon (21613, 21813) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21614, 21814)
+Amplicon (21614, 21814) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21615, 21815)
+Amplicon (21615, 21815) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21616, 21816)
+Amplicon (21616, 21816) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21617, 21817)
+Amplicon (21617, 21817) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21600, 21800)
+Amplicon (21600, 21800) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21618, 21818)
+Amplicon (21618, 21818) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21619, 21819)
+Amplicon (21619, 21819) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21620, 21820)
+Amplicon (21620, 21820) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21621, 21821)
+Amplicon (21621, 21821) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21622, 21822)
+Amplicon (21622, 21822) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21623, 21823)
+Amplicon (21623, 21823) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21624, 21824)
+Amplicon (21624, 21824) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21625, 21825)
+Amplicon (21625, 21825) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21626, 21826)
+Amplicon (21626, 21826) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21627, 21827)
+Amplicon (21627, 21827) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21628, 21828)
+Amplicon (21628, 21828) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21629, 21829)
+Amplicon (21629, 21829) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21630, 21830)
+Amplicon (21630, 21830) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21631, 21831)
+Amplicon (21631, 21831) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21632, 21832)
+Amplicon (21632, 21832) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21633, 21833)
+Amplicon (21633, 21833) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21634, 21834)
+Amplicon (21634, 21834) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21635, 21835)
+Amplicon (21635, 21835) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21636, 21836)
+Amplicon (21636, 21836) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21637, 21837)
+Amplicon (21637, 21837) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21638, 21838)
+Amplicon (21638, 21838) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21639, 21839)
+Amplicon (21639, 21839) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21640, 21840)
+Amplicon (21640, 21840) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21641, 21841)
+Amplicon (21641, 21841) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21642, 21842)
+Amplicon (21642, 21842) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21643, 21843)
+Amplicon (21643, 21843) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21644, 21844)
+Amplicon (21644, 21844) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21645, 21845)
+Amplicon (21645, 21845) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4520, 4720)
+Amplicon (4520, 4720) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4521, 4721)
+Amplicon (4521, 4721) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4522, 4722)
+Amplicon (4522, 4722) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4523, 4723)
+Amplicon (4523, 4723) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4524, 4724)
+Amplicon (4524, 4724) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4525, 4725)
+Amplicon (4525, 4725) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4526, 4726)
+Amplicon (4526, 4726) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4527, 4727)
+Amplicon (4527, 4727) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4528, 4728)
+Amplicon (4528, 4728) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4529, 4729)
+Amplicon (4529, 4729) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4530, 4730)
+Amplicon (4530, 4730) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4531, 4731)
+Amplicon (4531, 4731) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4532, 4732)
+Amplicon (4532, 4732) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4533, 4733)
+Amplicon (4533, 4733) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4534, 4734)
+Amplicon (4534, 4734) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4535, 4735)
+Amplicon (4535, 4735) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4536, 4736)
+Amplicon (4536, 4736) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4537, 4737)
+Amplicon (4537, 4737) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4538, 4738)
+Amplicon (4538, 4738) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4539, 4739)
+Amplicon (4539, 4739) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (1620, 1820)
+Amplicon (1620, 1820) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (1621, 1821)
+Amplicon (1621, 1821) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (1622, 1822)
+Amplicon (1622, 1822) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (1623, 1823)
+Amplicon (1623, 1823) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (1624, 1824)
+Amplicon (1624, 1824) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (1625, 1825)
+Amplicon (1625, 1825) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (1626, 1826)
+Amplicon (1626, 1826) succesfully added, new sequence pairs covered: 6(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
+Checking amplicon: (21104, 21304)
+Amplicon (21104, 21304) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21105, 21305)
+Amplicon (21105, 21305) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21106, 21306)
+Amplicon (21106, 21306) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21107, 21307)
+Amplicon (21107, 21307) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21108, 21308)
+Amplicon (21108, 21308) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21109, 21309)
+Amplicon (21109, 21309) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21110, 21310)
+Amplicon (21110, 21310) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21111, 21311)
+Amplicon (21111, 21311) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21112, 21312)
+Amplicon (21112, 21312) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21113, 21313)
+Amplicon (21113, 21313) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21114, 21314)
+Amplicon (21114, 21314) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21115, 21315)
+Amplicon (21115, 21315) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21116, 21316)
+Amplicon (21116, 21316) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21117, 21317)
+Amplicon (21117, 21317) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21118, 21318)
+Amplicon (21118, 21318) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21119, 21319)
+Amplicon (21119, 21319) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21120, 21320)
+Amplicon (21120, 21320) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21121, 21321)
+Amplicon (21121, 21321) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21122, 21322)
+Amplicon (21122, 21322) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21123, 21323)
+Amplicon (21123, 21323) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21124, 21324)
+Amplicon (21124, 21324) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21125, 21325)
+Amplicon (21125, 21325) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21126, 21326)
+Amplicon (21126, 21326) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21127, 21327)
+Amplicon (21127, 21327) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21128, 21328)
+Amplicon (21128, 21328) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21129, 21329)
+Amplicon (21129, 21329) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21130, 21330)
+Amplicon (21130, 21330) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21131, 21331)
+Amplicon (21131, 21331) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21132, 21332)
+Amplicon (21132, 21332) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21133, 21333)
+Amplicon (21133, 21333) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21134, 21334)
+Amplicon (21134, 21334) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21135, 21335)
+Amplicon (21135, 21335) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21136, 21336)
+Amplicon (21136, 21336) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21137, 21337)
+Amplicon (21137, 21337) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21138, 21338)
+Amplicon (21138, 21338) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21139, 21339)
+Amplicon (21139, 21339) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21140, 21340)
+Amplicon (21140, 21340) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21141, 21341)
+Amplicon (21141, 21341) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21142, 21342)
+Amplicon (21142, 21342) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21143, 21343)
+Amplicon (21143, 21343) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21144, 21344)
+Amplicon (21144, 21344) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21145, 21345)
+Amplicon (21145, 21345) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21146, 21346)
+Amplicon (21146, 21346) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21147, 21347)
+Amplicon (21147, 21347) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21148, 21348)
+Amplicon (21148, 21348) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21149, 21349)
+Amplicon (21149, 21349) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21150, 21350)
+Amplicon (21150, 21350) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21151, 21351)
+Amplicon (21151, 21351) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21152, 21352)
+Amplicon (21152, 21352) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21153, 21353)
+Amplicon (21153, 21353) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21154, 21354)
+Amplicon (21154, 21354) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21155, 21355)
+Amplicon (21155, 21355) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21156, 21356)
+Amplicon (21156, 21356) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21157, 21357)
+Amplicon (21157, 21357) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21158, 21358)
+Amplicon (21158, 21358) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21159, 21359)
+Amplicon (21159, 21359) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21160, 21360)
+Amplicon (21160, 21360) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21161, 21361)
+Amplicon (21161, 21361) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21162, 21362)
+Amplicon (21162, 21362) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21163, 21363)
+Amplicon (21163, 21363) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21164, 21364)
+Amplicon (21164, 21364) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21165, 21365)
+Amplicon (21165, 21365) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21166, 21366)
+Amplicon (21166, 21366) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21167, 21367)
+Amplicon (21167, 21367) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21168, 21368)
+Amplicon (21168, 21368) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21169, 21369)
+Amplicon (21169, 21369) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21170, 21370)
+Amplicon (21170, 21370) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21171, 21371)
+Amplicon (21171, 21371) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21172, 21372)
+Amplicon (21172, 21372) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21173, 21373)
+Amplicon (21173, 21373) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21174, 21374)
+Amplicon (21174, 21374) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21175, 21375)
+Amplicon (21175, 21375) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21176, 21376)
+Amplicon (21176, 21376) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21177, 21377)
+Amplicon (21177, 21377) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21178, 21378)
+Amplicon (21178, 21378) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21179, 21379)
+Amplicon (21179, 21379) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21180, 21380)
+Amplicon (21180, 21380) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21181, 21381)
+Amplicon (21181, 21381) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21182, 21382)
+Amplicon (21182, 21382) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21183, 21383)
+Amplicon (21183, 21383) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21184, 21384)
+Amplicon (21184, 21384) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21185, 21385)
+Amplicon (21185, 21385) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21186, 21386)
+Amplicon (21186, 21386) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21187, 21387)
+Amplicon (21187, 21387) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (13984, 14184)
+Amplicon (13984, 14184) succesfully added, new sequence pairs covered: 3(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
+Checking amplicon: (21188, 21388)
+Amplicon (21188, 21388) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21589, 21789)
+Amplicon (21589, 21789) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21590, 21790)
+Amplicon (21590, 21790) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21591, 21791)
+Amplicon (21591, 21791) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21592, 21792)
+Amplicon (21592, 21792) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21593, 21793)
+Amplicon (21593, 21793) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (21594, 21794)
+Amplicon (21594, 21794) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4540, 4740)
+Amplicon (4540, 4740) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4541, 4741)
+Amplicon (4541, 4741) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4542, 4742)
+Amplicon (4542, 4742) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4543, 4743)
+Amplicon (4543, 4743) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4544, 4744)
+Amplicon (4544, 4744) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4545, 4745)
+Amplicon (4545, 4745) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4546, 4746)
+Amplicon (4546, 4746) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4547, 4747)
+Amplicon (4547, 4747) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4548, 4748)
+Amplicon (4548, 4748) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (4549, 4749)
+Amplicon (4549, 4749) succesfully added, new sequence pairs covered: 1(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
+Checking amplicon: (5633, 5833)
+Amplicon (5633, 5833) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5634, 5834)
+Amplicon (5634, 5834) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5635, 5835)
+Amplicon (5635, 5835) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5636, 5836)
+Amplicon (5636, 5836) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5637, 5837)
+Amplicon (5637, 5837) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5638, 5838)
+Amplicon (5638, 5838) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5639, 5839)
+Amplicon (5639, 5839) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5640, 5840)
+Amplicon (5640, 5840) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5641, 5841)
+Amplicon (5641, 5841) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5642, 5842)
+Amplicon (5642, 5842) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5643, 5843)
+Amplicon (5643, 5843) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5644, 5844)
+Amplicon (5644, 5844) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5645, 5845)
+Amplicon (5645, 5845) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5646, 5846)
+Amplicon (5646, 5846) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5647, 5847)
+Amplicon (5647, 5847) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5648, 5848)
+Amplicon (5648, 5848) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5649, 5849)
+Amplicon (5649, 5849) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5650, 5850)
+Amplicon (5650, 5850) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5651, 5851)
+Amplicon (5651, 5851) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (5652, 5852)
+Amplicon (5652, 5852) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2270, 2470)
+Amplicon (2270, 2470) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2271, 2471)
+Amplicon (2271, 2471) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2272, 2472)
+Amplicon (2272, 2472) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2273, 2473)
+Amplicon (2273, 2473) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2274, 2474)
+Amplicon (2274, 2474) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2275, 2475)
+Amplicon (2275, 2475) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2276, 2476)
+Amplicon (2276, 2476) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2277, 2477)
+Amplicon (2277, 2477) rejected due to being unable to find primers to cover enough sequences
+Checking amplicon: (2278, 2478)
+Amplicon (2278, 2478) succesfully added, new sequence pairs covered: 1(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
