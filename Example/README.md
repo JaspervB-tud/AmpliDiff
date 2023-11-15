@@ -5,19 +5,18 @@ This folder contains some SARS-CoV-2 data from NCBIVirus as well as the results 
 
 To run AmpliDiff on this dataset, use the following command (assuming you are in this Example folder):
 ```bash
-python ../AmpliDiff/Amplidiff.py ../sequences_aligned.fasta ../metadata.tsv --min_non_align 50 -o Example_output/
+python ../AmpliDiff/Amplidiff.py sequences_aligned.fasta metadata.tsv --min_non_align 50 -o Example_output/
 ```
 Note that we set `--min_non_align` to 50 in order to make sure that there are 50 nucleotides surrounding every amplicon candidate, while other parameters are left as default.
-
 Running the above command should give the following output:
-```bash
+```
 Reading sequences
 Done reading sequences
 Randomly selecting up to -1 sequences with seed=0
 Done selecting sequences
 Processing sequences
 Done processing sequences
-Couldn\'t read primer_thresholds.csv, using default thresholds or those supplied as command line arguments
+Couldn't read primer_thresholds.csv, using default thresholds or those supplied as command line arguments
 Generating primer index
 Initially contains 39096 forward primers
 Finally contains 3978 forward primers
