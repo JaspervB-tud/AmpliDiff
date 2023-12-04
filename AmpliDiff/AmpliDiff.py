@@ -16,7 +16,6 @@ def main():
     parser.add_argument('-aw', '--amplicon_width', type=int, default=200, help='Amplicon size, default is 200')
     parser.add_argument('-mm', '--max_mismatches', type=int, default=0, help='Number of allowed mismatches for amplicon differentiation, default is 0')
     parser.add_argument('-mt', '--max_misalign', type=int, default=20, help='Number of allowed misalign characters in an amplicon, default is 20')
-    parser.add_argument('--min_non_align', type=int, default=0, help='Minimum number of nucleotides before the first amplicon and after the final amplicon, default is 0')
     #Primer parameters
     parser.add_argument('-pw', '--primer_width', type=int, default=25, help='Primer size, default is 25')
     parser.add_argument('-sw', '--search_width', type=int, default=50, help='Search window for finding primers, default is 50')
@@ -75,7 +74,7 @@ def main():
     
     #Process sequences
     print('Processing sequences')
-    sequences, lb, ub, feasible_amplicons, relevant_nucleotides = process_sequences(sequences, min_non_align=args.min_non_align, 
+    sequences, lb, ub, feasible_amplicons, relevant_nucleotides = process_sequences(sequences, min_non_align=args.search_width, 
                                                                                     amplicon_width=args.amplicon_width, max_misalign=args.max_misalign)
     with open(args.output + '/runtimes_' + str(args.seed) + '.txt', 'a') as f:
         f.write('Time spent processing sequences and determining feasible amplicons: ' + str(time.time() - st) + ', number of feasible amplicons: ' + str(len(feasible_amplicons)) + '\n')
