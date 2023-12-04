@@ -3,10 +3,10 @@
 This repository contains the code for [AmpliDiff](https://www.biorxiv.org/content/10.1101/2023.07.22.550164v1), a Python tool that finds amplicons and corresponding primers in viral genomes in order to differentiate between different lineages/strains/species.
 
 ### Requirements
-All dependencies can be found in the dependencies.txt files in the corresponding folders. Note that AmpliDiff has not been tested on Windows systems.
+All dependencies can be found in the dependencies_AmpliDiff.txt and environment_AmpliDiff.yml files. Note that AmpliDiff has not been tested on Windows systems and it is therefore discouraged to run AmpliDiff on Windows.
 
 ### Installation
-AmpliDiff can simply be installed by cloning this repo, and building the amplicon_generation.pyx Cython file using the following commands:
+AmpliDiff can be installed by cloning this repo, installing the dependencies (through conda using the environment_AmpliDiff.yml file for example) and building the amplicon_generation.pyx Cython file using the following commands:
 ```
 git clone git@github.com:JaspervB-tud/AmpliDiff.git
 cd AmpliDiff/AmpliDiff
@@ -25,7 +25,6 @@ AmpliDiff then has the following list of optional parameters:
 -aw                    : Amplicon width. Default is 200.
 -mm                    : Number of allowed mismatches during amplicon differentiation. Default is 0.
 -mt                    : Number of allowed misalignment characters in an amplicon. Default is 20.
---min_non_align        : Minimum number of nucleotides before the first amplicon and after the final amplicon, recommended to set equal to the search width (-sw). Default is 0.
 ##Primer parameters
 -pw                    : Primer size. Default is 25.
 -sw                    : Search window flanking an amplicon. Default is 50.
@@ -63,3 +62,6 @@ AmpliDiff will output the following four files:
 - runtimes_X.txt : this file contains information on the runtimes of AmpliDiff steps, as well as an ordered list of the selected amplicons and corresponding primers
 - sequences_included_X.txt : this file contains the identifiers of sequences that were considered
 Here X denotes the seed that was used (even when using all genomes), N the rank of an amplicon (when it was selected, 1 for first), and Y an index for the primer (e.g. AMPLICON_2_F3 referes to the third forward primer for amplicon 2).
+
+### Example
+The ```example``` directory has a small example with some test data to run AmpliDiff. It also includes the expected output in order to check if your installation gives the correct results.
