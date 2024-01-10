@@ -7,7 +7,7 @@ To run AmpliDiff on this dataset, use the following command (assuming you are in
 ```bash
 python ../AmpliDiff/AmpliDiff.py sequences_aligned.fasta metadata.tsv -o Example_output/
 ```
-Note that we set `--min_non_align` to 50 in order to make sure that there are 50 nucleotides surrounding every amplicon candidate, while other parameters are left as default.
+
 Running the above command should give the following output:
 ```
 Reading sequences
