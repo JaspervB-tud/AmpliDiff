@@ -8,7 +8,7 @@ All dependencies can be found in the dependencies_AmpliDiff.txt and environment_
 ### Installation
 AmpliDiff can be installed by cloning this repo, installing the dependencies (through conda using the environment_AmpliDiff.yml file for example) and building the amplicon_generation.pyx Cython file using the following commands:
 ```
-git clone git@github.com:JaspervB-tud/AmpliDiff.git
+git clone https://github.com/JaspervB-tud/AmpliDiff.git
 cd AmpliDiff/AmpliDiff
 python setup.py build_ext --inplace
 ```
