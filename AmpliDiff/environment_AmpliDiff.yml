@@ -1,9 +1,0 @@
-name: amplidiff
-dependencies:
-  - python=3.9.*
-  - conda-forge::biopython=1.79.*
-  - conda-forge::cython=0.29.*
-  - gurobi::gurobi=9.5.*
-  - conda-forge::multiprocess=0.70.*
-  - conda-forge::numpy=1.22.*
-  - bioconda::viennarna=2.5.*

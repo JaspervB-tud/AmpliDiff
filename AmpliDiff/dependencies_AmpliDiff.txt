@@ -1,8 +1,0 @@
-# Name                    Version                   Build  Channel
-biopython                 1.79             py39h3811e60_1    conda-forge
-cython                    0.29.30          py39h5a03fae_0    conda-forge
-gurobi                    9.5.2                    py39_0    gurobi
-multiprocess              0.70.12.2        py39hb9d737c_2    conda-forge
-numpy                     1.22.3           py39hc58783e_2    conda-forge
-python                    3.9.12          h2660328_1_cpython    conda-forge
-viennarna                 2.5.0           py39pl5321h2add14b_2    bioconda
