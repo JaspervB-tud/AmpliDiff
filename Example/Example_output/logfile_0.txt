@@ -1,4 +1,4 @@
-Total to cover based on amplicon feasibility: 274 with 24 sequences and 29343 amplicons.
+Total to cover based on amplicon feasibility: 298 with 25 sequences and 29343 amplicons.
 Checking amplicon: (22872, 23072)
 Amplicon (22872, 23072) rejected due to being unable to find primers to cover enough sequences
 Checking amplicon: (22873, 23073)
@@ -64,7 +64,7 @@ Amplicon (22902, 23102) rejected due to being unable to find primers to cover en
 Checking amplicon: (22903, 23103)
 Amplicon (22903, 23103) rejected due to being unable to find primers to cover enough sequences
 Checking amplicon: (22904, 23104)
-Amplicon (22904, 23104) succesfully added, new sequence pairs covered: 262(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
+Amplicon (22904, 23104) succesfully added, new sequence pairs covered: 286(fraction differences covered: 1.0), (fraction sequences covered: 1.0000000000000002)
 Checking amplicon: (21646, 21846)
 Amplicon (21646, 21846) rejected due to being unable to find primers to cover enough sequences
 Checking amplicon: (21647, 21847)
@@ -230,9 +230,9 @@ Amplicon (29517, 29717) rejected due to being unable to find primers to cover en
 Checking amplicon: (29518, 29718)
 Amplicon (29518, 29718) rejected due to being unable to find primers to cover enough sequences
 Checking amplicon: (29509, 29709)
-Amplicon (29509, 29709) succesfully added, new sequence pairs covered: 6(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
+Amplicon (29509, 29709) succesfully added, new sequence pairs covered: 6(fraction differences covered: 1.0), (fraction sequences covered: 1.0000000000000002)
 Checking amplicon: (10123, 10323)
-Amplicon (10123, 10323) succesfully added, new sequence pairs covered: 4(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
+Amplicon (10123, 10323) succesfully added, new sequence pairs covered: 4(fraction differences covered: 1.0), (fraction sequences covered: 1.0000000000000002)
 Checking amplicon: (21589, 21789)
 Amplicon (21589, 21789) rejected due to being unable to find primers to cover enough sequences
 Checking amplicon: (21590, 21790)
@@ -392,4 +392,4 @@ Amplicon (1593, 1793) rejected due to being unable to find primers to cover enou
 Checking amplicon: (1594, 1794)
 Amplicon (1594, 1794) rejected due to being unable to find primers to cover enough sequences
 Checking amplicon: (1595, 1795)
-Amplicon (1595, 1795) succesfully added, new sequence pairs covered: 2(fraction differences covered: 1.0), (fraction sequences covered: 0.9999999999999996)
+Amplicon (1595, 1795) succesfully added, new sequence pairs covered: 2(fraction differences covered: 1.0), (fraction sequences covered: 1.0000000000000002)

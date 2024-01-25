@@ -60,10 +60,14 @@ def main():
 
     #Randomly pick sequences up until maximum number of sequences to include
     st = time.time()
-    print('Randomly selecting up to ' + str(args.num_sequences) + ' sequences with seed=' + str(args.seed))
+    if args.num_sequences == -1:
+        num_sequences = len(sequences)
+    else:
+        num_sequences = args.num_sequences
+    print('Randomly selecting up to ' + str(num_sequences) + ' sequences with seed=' + str(args.seed))
     random.seed(args.seed)
     random.shuffle(sequences)
-    sequences = sequences[:args.num_sequences]
+    sequences = sequences[:num_sequences]
     #Assign new numerical ids to sequences
     for i in range(len(sequences)):
         sequences[i].id_num = i
