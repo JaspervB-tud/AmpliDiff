@@ -18,6 +18,7 @@ As of now, AmpliDiff uses [Gurobi](https://www.gurobi.com) to solve the primer f
 - Institution
 - Job title
 - Phone number
+
 After obtaining a license, Gurobi can be downloaded from their [website](https://www.gurobi.com/downloads/). It may be required to disable OS security checks in order to run the unsigned binaries from Gurobi to connect to the licensing server.
 
 ### Usage
