@@ -37,4 +37,4 @@ Running greedy algorithm
 ...
 Done running greedy algorithm
 ```
-with a list of primers before the final line. The primers can now be found in `Example_output/primers_0.fasta`. As can be seen, there are only 4 amplicons (and a total of 16 primers) since after the 4th amplicon every pair of sequences with different lineages can be discriminated.
+with a list of primers before the final line. The primers can now be found in `Example_output/primers_0.fasta` and should be the same as those in `Example_output/primers_expected.fasta`. As can be seen, there are only 4 amplicons (and a total of 16 primers) since after the 4th amplicon every pair of sequences with different lineages can be discriminated. Note that runtimes can depend on the machine specifications.
