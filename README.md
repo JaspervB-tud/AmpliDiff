@@ -12,7 +12,13 @@ git clone https://github.com/JaspervB-tud/AmpliDiff.git
 cd AmpliDiff/AmpliDiff
 python setup.py build_ext --inplace
 ```
-As of now, AmpliDiff uses [Gurobi](https://www.gurobi.com) to solve the primer feasibility and minimization problems.
+As of now, AmpliDiff uses [Gurobi](https://www.gurobi.com) to solve the primer feasibility and minimization problems. Gurobi requires an active license, and provides free academic licenses which can be obtained through their [website](https://www.gurobi.com/academia/academic-program-and-licenses/). The license requires an user to sign up by providing their:
+- Name
+- Email
+- Institution
+- Job title
+- Phone number
+After obtaining a license, Gurobi can be downloaded from their [website](https://www.gurobi.com/downloads/). It may be required to disable OS security checks in order to run the unsigned binaries from Gurobi to connect to the licensing server.
 
 ### Usage
 AmpliDiff requires the user to provide an Multiple Sequence Alignment in the form of a fasta file, and a metadata file in TSV format which has a header line containing a header with "lineage" that contains the lineages/strains/species of an entry. The first column should always be a sequence identifier which is used to assign classes to genomes in the MSA fasta file. Note that sequence IDs in the metadata should not contain "|" characters and should correspond exactly to the IDs in the fasta file.
@@ -24,7 +30,7 @@ AmpliDiff then has the following list of optional parameters:
 ##Amplicon parameters
 -aw                    : Amplicon width. Default is 200.
 -mm                    : Number of allowed mismatches during amplicon differentiation. Default is 0.
--mt                    : Number of allowed misalignment characters in an amplicon. Default is 20.
+-mt                    : Number of allowed misalignment characters in an amplicon. Default is -1 in which case 10% of the amplicon width is used.
 ##Primer parameters
 -pw                    : Primer size. Default is 25.
 -sw                    : Search window flanking an amplicon. Default is 50.
@@ -41,7 +47,7 @@ AmpliDiff then has the following list of optional parameters:
 --monorun_threshold    : Maximum allowed length of a single nucleotide run. Default is 3.
 --duorun_threshold     : Maximum allowed length of a double nucleotide run. Default is 3.
 --mfe_threshold        : Minimum required MFE for determining hairpin formation risk. Default is -5.
---self_complementarity_threshold : Maximum primer-primer complementarity in worst alignment between primers. Default is 10.
+--self_complementarity_threshold : Maximum primer-primer complementarity in any alignment between primers. Default is 10.
 ##Greedy algorithm parameters
 -amps                  : Number of amplicons to find. Default is 10.
 ##Sequence parameters
