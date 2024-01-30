@@ -68,7 +68,15 @@ AmpliDiff then has the following list of optional parameters:
 -c                     : Number of cores to use in multiprocessing mode. Default is 1 (no multiprocessing).
 -sd                    : Random seed to use when selecting subset of input sequences (only if -n is provided and smaller than actual number of sequences). Default is 0.
 ```
-
+Alternatively, you can refer to the following usage instructions:
+```
+usage: AmpliDiff.py [-h] [-o OUTPUT] [--primer_thresholds PRIMER_THRESHOLDS] [-aw AMPLICON_WIDTH] [-mm MAX_MISMATCHES] [-mt MAX_MISALIGN] [-pw PRIMER_WIDTH] [-sw SEARCH_WIDTH] [-cov COVERAGE] [-b BETA]
+                    [--max_primer_degeneracy MAX_PRIMER_DEGENERACY] [--gc_lb GC_LB] [--gc_ub GC_UB] [--melting_lb MELTING_LB] [--melting_ub MELTING_UB] [--end_at_threshold END_AT_THRESHOLD]
+                    [--end_gc_threshold END_GC_THRESHOLD] [--monorun_threshold MONORUN_THRESHOLD] [--duorun_threshold DUORUN_THRESHOLD] [--mfe_threshold MFE_THRESHOLD]
+                    [--self_complementarity_threshold SELF_COMPLEMENTARITY_THRESHOLD] [--max_temperature_difference MAX_TEMPERATURE_DIFFERENCE] [-amps NUM_AMPLICONS] [-n NUM_SEQUENCES]
+                    [--min_characters MIN_CHARACTERS] [--max_degeneracy MAX_DEGENERACY] [--max_n MAX_N] [-c CORES] [-sd SEED]
+                    sequences metadata
+```
 If both a primer threshold file and primer property thresholds are given through the CLI, AmpliDiff will prioritize threshold given through the CLI.
 
 AmpliDiff will output the following four files:
