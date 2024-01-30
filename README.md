@@ -13,6 +13,12 @@ cd AmpliDiff/AmpliDiff
 python setup.py build_ext --inplace
 ```
 
+#### ViennaRNA
+ViennaRNA has recently updated is base package and might not be available through bioconda for OSX anymore. It (although at version >= 2.6 instead of 2.5) can still be installed using pip by removing it from `environment_AmpliDiff.yml`, creating the environment containing the remaining packages, activating it and running the following:
+```
+pip install viennarna
+```
+
 #### Gurobi
 As of now, AmpliDiff uses [Gurobi](https://www.gurobi.com) to solve the primer feasibility and minimization problems. Gurobi requires an active license, and provides free academic licenses which can be obtained through their [website](https://www.gurobi.com/academia/academic-program-and-licenses/). The license requires an user to sign up by providing their:
 - Name
