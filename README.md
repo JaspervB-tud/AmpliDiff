@@ -12,6 +12,8 @@ git clone https://github.com/JaspervB-tud/AmpliDiff.git
 cd AmpliDiff/AmpliDiff
 python setup.py build_ext --inplace
 ```
+
+#### Gurobi
 As of now, AmpliDiff uses [Gurobi](https://www.gurobi.com) to solve the primer feasibility and minimization problems. Gurobi requires an active license, and provides free academic licenses which can be obtained through their [website](https://www.gurobi.com/academia/academic-program-and-licenses/). The license requires an user to sign up by providing their:
 - Name
 - Email
