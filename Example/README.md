@@ -18,11 +18,11 @@ Processing sequences
 Done processing sequences
 Couldn't read primer_thresholds.csv, using default thresholds or those supplied as command line arguments
 Generating primer index
-Initially contains 39096 forward primers
-Finally contains 3978 forward primers
+Initially contains 39321 forward primers
+Finally contains 3992 forward primers
 Removed 0 primers occurring both as forward and reverse
-Initially contains 39096 reverse primers
-Finally contains 4012 reverse primers
+Initially contains 39321 reverse primers
+Finally contains 4027 reverse primers
 Removed 0 primers occurring both as forward and reverse
 Done generating primer index
 Determining amplicon differentiabilities
