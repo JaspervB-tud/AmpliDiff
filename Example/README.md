@@ -12,7 +12,7 @@ Running the above command should give the following output:
 ```
 Reading sequences
 Done reading sequences
-Randomly selecting up to -1 sequences with seed=0
+Randomly selecting up to 25 sequences with seed=0
 Done selecting sequences
 Processing sequences
 Done processing sequences
