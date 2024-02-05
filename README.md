@@ -1,6 +1,7 @@
 # AmpliDiff
+AmpliDiff is a Python-based computational tool for Linux and OSX that simultaneously finds highly discriminatory genomic regions in viral genomes, as well as primers allowing for the amplification of these regions, which can be used in the context of metagenomic profiling. AmpliDiff works by greedily selecting amplicons capable of discriminating between the most pairs of genomes belonging to different classes. For every selected amplicon, a minimal set of primer pairs is selected that allow for the amplification of the amplicon in the input genomes.
 
-This repository contains the code for [AmpliDiff](https://www.biorxiv.org/content/10.1101/2023.07.22.550164v1), a Python tool for Linux and MacOS that finds amplicons and corresponding primers in viral genomes in order to differentiate between different groups (e.g. lineages or strains). 
+If you are using AmpliDiff, please cite our pre-print: AmpliDiff: An Optimized Amplicon Sequencing Approach to Estimating Lineage Abundances in Viral Metagenomes, J. van Bemmelen, D.S. Smyth, and J. Baaijens, bioRxiv (2023): 2023-07, doi:https://doi.org/10.1101/2023.07.22.550164
 
 ## Example
 The Example folder contains example data as well as instructions on how to run the tool on the example data.
